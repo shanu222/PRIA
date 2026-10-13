@@ -252,12 +252,36 @@ function speakChunks(
   const parts = chunksOf(text);
   return new Promise<void>((resolve) => {
     let index = 0;
-    const next = () => {
-      if (run !== runRef.current || index >= parts.length) {
-        resolve();
+    let token = 0;
+    let settled = false;
+    let remainder = "";
+    let heard = 0;
+    let appliedRate = voiceRef.current.rate;
+    let appliedVolume = voiceRef.current.volume;
+
+    const done = () => {
+      if (settled) return;
+      settled = true;
+      window.clearInterval(watch);
+      resolve();
+    };
+
+    const speak = (chunk: string) => {
+      if (run !== runRef.current) {
+        done();
         return;
       }
-      const utterance = new SpeechSynthesisUtterance(parts[index]);
+      const line = chunk.trim();
+      if (!line) {
+        window.setTimeout(next, 40);
+        return;
+      }
+      const mine = ++token;
+      remainder = line;
+      heard = 0;
+      appliedRate = voiceRef.current.rate;
+      appliedVolume = voiceRef.current.volume;
+      const utterance = new SpeechSynthesisUtterance(line);
       const voice = pickVoice(synth.getVoices());
       if (voice) {
         utterance.voice = voice;
@@ -265,25 +289,51 @@ function speakChunks(
       } else {
         utterance.lang = "en-GB";
       }
-      utterance.volume = voiceRef.current.volume;
-      utterance.rate = voiceRef.current.rate;
+      utterance.volume = appliedVolume;
+      utterance.rate = appliedRate;
       utterance.pitch = 1;
-      const part = parts[index];
-      index += 1;
-      let settled = false;
-      const finish = () => {
-        if (settled) return;
-        settled = true;
+      utterance.onboundary = (event) => {
+        if (mine !== token) return;
+        if (typeof event.charIndex === "number") heard = event.charIndex;
+      };
+      const advance = () => {
+        if (settled || mine !== token) return;
+        token += 1;
         window.setTimeout(next, 40);
       };
-      utterance.onend = finish;
-      utterance.onerror = finish;
-      const expected = Math.max(1800, (part.split(/\s+/).length / (2.2 * voiceRef.current.rate)) * 1000 + 900);
+      utterance.onend = advance;
+      utterance.onerror = advance;
+      const expected = Math.max(1600, (line.split(/\s+/).length / (2.2 * appliedRate)) * 1000 + 900);
       window.setTimeout(() => {
-        if (!settled && run === runRef.current && !synth.speaking) finish();
+        if (settled || mine !== token || run !== runRef.current) return;
+        if (!synth.speaking) advance();
       }, expected);
       synth.speak(utterance);
     };
+
+    const next = () => {
+      if (run !== runRef.current || index >= parts.length) {
+        done();
+        return;
+      }
+      const part = parts[index];
+      index += 1;
+      speak(part);
+    };
+
+    const watch = window.setInterval(() => {
+      if (settled || run !== runRef.current) {
+        if (run !== runRef.current) done();
+        return;
+      }
+      const { rate, volume } = voiceRef.current;
+      if (rate === appliedRate && volume === appliedVolume) return;
+      const rest = remainder.slice(heard).trim() || remainder;
+      token += 1;
+      synth.cancel();
+      speak(rest);
+    }, 180);
+
     synth.cancel();
     window.setTimeout(next, 50);
   });
