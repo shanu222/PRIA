@@ -10,10 +10,10 @@ const LABELS: Record<string, { text: string; at?: [number, number] }> = {
   balochistan: { text: "Balochistan" },
   sindh: { text: "Sindh" },
   punjab: { text: "Punjab" },
-  "khyber-pakhtunkhwa": { text: "Khyber Pakhtunkhwa", at: [560, 250] },
+  "khyber-pakhtunkhwa": { text: "Khyber Pakhtunkhwa", at: [549, 271] },
   "gilgit-baltistan": { text: "Gilgit-Baltistan" },
-  "azad-kashmir": { text: "AJK", at: [838, 222] },
-  islamabad: { text: "ICT", at: [742, 262] },
+  "azad-kashmir": { text: "AJK", at: [815, 241] },
+  islamabad: { text: "ICT", at: [724, 280] },
 };
 
 export type ProvinceFill = { fill: string; opacity?: number; stroke?: string; strokeWidth?: number };
