@@ -39,9 +39,15 @@ export default function HomePage() {
           <div>
             <LogoEmblem className="mb-6 h-16 w-16 lg:hidden" />
             <Reveal>
-              <p className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-white/90 backdrop-blur">
-                <span className="h-1.5 w-1.5 rounded-full bg-emerald-300" aria-hidden />
-                {hero.eyebrow}
+              <p className="relative inline-flex overflow-hidden rounded-full p-[2px] shadow-[0_8px_18px_-8px_rgba(217,119,6,0.85)]">
+                <span
+                  aria-hidden
+                  className="pointer-events-none absolute -inset-1/2 bg-[conic-gradient(from_90deg,#fde68a,#f97316,#fef3c7,#fbbf24,#fde68a)] motion-safe:animate-[spin_3.5s_linear_infinite]"
+                />
+                <span className="relative inline-flex items-center gap-2 rounded-full bg-gradient-to-b from-[#fde68a] via-[#fbbf24] to-[#d97706] px-3.5 py-1.5 text-xs font-semibold uppercase tracking-[0.14em] text-[#431407] shadow-[inset_0_1px_0_rgba(255,255,255,0.75),0_3px_0_#b45309]">
+                  <span className="h-1.5 w-1.5 rounded-full bg-[#b45309] shadow-[inset_0_1px_0_rgba(255,255,255,0.7)]" aria-hidden />
+                  {hero.eyebrow}
+                </span>
               </p>
             </Reveal>
             <Reveal delay={0.08}>
