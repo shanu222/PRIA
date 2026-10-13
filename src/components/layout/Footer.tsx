@@ -10,13 +10,13 @@ export function Footer() {
         .paindabad-stage { perspective: 900px; }
         .paindabad-card {
           position: relative;
+          isolation: isolate;
           display: inline-flex;
           align-items: center;
-          gap: 0.7rem;
-          padding: 0.45rem 0.9rem 0.45rem 0.45rem;
+          gap: 0.85rem;
+          padding: 0.55rem 1.05rem 0.55rem 0.55rem;
           border-radius: 1rem;
           background: linear-gradient(155deg, #fffef8 0%, #f4fff8 48%, #e4f6ee 100%);
-          transform-style: preserve-3d;
           animation: paindabad-float 4.8s ease-in-out infinite;
           box-shadow:
             inset 0 1px 0 rgba(255, 255, 255, 0.95),
@@ -28,6 +28,7 @@ export function Footer() {
         .paindabad-card::before {
           content: "";
           position: absolute;
+          z-index: 0;
           inset: -3px;
           border-radius: 1.15rem;
           padding: 3px;
@@ -39,61 +40,54 @@ export function Footer() {
           mask-composite: exclude;
           pointer-events: none;
         }
-        .paindabad-card::after {
-          content: "";
-          position: absolute;
-          inset: 0;
-          border-radius: inherit;
-          background: linear-gradient(110deg, transparent 32%, rgba(255, 255, 255, 0.72) 50%, transparent 68%);
-          background-size: 220% 100%;
-          animation: paindabad-sheen 3.4s ease-in-out infinite;
-          pointer-events: none;
-        }
         .paindabad-flag {
           position: relative;
           z-index: 1;
           display: block;
-          width: 54px;
-          height: 36px;
+          width: 78px;
+          height: 52px;
           flex: none;
-          border-radius: 4px;
-          box-shadow: 0 2px 0 rgba(1, 65, 28, 0.35);
-          transform-origin: left center;
+          overflow: hidden;
+          border-radius: 6px;
+          border: 2px solid #fff;
+          box-shadow: 0 0 0 2px #01411c, 0 3px 0 rgba(1, 65, 28, 0.35);
           animation: paindabad-wave 2.6s ease-in-out infinite;
+        }
+        .paindabad-flag svg {
+          display: block;
+          width: 100%;
+          height: 100%;
         }
         .paindabad-word {
           position: relative;
           z-index: 1;
+          margin: 0;
           font-family: var(--font-jakarta), ui-sans-serif, sans-serif;
           font-weight: 800;
-          font-size: clamp(0.78rem, 2.2vw, 1.05rem);
-          letter-spacing: 0.08em;
-          line-height: 1.15;
+          font-size: clamp(1rem, 2.5vw, 1.35rem);
+          letter-spacing: 0.06em;
+          line-height: 1;
           white-space: nowrap;
-          color: #fffdf6;
-          -webkit-text-stroke: 1.35px #01411c;
-          paint-order: stroke fill;
+          color: #013318;
           text-shadow:
-            1px 1px 0 #0b5d3b,
-            2px 2px 0 #12805a,
-            3px 3px 0 #c9a227,
-            4px 4px 0 #0e7490;
+            -1px -1px 0 #ffffff,
+            1px -1px 0 #ffffff,
+            -1px 1px 0 #ffffff,
+            1px 1px 0 #ffffff,
+            2px 3px 0 #c9a227,
+            3px 4px 0 #0e7490;
         }
         @keyframes paindabad-float {
-          0%, 100% { transform: rotateX(7deg) rotateY(-7deg) translateY(0); }
-          50% { transform: rotateX(2deg) rotateY(8deg) translateY(-5px); }
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-4px); }
         }
         @keyframes paindabad-border {
           0% { background-position: 0% 50%; }
           100% { background-position: 100% 50%; }
         }
-        @keyframes paindabad-sheen {
-          0% { background-position: 130% 0; }
-          100% { background-position: -130% 0; }
-        }
         @keyframes paindabad-wave {
-          0%, 100% { transform: perspective(180px) rotateY(0deg); }
-          50% { transform: perspective(180px) rotateY(16deg); }
+          0%, 100% { transform: rotate(-2deg); }
+          50% { transform: rotate(2deg); }
         }
       `}</style>
       <div className="relative mx-auto flex max-w-7xl flex-col items-center gap-4 px-6 pb-14 pt-10 text-center sm:flex-row sm:justify-between sm:text-left">
@@ -106,16 +100,18 @@ export function Footer() {
         </p>
         <div className="paindabad-stage">
           <div className="paindabad-card">
-            <svg className="paindabad-flag" viewBox="0 0 120 80" role="img" aria-label="Flag of Pakistan">
-              <rect width="120" height="80" fill="#01411C" />
-              <rect width="30" height="80" fill="#FFFFFF" />
-              <circle cx="57" cy="40" r="15" fill="#FFFFFF" />
-              <circle cx="63.5" cy="37.5" r="12.4" fill="#01411C" />
-              <polygon
-                fill="#FFFFFF"
-                points="91.12,30.50 88.50,34.07 90.91,37.78 86.70,36.40 83.92,39.84 83.94,35.41 79.80,33.82 84.02,32.47 84.25,28.05 86.84,31.65"
-              />
-            </svg>
+            <span className="paindabad-flag">
+              <svg viewBox="0 0 120 80" width="78" height="52" role="img" aria-label="Flag of Pakistan">
+                <rect width="120" height="80" fill="#01411C" />
+                <rect width="30" height="80" fill="#FFFFFF" />
+                <circle cx="62" cy="40" r="18" fill="#FFFFFF" />
+                <circle cx="69" cy="36" r="15" fill="#01411C" />
+                <polygon
+                  fill="#FFFFFF"
+                  points="96.8,31.8 93.2,36.3 96.1,41.2 90.7,39.1 86.9,43.4 87.3,37.7 82.0,35.4 87.6,33.9 88.1,28.2 91.2,33.0"
+                />
+              </svg>
+            </span>
             <p className="paindabad-word">{line}</p>
           </div>
         </div>
