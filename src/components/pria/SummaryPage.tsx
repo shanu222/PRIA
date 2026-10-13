@@ -4,6 +4,7 @@ import { getIcon } from "@/lib/icons";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { ContentPending } from "./ContentPending";
 import { Reveal } from "./Motion";
+import { SummaryReadAloud } from "./SummaryReadAloud";
 import { TopoPattern } from "./TopoPattern";
 
 export async function SummaryPage({ id, visionBanner = false }: { id: keyof typeof summary; visionBanner?: boolean }) {
@@ -27,11 +28,7 @@ export async function SummaryPage({ id, visionBanner = false }: { id: keyof type
       <Reveal>
         <article className="card-pro rounded-2xl bg-card p-6 sm:p-10">
           {block.paragraphs.length > 0 ? (
-            <div className="space-y-5 text-lg leading-relaxed text-foreground/90">
-              {block.paragraphs.map((p, i) => (
-                <p key={i}>{p}</p>
-              ))}
-            </div>
+            <SummaryReadAloud paragraphs={block.paragraphs} />
           ) : (
             <ContentPending
               size="lg"
