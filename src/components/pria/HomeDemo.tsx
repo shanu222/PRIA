@@ -52,8 +52,8 @@ function speakChunks(text: string, run: number, runRef: React.MutableRefObject<n
       } else {
         utterance.lang = "en-GB";
       }
-      utterance.rate = 0.96;
-      utterance.pitch = 1;
+      utterance.rate = 0.94;
+      utterance.pitch = 1.02;
       const part = parts[index];
       index += 1;
       let settled = false;
@@ -217,8 +217,9 @@ export function PageDemo() {
               </div>
               <ZoomShot sourceId={active.id} tick={step ?? 0} />
               <div className="rounded-2xl bg-white px-5 py-4 text-[#042f2e] shadow-lift">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-emerald-800">{active.title}</p>
-                <p className="mt-1 text-base leading-relaxed sm:text-lg">{active.script}</p>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-emerald-800">Curator’s note</p>
+                <p className="mt-1 font-heading text-lg font-semibold leading-snug">{active.title}</p>
+                <p className="mt-1 text-base leading-relaxed text-[#134e4a]">{active.gist}</p>
               </div>
             </div>
           </div>,
