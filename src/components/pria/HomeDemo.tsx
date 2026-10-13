@@ -8,7 +8,7 @@ import { Play, Square } from "lucide-react";
 import { pages } from "@/data/pria";
 import { Button } from "@/components/ui/button";
 import { stepsForPath, type DemoStep } from "./demo-steps";
-import { INTRO_SRC } from "./HomeIntro";
+import { INTRO_POSTER, INTRO_SRC } from "./HomeIntro";
 
 function pickVoice(voices: SpeechSynthesisVoice[]) {
   const scored = voices
@@ -50,6 +50,38 @@ function releaseMotion(root: HTMLElement) {
     if (el.style.translate) el.style.translate = "none";
     el.style.visibility = "visible";
   }
+}
+
+function paintVideos(source: HTMLElement, clone: HTMLElement) {
+  const from = source.querySelectorAll("video");
+  const to = clone.querySelectorAll("video");
+  from.forEach((src, index) => {
+    const dest = to[index];
+    if (!dest) return;
+    const width = src.videoWidth || src.clientWidth || 1280;
+    const height = src.videoHeight || src.clientHeight || 720;
+    if (src.readyState >= 2 && width > 0 && height > 0) {
+      const canvas = document.createElement("canvas");
+      canvas.width = width;
+      canvas.height = height;
+      canvas.className = dest.className;
+      canvas.style.width = "100%";
+      canvas.style.height = "auto";
+      canvas.style.objectFit = "cover";
+      canvas.style.backgroundImage = `url(${INTRO_POSTER})`;
+      canvas.style.backgroundSize = "cover";
+      try {
+        canvas.getContext("2d")?.drawImage(src, 0, 0, width, height);
+        dest.replaceWith(canvas);
+        return;
+      } catch {
+        /* The poster remains if the frame cannot be copied. */
+      }
+    }
+    dest.setAttribute("poster", INTRO_POSTER);
+    dest.muted = true;
+    dest.preload = "auto";
+  });
 }
 
 function copyCanvases(source: HTMLElement, clone: HTMLElement) {
@@ -366,11 +398,13 @@ function ZoomShot({ sourceId, tick }: { sourceId: string; tick: number }) {
     clone.style.maxWidth = "none";
     releaseMotion(clone);
     copyCanvases(source, clone);
+    paintVideos(source, clone);
     host.replaceChildren(clone);
     const again = window.setTimeout(() => {
       releaseMotion(clone);
       copyCanvases(source, clone);
-    }, 500);
+      paintVideos(source, clone);
+    }, 400);
     return () => window.clearTimeout(again);
   }, [sourceId, shot, tick]);
 
@@ -462,6 +496,7 @@ function IntroFilm({ volume, onDone }: { volume: number; onDone: () => void }) {
     if (!video) return;
     video.muted = false;
     video.volume = volume;
+    video.preload = "auto";
     void video.play().catch(() => undefined);
     void stage?.requestFullscreen?.().catch(() => undefined);
     return () => {
@@ -475,7 +510,16 @@ function IntroFilm({ volume, onDone }: { volume: number; onDone: () => void }) {
 
   return createPortal(
     <div ref={stageRef} className="fixed inset-0 z-[70] flex items-center justify-center bg-black">
-      <video ref={videoRef} src={INTRO_SRC} playsInline className="h-full w-full bg-black object-contain" onEnded={onDone} />
+      <video
+        ref={videoRef}
+        src={INTRO_SRC}
+        poster={INTRO_POSTER}
+        preload="auto"
+        playsInline
+        className="h-full w-full bg-black object-contain"
+        style={{ backgroundImage: `url(${INTRO_POSTER})`, backgroundSize: "contain", backgroundRepeat: "no-repeat", backgroundPosition: "center" }}
+        onEnded={onDone}
+      />
       <div className="absolute inset-x-0 top-0 flex items-center justify-between gap-3 bg-gradient-to-b from-black/70 to-transparent p-4">
         <p className="text-xs font-semibold uppercase tracking-[0.16em] text-white/85">PRIA introduction</p>
         <Button type="button" variant="outline" onClick={onDone} className="border-white/30 bg-white text-[#042f2e]">
