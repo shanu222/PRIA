@@ -113,6 +113,15 @@ export function SubSectionPanel({ segment, category }: { segment: Segment; categ
   const [activeId, setActiveId] = React.useState(category.subSections[0]?.id);
   const active = category.subSections.find((s) => s.id === activeId) ?? category.subSections[0];
 
+  React.useEffect(() => {
+    const onOpen = (event: Event) => {
+      const id = (event as CustomEvent<string>).detail;
+      if (category.subSections.some((sub) => sub.id === id)) setActiveId(id);
+    };
+    window.addEventListener("pria-demo-sub", onOpen);
+    return () => window.removeEventListener("pria-demo-sub", onOpen);
+  }, [category.subSections]);
+
   return (
     <>
       {/* Desktop: mini-nav + content */}
@@ -183,7 +192,10 @@ export function SubSectionPanel({ segment, category }: { segment: Segment; categ
       <Accordion
         type="single"
         collapsible
-        defaultValue={category.subSections[0]?.id}
+        value={activeId}
+        onValueChange={(value) => {
+          if (value) setActiveId(value);
+        }}
         className="rounded-xl border bg-card px-4 shadow-soft lg:hidden"
       >
         {category.subSections.map((sub) => (

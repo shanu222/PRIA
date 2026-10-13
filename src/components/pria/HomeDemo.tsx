@@ -7,7 +7,7 @@ import { motion } from "framer-motion";
 import { Pause, Play, Square } from "lucide-react";
 import { pages } from "@/data/pria";
 import { Button } from "@/components/ui/button";
-import { stepsForPath, type DemoStep } from "./demo-steps";
+import { demoCarryOn, markDemoCarry, stepsForPath, type DemoStep } from "./demo-steps";
 import { INTRO_POSTER, INTRO_SRC } from "./HomeIntro";
 
 function pickVoice(voices: SpeechSynthesisVoice[]) {
@@ -684,10 +684,10 @@ export function PageDemo() {
 
   React.useEffect(() => {
     const tourContinues = () => touringRef.current && modeRef.current === "all";
-    if (tourContinues() || carryRef.current) {
+    if (tourContinues() || carryRef.current || demoCarryOn()) {
       carryRef.current = false;
       return () => {
-        if (tourContinues() || carryRef.current) return;
+        if (tourContinues() || carryRef.current || demoCarryOn()) return;
         runRef.current += 1;
         stopMusic();
         window.speechSynthesis?.cancel();
@@ -704,7 +704,7 @@ export function PageDemo() {
     stopMusic();
     window.speechSynthesis?.cancel();
     return () => {
-      if (tourContinues() || carryRef.current) return;
+      if (tourContinues() || carryRef.current || demoCarryOn()) return;
       runRef.current += 1;
       stopMusic();
       window.speechSynthesis?.cancel();
@@ -724,11 +724,13 @@ export function PageDemo() {
     setTourMark(null);
     setStep(null);
     if (document.fullscreenElement) void document.exitFullscreen().catch(() => undefined);
+    markDemoCarry(false);
     window.speechSynthesis?.cancel();
     window.dispatchEvent(new CustomEvent("pria-demo-segment", { detail: null }));
   }, [releaseHold, stopMusic]);
 
   const explainPage = async (path: string, run: number) => {
+    try {
     const readyAt = Date.now() + 8000;
     let tour: DemoStep[] = [];
     while (run === runRef.current && Date.now() < readyAt) {
@@ -743,7 +745,7 @@ export function PageDemo() {
       if (run !== runRef.current) return;
       const current = tour[index];
       musicRef.current?.setScene(path, index);
-      current.prepare?.();
+      await current.prepare?.();
       let source = document.querySelector(`[data-demo="${current.id}"]`);
       if (current.prepare) {
         const foundBy = Date.now() + 2000;
@@ -763,6 +765,9 @@ export function PageDemo() {
       await wait(400, holdRef);
       if (run !== runRef.current) return;
       await speakChunks(current.script, run, runRef, voiceRef, holdRef);
+    }
+    } finally {
+      markDemoCarry(false);
     }
   };
 

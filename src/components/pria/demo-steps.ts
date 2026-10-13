@@ -2,15 +2,27 @@ import { provinces } from "@/data/census";
 import { evidenceSources } from "@/data/city-evidence";
 import { drimHazards, drimModels, drimSystems, getDrimModel } from "@/data/drim";
 import { outlookHeadlines } from "@/data/outlook";
-import { getCategory, getSegment, site } from "@/data/pria";
+import { getCategory, getSegment, site, type InfraCategory, type Segment, type SubSection } from "@/data/pria";
 
 export type DemoStep = {
   id: string;
   title: string;
   gist: string;
   script: string;
-  prepare?: () => void;
+  prepare?: () => void | boolean | Promise<void>;
 };
+
+const demoCarryKey = "__priaDemoCarry";
+
+export function markDemoCarry(on: boolean) {
+  if (typeof window === "undefined") return;
+  (window as unknown as Record<string, boolean>)[demoCarryKey] = on;
+}
+
+export function demoCarryOn() {
+  if (typeof window === "undefined") return false;
+  return Boolean((window as unknown as Record<string, boolean>)[demoCarryKey]);
+}
 
 const HOME: DemoStep[] = [
   {
@@ -471,6 +483,150 @@ const STATIC: Record<string, DemoStep[]> = {
   ],
 };
 
+function openCategory(segment: Segment, category: InfraCategory) {
+  return () =>
+    new Promise<void>((resolve) => {
+      const href = `/segments/${segment.slug}/${category.id}`;
+      if (typeof window === "undefined" || window.location.pathname === href) {
+        resolve();
+        return;
+      }
+      markDemoCarry(true);
+      document.querySelector<HTMLAnchorElement>(`a[href="${href}"]`)?.click();
+      const started = Date.now();
+      const tick = () => {
+        if (window.location.pathname === href || Date.now() - started > 5000) {
+          window.setTimeout(resolve, 350);
+          return;
+        }
+        window.setTimeout(tick, 50);
+      };
+      tick();
+    });
+}
+
+function openSub(id: string) {
+  return () => {
+    window.dispatchEvent(new CustomEvent("pria-demo-sub", { detail: id }));
+  };
+}
+
+function categoryScript(category: InfraCategory, segment: Segment) {
+  const ground = segment.shortTitle;
+  const lines: Record<string, { gist: string; script: string }> = {
+    residential: {
+      gist: "Homes, and the house models that belong only here.",
+      script: `Homes are the first question on the ${ground} ground. The hazard decides the house, and the DRIM models are the house answers. The other categories are not houses, and they do not borrow these models.`,
+    },
+    commercial: {
+      gist: "Markets and workplaces, where a failure fills a street.",
+      script: `Commerce on the ${ground} ground is the market and the workplace, not a house. The same hazard applies, but a failure gathers a street of people. Materials, design and construction are asked again for that public life.`,
+    },
+    communication: {
+      gist: "How the ground stays connected when a road fails.",
+      script: `Communication is how the ${ground} ground stays linked when a road, a bridge or a cable is lost. The question is a second path and a link that survives, not another building type.`,
+    },
+    strategic: {
+      gist: "The road, bridge, port or line the rest depends on.",
+      script: `Strategic infrastructure is what the rest of the ${ground} ground depends on: the road, the bridge, the embankment, the port or the power line. If it fails, the other categories cannot be reached or protected.`,
+    },
+    "private-sector": {
+      gist: "Whether the people who build will follow the hazard.",
+      script: `The private sector is who actually builds on the ${ground} ground. The question is whether approval, materials and site practice will follow the hazard, or quietly set it aside.`,
+    },
+    industrial: {
+      gist: "Plant and estates that must not spread a failure.",
+      script: `Industry is the plant, the mine or the estate on the ${ground} ground. It has to sit where this ground can bear it, and a failure must not spread into water, homes or the coast.`,
+    },
+  };
+  return (
+    lines[category.id] ?? {
+      gist: `${category.shortTitle} on this ground.`,
+      script: `${category.shortTitle} is one of the six questions asked of the ${ground} ground. It is the same question the other grounds answer, for a different kind of infrastructure.`,
+    }
+  );
+}
+
+function subScript(sub: SubSection, category: InfraCategory, segment: Segment) {
+  const ground = segment.shortTitle;
+  const kind = category.shortTitle.toLowerCase();
+  if (sub.id === "material-options") {
+    return {
+      gist: "What it should be made of, because of this hazard.",
+      script: `Materials are the first decision for ${kind} on the ${ground} ground. They are chosen because of the hazard, not because they are familiar. A material that is right on another ground is not automatically right here.`,
+    };
+  }
+  if (sub.id === "design-options") {
+    return category.id === "residential"
+      ? {
+          gist: "The house form, including the DRIM models.",
+          script: `Design for homes is where the DRIM models belong. They show a house that fits the ${ground} ground. The point is how it behaves under the hazard, not a style of building.`,
+        }
+      : {
+          gist: "Layout and structure, not a borrowed house model.",
+          script: `Design for ${kind} is not a house model. DRIM belongs to homes. Here, design means the layout and the structure that let this infrastructure survive the ${ground} hazard. The picture is that idea.`,
+        };
+  }
+  if (sub.id === "construction-methodology" || sub.id === "construction-methodologies") {
+    return {
+      gist: "How the work on site has to change.",
+      script: `Construction is how the work on site has to change for ${kind} on the ${ground} ground. A correct drawing still fails if the build ignores the hazard. This is the method, not a second design.`,
+    };
+  }
+  if (sub.id === "no-go-areas") {
+    return {
+      gist: "Where this ground must not be built on.",
+      script: `No-go areas are the protected places on the ${ground} ground. They are not spare land. Homes, and anything else, stay out of the paths the hazard already uses.`,
+    };
+  }
+  if (sub.id === "tourism-templates") {
+    return {
+      gist: "Visitor places follow the same limits.",
+      script: `Tourism does not get a lighter rule. Visitor places on the ${ground} ground follow the same limits as the rest of the segment. A guest house in the path of the hazard is still a building in that path.`,
+    };
+  }
+  if (sub.id === "maintenance") {
+    return {
+      gist: "What keeps the recommendation true after handover.",
+      script: `Maintenance is what keeps the recommendation alive after handover. Without it, a sound design on the ${ground} ground becomes the next failure.`,
+    };
+  }
+  if (sub.id === "e-infra-audit") {
+    return {
+      gist: "The periodic check, and who should make it.",
+      script: `The audit is the periodic look at ${kind} on the ${ground} ground: what to inspect, in what form, and which agency should do it. It is how the atlas stays honest after the project is built.`,
+    };
+  }
+  return {
+    gist: "What still belongs here, outside the other headings.",
+    script: `Other subjects are the remainder that still belongs to the ${ground} ground and does not fit the headings above. They are part of the brief, not an appendix to skip.`,
+  };
+}
+
+function optionSteps(segment: Segment): DemoStep[] {
+  return segment.categories.flatMap((category) => {
+    const introduced = categoryScript(category, segment);
+    const categoryStep: DemoStep = {
+      id: "tabs",
+      title: category.shortTitle,
+      gist: introduced.gist,
+      script: introduced.script,
+      prepare: openCategory(segment, category),
+    };
+    const subs = category.subSections.map((sub) => {
+      const spoken = subScript(sub, category, segment);
+      return {
+        id: "content",
+        title: sub.title,
+        gist: spoken.gist,
+        script: spoken.script,
+        prepare: openSub(sub.id),
+      };
+    });
+    return [categoryStep, ...subs];
+  });
+}
+
 function segmentSteps(slug: string, categoryId?: string): DemoStep[] {
   const segment = getSegment(slug);
   if (!segment) return [];
@@ -496,6 +652,7 @@ function segmentSteps(slug: string, categoryId?: string): DemoStep[] {
       gist: "Materials, design, method, and the limit on where to build.",
       script: `Read ${category.shortTitle.toLowerCase()} for ${segment.shortTitle} as a build brief. Materials and design, then how construction should change, where not to build, and the maintenance and audit that keep the advice alive. If a sub-section is still empty, the portal says so. It does not invent a recommendation.`,
     },
+    ...optionSteps(segment),
     {
       id: "hazards",
       title: "Why these rules",
