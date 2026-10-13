@@ -24,11 +24,31 @@ function SubSectionBody({
   const showDrim = category.id === "residential" && sub.id === "design-options";
   const showRoutes = sub.id === "tourism-templates";
   const showBuild = category.id === "residential" && sub.id === "construction-methodology";
-  if (sub.items.length === 0 && !showDrim && !showRoutes && !showBuild) {
+  const sketchKind =
+    category.id !== "residential" && sub.id === "design-options"
+      ? "design"
+      : category.id !== "residential" && sub.id === "construction-methodologies"
+        ? "build"
+        : null;
+  if (sub.items.length === 0 && !showDrim && !showRoutes && !showBuild && !sketchKind) {
     return <ContentPending title={sub.title} icon={getIcon(sub.icon)} accent={segment.color} />;
   }
   return (
     <div className="flex flex-col gap-8">
+      {sketchKind && (
+        <figure className="overflow-hidden rounded-2xl border-2 border-[color-mix(in_srgb,var(--seg)_25%,hsl(var(--border)))] bg-card shadow-soft">
+          <img
+            src={`/infra/${segment.id}-${category.id}-${sketchKind}.jpg`}
+            alt={`${segment.shortTitle} ${category.shortTitle}: ${sub.title}`}
+            className="aspect-video w-full object-cover"
+          />
+          <figcaption className="border-t px-4 py-2.5 text-xs leading-relaxed text-muted-foreground">
+            {sketchKind === "design" ? "Design options for this segment" : "Construction methodology for this segment"}
+            <span aria-hidden="true"> · </span>
+            {category.shortTitle}
+          </figcaption>
+        </figure>
+      )}
       {showDrim && <DrimStrip segment={segment} compact />}
       {sub.items.length > 0 && <ItemList sub={sub} />}
       {showRoutes && <NorthernRoutes key={segment.id} segmentId={segment.id} />}
