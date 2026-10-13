@@ -20,10 +20,19 @@ export default function HomePage() {
   return (
     <div className="mx-auto flex max-w-7xl flex-col gap-16 sm:gap-20">
       {/* Hero */}
-      <section className="relative isolate overflow-hidden rounded-3xl bg-[#07402A] px-6 py-14 text-white shadow-lift sm:px-12 sm:py-20 lg:px-14">
+      <section className="relative isolate overflow-hidden rounded-[1.7rem] p-[3px] shadow-[0_24px_60px_-28px_rgba(13,148,136,0.65)]">
         <div
           aria-hidden="true"
-          className="absolute inset-0 -z-10 bg-[radial-gradient(120%_90%_at_100%_0%,#0E7490_0%,transparent_55%),radial-gradient(90%_80%_at_0%_100%,#0B5D3B_0%,transparent_60%),linear-gradient(135deg,#063521,#0B5D3B)]"
+          className="pointer-events-none absolute -inset-1/2 bg-[conic-gradient(from_90deg,#99f6e4,#2dd4bf,#fbbf24,#22d3ee,#5eead4,#99f6e4)] motion-safe:animate-[spin_8s_linear_infinite]"
+        />
+        <div className="relative isolate overflow-hidden rounded-[1.5rem] bg-[#042f2e] px-6 py-14 text-white sm:px-12 sm:py-20 lg:px-14">
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 -z-10 bg-[radial-gradient(120%_90%_at_100%_0%,#0f766e_0%,transparent_52%),radial-gradient(80%_80%_at_0%_100%,#115e59_0%,transparent_58%),linear-gradient(145deg,#042f2e_0%,#0f766e_55%,#134e4a_100%)]"
+        />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -right-20 -top-24 -z-10 h-80 w-80 rounded-full bg-teal-300/25 blur-3xl motion-safe:animate-glow-pulse"
         />
         <TopoPattern className="-z-10 text-white opacity-[0.14]" />
         <div className="grid items-center gap-12 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
@@ -66,7 +75,11 @@ export default function HomePage() {
               {[0, 1, 2, 3].map((i) => (
                 <span
                   key={i}
-                  className="absolute rounded-full border border-white/15"
+                  className={
+                    i % 2 === 0
+                      ? "absolute rounded-full border border-dashed border-teal-100/35 motion-safe:animate-[spin_28s_linear_infinite]"
+                      : "absolute rounded-full border border-dashed border-amber-200/30 motion-safe:animate-[spin_36s_linear_infinite_reverse]"
+                  }
                   style={{ inset: `${i * 12}%` }}
                 />
               ))}
@@ -77,11 +90,12 @@ export default function HomePage() {
               <span className="absolute left-[6%] top-[46%] rounded-full bg-white/10 px-2.5 py-1 text-xs font-semibold ring-1 ring-white/25 backdrop-blur">
                 {from.year}
               </span>
-              <span className="absolute bottom-[8%] right-[2%] max-w-[9rem] rounded-xl bg-white px-3 py-2 text-xs font-semibold text-[#0B5D3B] shadow-lg">
+              <span className="absolute bottom-[8%] right-[2%] max-w-[9rem] rounded-xl bg-white px-3 py-2 text-xs font-semibold text-[#115e59] shadow-lg">
                 {to.label}
               </span>
             </div>
           </Reveal>
+        </div>
         </div>
       </section>
 
