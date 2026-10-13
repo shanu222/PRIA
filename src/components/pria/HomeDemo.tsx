@@ -4,7 +4,7 @@ import * as React from "react";
 import { createPortal } from "react-dom";
 import { usePathname, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { Play, Square } from "lucide-react";
+import { Pause, Play, Square } from "lucide-react";
 import { pages } from "@/data/pria";
 import { Button } from "@/components/ui/button";
 import { stepsForPath, type DemoStep } from "./demo-steps";
@@ -32,8 +32,35 @@ function chunksOf(text: string) {
   return parts.length > 0 ? parts : [text];
 }
 
-function wait(ms: number) {
-  return new Promise((resolve) => window.setTimeout(resolve, ms));
+type Hold = {
+  paused: boolean;
+  waiters: Array<() => void>;
+  onResume: (() => void) | null;
+};
+
+function wait(ms: number, hold?: React.MutableRefObject<Hold>) {
+  return new Promise<void>((resolve) => {
+    let elapsed = 0;
+    let mark = Date.now();
+    const step = () => {
+      if (hold?.current.paused) {
+        elapsed += Date.now() - mark;
+        hold.current.waiters.push(() => {
+          mark = Date.now();
+          step();
+        });
+        return;
+      }
+      elapsed += Date.now() - mark;
+      mark = Date.now();
+      if (elapsed >= ms) {
+        resolve();
+        return;
+      }
+      window.setTimeout(step, Math.min(80, ms - elapsed));
+    };
+    step();
+  });
 }
 
 /** Framer Motion leaves off-screen sections at opacity 0. A clone would otherwise be a blank card. */
@@ -118,7 +145,12 @@ function sceneFor(pathname: string): Scene {
   return { root: 87.3, intervals: [0, 5, 12, 17], pace: 2500, air: 660 };
 }
 
-type Score = { setScene: (pathname: string, step: number) => void; stop: () => void };
+type Score = {
+  setScene: (pathname: string, step: number) => void;
+  pause: () => void;
+  resume: () => void;
+  stop: () => void;
+};
 
 function createScore(): Score {
   const ctx = new window.AudioContext();
@@ -197,8 +229,10 @@ function createScore(): Score {
     warm.frequency.linearRampToValueAtTime(scene.air, time + 0.9);
   };
 
+  let held = false;
+
   const playNote = () => {
-    if (stopped) return;
+    if (stopped || held) return;
     const semi = scene.intervals[cursor % scene.intervals.length];
     cursor += 1;
     let tone = scene.root * 2 ** (semi / 12);
@@ -236,6 +270,14 @@ function createScore(): Score {
       retune();
       arm();
       playNote();
+    },
+    pause() {
+      held = true;
+      void ctx.suspend();
+    },
+    resume() {
+      held = false;
+      void ctx.resume();
     },
     stop() {
       if (stopped) return;
@@ -279,6 +321,7 @@ function speakChunks(
   run: number,
   runRef: React.MutableRefObject<number>,
   voiceRef: React.MutableRefObject<{ rate: number; volume: number }>,
+  hold: React.MutableRefObject<Hold>,
 ) {
   const synth = window.speechSynthesis;
   const parts = chunksOf(text);
@@ -294,13 +337,33 @@ function speakChunks(
     const done = () => {
       if (settled) return;
       settled = true;
+      if (hold.current.onResume === onResume) hold.current.onResume = null;
       window.clearInterval(watch);
       resolve();
     };
 
+    const onResume = () => {
+      if (settled || run !== runRef.current) return;
+      const { rate, volume } = voiceRef.current;
+      if (synth.paused && rate === appliedRate && volume === appliedVolume) {
+        synth.resume();
+        return;
+      }
+      const rest = remainder.slice(heard).trim() || remainder;
+      if (!rest || synth.speaking) return;
+      token += 1;
+      synth.cancel();
+      speak(rest);
+    };
+    hold.current.onResume = onResume;
+
     const speak = (chunk: string) => {
       if (run !== runRef.current) {
         done();
+        return;
+      }
+      if (hold.current.paused) {
+        hold.current.waiters.push(() => speak(chunk));
         return;
       }
       const line = chunk.trim();
@@ -336,16 +399,27 @@ function speakChunks(
       utterance.onend = advance;
       utterance.onerror = advance;
       const expected = Math.max(1600, (line.split(/\s+/).length / (2.2 * appliedRate)) * 1000 + 900);
-      window.setTimeout(() => {
-        if (settled || mine !== token || run !== runRef.current) return;
-        if (!synth.speaking) advance();
-      }, expected);
+      const guard = () => {
+        window.setTimeout(() => {
+          if (settled || mine !== token || run !== runRef.current) return;
+          if (hold.current.paused || synth.paused) {
+            guard();
+            return;
+          }
+          if (!synth.speaking) advance();
+        }, expected);
+      };
+      guard();
       synth.speak(utterance);
     };
 
     const next = () => {
       if (run !== runRef.current || index >= parts.length) {
         done();
+        return;
+      }
+      if (hold.current.paused) {
+        hold.current.waiters.push(next);
         return;
       }
       const part = parts[index];
@@ -358,6 +432,7 @@ function speakChunks(
         if (run !== runRef.current) done();
         return;
       }
+      if (hold.current.paused) return;
       const { rate, volume } = voiceRef.current;
       if (rate === appliedRate && volume === appliedVolume) return;
       const rest = remainder.slice(heard).trim() || remainder;
@@ -486,13 +561,26 @@ function VoiceControls({
   );
 }
 
-function IntroFilm({ volume, onDone }: { volume: number; onDone: () => void }) {
+function IntroFilm({
+  volume,
+  paused,
+  onPause,
+  onDone,
+  controlRef,
+}: {
+  volume: number;
+  paused: boolean;
+  onPause: () => void;
+  onDone: () => void;
+  controlRef: React.MutableRefObject<HTMLVideoElement | null>;
+}) {
   const videoRef = React.useRef<HTMLVideoElement>(null);
   const stageRef = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
     const video = videoRef.current;
     const stage = stageRef.current;
+    controlRef.current = video;
     if (!video) return;
     video.muted = false;
     video.volume = volume;
@@ -500,9 +588,10 @@ function IntroFilm({ volume, onDone }: { volume: number; onDone: () => void }) {
     void video.play().catch(() => undefined);
     void stage?.requestFullscreen?.().catch(() => undefined);
     return () => {
+      controlRef.current = null;
       if (document.fullscreenElement) void document.exitFullscreen().catch(() => undefined);
     };
-  }, []);
+  }, [controlRef]);
 
   React.useEffect(() => {
     if (videoRef.current) videoRef.current.volume = volume;
@@ -522,9 +611,14 @@ function IntroFilm({ volume, onDone }: { volume: number; onDone: () => void }) {
       />
       <div className="absolute inset-x-0 top-0 flex items-center justify-between gap-3 bg-gradient-to-b from-black/70 to-transparent p-4">
         <p className="text-xs font-semibold uppercase tracking-[0.16em] text-white/85">PRIA introduction</p>
-        <Button type="button" variant="outline" onClick={onDone} className="border-white/30 bg-white text-[#042f2e]">
-          Continue
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button type="button" variant="outline" onClick={onPause} className="border-white/30 bg-white text-[#042f2e]">
+            {paused ? <Play /> : <Pause />} {paused ? "Resume" : "Pause"}
+          </Button>
+          <Button type="button" variant="outline" onClick={onDone} className="border-white/30 bg-white text-[#042f2e]">
+            Continue
+          </Button>
+        </div>
       </div>
     </div>,
     document.body,
@@ -540,12 +634,39 @@ export function PageDemo() {
   const [tourMark, setTourMark] = React.useState<{ mode: "page" | "all"; index: number; total: number } | null>(null);
   const [mounted, setMounted] = React.useState(false);
   const [intro, setIntro] = React.useState(false);
+  const [paused, setPaused] = React.useState(false);
   const [rate, setRate] = React.useState(1);
   const [volume, setVolume] = React.useState(1);
   const runRef = React.useRef(0);
   const carryRef = React.useRef(false);
   const musicRef = React.useRef<Score | null>(null);
   const introDone = React.useRef<(() => void) | null>(null);
+  const introVideoRef = React.useRef<HTMLVideoElement | null>(null);
+  const holdRef = React.useRef<Hold>({ paused: false, waiters: [], onResume: null });
+
+  const releaseHold = React.useCallback(() => {
+    holdRef.current.paused = false;
+    setPaused(false);
+    const waiting = holdRef.current.waiters.splice(0);
+    waiting.forEach((resume) => resume());
+  }, []);
+
+  const togglePause = React.useCallback(() => {
+    const next = !holdRef.current.paused;
+    holdRef.current.paused = next;
+    setPaused(next);
+    if (next) {
+      window.speechSynthesis?.pause();
+      introVideoRef.current?.pause();
+      musicRef.current?.pause();
+      return;
+    }
+    musicRef.current?.resume();
+    void introVideoRef.current?.play().catch(() => undefined);
+    const waiting = holdRef.current.waiters.splice(0);
+    waiting.forEach((resume) => resume());
+    holdRef.current.onResume?.();
+  }, []);
   const voiceRef = React.useRef({ rate: 1, volume: 1 });
   voiceRef.current = { rate, volume };
 
@@ -569,6 +690,7 @@ export function PageDemo() {
       setTourMark(null);
       introDone.current?.();
       introDone.current = null;
+      releaseHold();
       runRef.current += 1;
       stopMusic();
       window.speechSynthesis?.cancel();
@@ -579,12 +701,13 @@ export function PageDemo() {
       stopMusic();
       window.speechSynthesis?.cancel();
     };
-  }, [pathname, stopMusic]);
+  }, [pathname, releaseHold, stopMusic]);
 
   const finish = React.useCallback(() => {
     runRef.current += 1;
     introDone.current?.();
     introDone.current = null;
+    releaseHold();
     stopMusic();
     setRunning(false);
     setIntro(false);
@@ -593,7 +716,7 @@ export function PageDemo() {
     if (document.fullscreenElement) void document.exitFullscreen().catch(() => undefined);
     window.speechSynthesis?.cancel();
     window.dispatchEvent(new CustomEvent("pria-demo-segment", { detail: null }));
-  }, [stopMusic]);
+  }, [releaseHold, stopMusic]);
 
   const explainPage = async (path: string, run: number) => {
     const readyAt = Date.now() + 8000;
@@ -603,7 +726,7 @@ export function PageDemo() {
         tour = stepsForPath(path);
         if (tour.length > 0 && document.querySelector("[data-demo]")) break;
       }
-      await wait(80);
+      await wait(80, holdRef);
     }
     if (run !== runRef.current) return;
     for (let index = 0; index < tour.length; index++) {
@@ -615,21 +738,21 @@ export function PageDemo() {
       if (current.prepare) {
         const foundBy = Date.now() + 2000;
         while (run === runRef.current && Date.now() < foundBy && !source) {
-          await wait(100);
+          await wait(100, holdRef);
           source = document.querySelector(`[data-demo="${current.id}"]`);
         }
-        await wait(450);
+        await wait(450, holdRef);
         source = document.querySelector(`[data-demo="${current.id}"]`);
       }
       if (run !== runRef.current) return;
       if (!source) continue;
       source.scrollIntoView({ behavior: "auto", block: "center" });
-      await wait(700);
+      await wait(700, holdRef);
       if (run !== runRef.current) return;
       setStep(index);
-      await wait(400);
+      await wait(400, holdRef);
       if (run !== runRef.current) return;
-      await speakChunks(current.script, run, runRef, voiceRef);
+      await speakChunks(current.script, run, runRef, voiceRef, holdRef);
     }
   };
 
@@ -664,9 +787,9 @@ export function PageDemo() {
         router.push(path);
         const readyAt = Date.now() + 8000;
         while (run === runRef.current && window.location.pathname !== path && Date.now() < readyAt) {
-          await wait(50);
+          await wait(50, holdRef);
         }
-        await wait(600);
+        await wait(600, holdRef);
       }
       if (run !== runRef.current) return;
       await explainPage(path, run);
@@ -679,7 +802,15 @@ export function PageDemo() {
 
   return (
     <>
-      {mounted && intro && <IntroFilm volume={volume} onDone={() => introDone.current?.()} />}
+      {mounted && intro && (
+        <IntroFilm
+          volume={volume}
+          paused={paused}
+          onPause={togglePause}
+          controlRef={introVideoRef}
+          onDone={() => introDone.current?.()}
+        />
+      )}
       {!running && (
         <div className="fixed bottom-5 right-5 z-40 flex max-w-[calc(100vw-1.5rem)] flex-col items-end gap-2">
           <div className="flex items-center gap-2 rounded-2xl border bg-card/95 px-3 py-2 shadow-lift backdrop-blur">
@@ -712,6 +843,9 @@ export function PageDemo() {
                   {active ? ` · ${(step ?? 0) + 1} of ${steps.length}` : ""}
                 </p>
                 <VoiceControls rate={rate} volume={volume} onRate={setRate} onVolume={setVolume} onDark />
+                <Button type="button" variant="outline" onClick={togglePause} className="border-white/30 bg-white text-[#042f2e]">
+                  {paused ? <Play /> : <Pause />} {paused ? "Resume" : "Pause"}
+                </Button>
                 <Button type="button" variant="outline" onClick={finish} className="border-white/30 bg-white text-[#042f2e]">
                   <Square /> Stop
                 </Button>
