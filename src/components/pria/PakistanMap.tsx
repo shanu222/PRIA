@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { Info } from "lucide-react";
-import { MAP_VIEWBOX, provinceShapes } from "@/data/pakistan-geo";
+import { MAP_VIEWBOX, kashmirShape, provinceShapes } from "@/data/pakistan-geo";
 import { fmtInt, getProvince, type ProvinceCensus } from "@/data/census";
 import { cn } from "@/lib/utils";
 
@@ -12,7 +12,7 @@ const LABELS: Record<string, { text: string; at?: [number, number] }> = {
   punjab: { text: "Punjab" },
   "khyber-pakhtunkhwa": { text: "Khyber Pakhtunkhwa", at: [549, 271] },
   "gilgit-baltistan": { text: "Gilgit-Baltistan" },
-  "azad-kashmir": { text: "AJK", at: [815, 241] },
+  "azad-kashmir": { text: "AJK", at: [742, 236] },
   islamabad: { text: "ICT", at: [724, 280] },
 };
 
@@ -58,6 +58,15 @@ export function PakistanMap({
           <feDropShadow dx="0" dy="6" stdDeviation="8" floodOpacity="0.22" />
         </filter>
       </defs>
+      <path
+        d={kashmirShape.d}
+        fill="hsl(var(--primary))"
+        fillOpacity={0.2}
+        stroke="none"
+        fillRule="evenodd"
+        pointerEvents="none"
+        aria-hidden
+      />
       {ordered.map((shape) => {
         const province = getProvince(shape.id);
         const f = fills(shape.id);
@@ -90,6 +99,16 @@ export function PakistanMap({
           />
         );
       })}
+      <path
+        d={kashmirShape.d}
+        fill="none"
+        stroke="#b45309"
+        strokeWidth={4}
+        strokeLinejoin="round"
+        fillRule="evenodd"
+        pointerEvents="none"
+        aria-hidden
+      />
       <g pointerEvents="none" aria-hidden="true">
         {provinceShapes.map((shape) => {
           const label = LABELS[shape.id];
@@ -110,6 +129,18 @@ export function PakistanMap({
             </text>
           );
         })}
+        <text
+          x={kashmirShape.label[0]}
+          y={kashmirShape.label[1]}
+          textAnchor="middle"
+          dominantBaseline="central"
+          fontSize={20}
+          fontWeight={700}
+          className="fill-foreground/75 font-heading"
+          style={{ paintOrder: "stroke", stroke: "hsl(var(--card))", strokeWidth: 4, strokeOpacity: 0.8 }}
+        >
+          Kashmir
+        </text>
       </g>
       {children}
     </svg>
