@@ -635,10 +635,13 @@ export function PageDemo() {
   const [mounted, setMounted] = React.useState(false);
   const [intro, setIntro] = React.useState(false);
   const [paused, setPaused] = React.useState(false);
+  const [menuOpen, setMenuOpen] = React.useState(false);
   const [rate, setRate] = React.useState(1);
   const [volume, setVolume] = React.useState(1);
   const runRef = React.useRef(0);
   const carryRef = React.useRef(false);
+  const touringRef = React.useRef(false);
+  const modeRef = React.useRef<"page" | "all" | null>(null);
   const musicRef = React.useRef<Score | null>(null);
   const introDone = React.useRef<(() => void) | null>(null);
   const introVideoRef = React.useRef<HTMLVideoElement | null>(null);
@@ -680,23 +683,28 @@ export function PageDemo() {
   }, []);
 
   React.useEffect(() => {
-    if (carryRef.current) {
+    const tourContinues = () => touringRef.current && modeRef.current === "all";
+    if (tourContinues() || carryRef.current) {
       carryRef.current = false;
-      setStep(null);
-    } else {
-      setStep(null);
-      setRunning(false);
-      setIntro(false);
-      setTourMark(null);
-      introDone.current?.();
-      introDone.current = null;
-      releaseHold();
-      runRef.current += 1;
-      stopMusic();
-      window.speechSynthesis?.cancel();
+      return () => {
+        if (tourContinues() || carryRef.current) return;
+        runRef.current += 1;
+        stopMusic();
+        window.speechSynthesis?.cancel();
+      };
     }
+    setStep(null);
+    setRunning(false);
+    setIntro(false);
+    setTourMark(null);
+    introDone.current?.();
+    introDone.current = null;
+    releaseHold();
+    runRef.current += 1;
+    stopMusic();
+    window.speechSynthesis?.cancel();
     return () => {
-      if (carryRef.current) return;
+      if (tourContinues() || carryRef.current) return;
       runRef.current += 1;
       stopMusic();
       window.speechSynthesis?.cancel();
@@ -704,6 +712,8 @@ export function PageDemo() {
   }, [pathname, releaseHold, stopMusic]);
 
   const finish = React.useCallback(() => {
+    touringRef.current = false;
+    modeRef.current = null;
     runRef.current += 1;
     introDone.current?.();
     introDone.current = null;
@@ -758,7 +768,10 @@ export function PageDemo() {
 
   const start = async (mode: "page" | "all") => {
     const run = ++runRef.current;
+    touringRef.current = true;
+    modeRef.current = mode;
     const paths = mode === "page" ? [window.location.pathname] : portalTour(window.location.pathname);
+    setMenuOpen(false);
     setRunning(true);
     setIntro(true);
     setTourMark({ mode, index: 0, total: paths.length });
@@ -813,20 +826,29 @@ export function PageDemo() {
       )}
       {!running && (
         <div className="fixed bottom-5 right-5 z-40 flex max-w-[calc(100vw-1.5rem)] flex-col items-end gap-2">
-          <div className="flex items-center gap-2 rounded-2xl border bg-card/95 px-3 py-2 shadow-lift backdrop-blur">
-            <VoiceControls rate={rate} volume={volume} onRate={setRate} onVolume={setVolume} />
-          </div>
-          <div className="flex items-center gap-2 rounded-full border bg-card/95 p-1.5 shadow-lift backdrop-blur">
-            <span className="hidden pl-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground sm:inline">
-              Demo
-            </span>
-            <Button type="button" size="sm" className="rounded-full" onClick={() => void start("page")}>
-              <Play /> This page
-            </Button>
-            <Button type="button" size="sm" variant="outline" className="rounded-full" onClick={() => void start("all")}>
-              All pages
-            </Button>
-          </div>
+          {menuOpen && (
+            <>
+              <div className="flex items-center gap-2 rounded-2xl border bg-card/95 px-3 py-2 shadow-lift backdrop-blur">
+                <VoiceControls rate={rate} volume={volume} onRate={setRate} onVolume={setVolume} />
+              </div>
+              <div className="flex items-center gap-2 rounded-full border bg-card/95 p-1.5 shadow-lift backdrop-blur">
+                <Button type="button" size="sm" className="rounded-full" onClick={() => void start("page")}>
+                  <Play /> This page
+                </Button>
+                <Button type="button" size="sm" variant="outline" className="rounded-full" onClick={() => void start("all")}>
+                  All pages
+                </Button>
+              </div>
+            </>
+          )}
+          <Button
+            type="button"
+            className="rounded-full shadow-lift"
+            aria-expanded={menuOpen}
+            onClick={() => setMenuOpen((open) => !open)}
+          >
+            <Play /> Demo
+          </Button>
         </div>
       )}
       {mounted &&
