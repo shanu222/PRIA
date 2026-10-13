@@ -6,11 +6,33 @@ import { Button } from "@/components/ui/button";
 
 type Status = "idle" | "playing" | "paused";
 
+const MAX_CHUNK = 140;
+
 function splitSentences(paragraph: string) {
-  return paragraph
+  const sentences = paragraph
     .split(/(?<=[.!?])\s+(?=[A-Z“"])/)
     .map((sentence) => sentence.trim())
     .filter(Boolean);
+  const chunks: string[] = [];
+  for (const sentence of sentences) {
+    if (sentence.length <= MAX_CHUNK) {
+      chunks.push(sentence);
+      continue;
+    }
+    const clauses = sentence.split(/(?<=[,;:—])\s+/);
+    let buffer = "";
+    for (const clause of clauses) {
+      const next = buffer ? `${buffer} ${clause}` : clause;
+      if (buffer && next.length > MAX_CHUNK) {
+        chunks.push(buffer);
+        buffer = clause;
+      } else {
+        buffer = next;
+      }
+    }
+    if (buffer) chunks.push(buffer);
+  }
+  return chunks;
 }
 
 function scoreVoice(voice: SpeechSynthesisVoice) {
@@ -18,7 +40,9 @@ function scoreVoice(voice: SpeechSynthesisVoice) {
   const lang = voice.lang.toLowerCase();
   if (!lang.startsWith("en")) return -1;
   let score = 0;
-  if (name.includes("natural") || name.includes("neural")) score += 12;
+  if (voice.localService) score += 10;
+  if (!voice.localService) score -= 6;
+  if (name.includes("natural") || name.includes("neural")) score += 4;
   if (name.includes("premium") || name.includes("enhanced")) score += 6;
   if (lang.startsWith("en-gb")) score += 4;
   if (lang.startsWith("en-us")) score += 3;
@@ -75,6 +99,12 @@ export function SummaryReadAloud({ paragraphs }: { paragraphs: string[] }) {
   const statusRef = React.useRef<Status>("idle");
   const activeRef = React.useRef<HTMLSpanElement>(null);
   const utteranceRef = React.useRef<SpeechSynthesisUtterance | null>(null);
+  const indexRef = React.useRef(0);
+  const watchRef = React.useRef<number | null>(null);
+  const chunkStarted = React.useRef(0);
+  const retried = React.useRef(false);
+  const lastResume = React.useRef(0);
+  const utterGen = React.useRef(0);
 
   React.useEffect(() => {
     statusRef.current = status;
@@ -84,6 +114,7 @@ export function SummaryReadAloud({ paragraphs }: { paragraphs: string[] }) {
     setSupported(typeof window !== "undefined" && "speechSynthesis" in window);
     return () => {
       runId.current += 1;
+      if (watchRef.current) window.clearInterval(watchRef.current);
       window.speechSynthesis?.cancel();
     };
   }, []);
@@ -92,14 +123,20 @@ export function SummaryReadAloud({ paragraphs }: { paragraphs: string[] }) {
     activeRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
   }, [activeIndex]);
 
+  const clearWatch = React.useCallback(() => {
+    if (watchRef.current) window.clearInterval(watchRef.current);
+    watchRef.current = null;
+  }, []);
+
   const stop = React.useCallback(() => {
     runId.current += 1;
+    clearWatch();
     window.speechSynthesis?.cancel();
     statusRef.current = "idle";
     setStatus("idle");
     setActiveIndex(null);
     setWord(null);
-  }, []);
+  }, [clearWatch]);
 
   const speakFrom = React.useCallback(
     async (index: number) => {
@@ -137,30 +174,69 @@ export function SummaryReadAloud({ paragraphs }: { paragraphs: string[] }) {
       }
       utterance.rate = 0.95;
       utterance.pitch = 1;
-      utterance.onboundary = (event) => {
-        if (run !== runId.current || event.name !== "word") return;
-        setWord(wordAt(text, event.charIndex));
-      };
-      utterance.onend = () => {
+      const mine = ++utterGen.current;
+      const advance = () => {
+        if (mine !== utterGen.current) return;
         if (run !== runId.current || statusRef.current !== "playing") return;
+        if (indexRef.current !== index) return;
+        retried.current = false;
+        indexRef.current = index + 1;
+        clearWatch();
         window.setTimeout(() => {
           if (run !== runId.current) return;
           void speakFrom(index + 1);
-        }, 40);
+        }, 50);
       };
+      utterance.onboundary = (event) => {
+        if (mine !== utterGen.current || run !== runId.current || event.name !== "word") return;
+        setWord(wordAt(text, event.charIndex));
+      };
+      utterance.onend = () => advance();
       utterance.onerror = (event) => {
-        if (run !== runId.current) return;
+        if (mine !== utterGen.current || run !== runId.current) return;
         if (event.error === "interrupted" || event.error === "canceled") return;
-        stop();
+        advance();
       };
+      if (indexRef.current !== index) retried.current = false;
+      indexRef.current = index;
+      chunkStarted.current = Date.now();
+      lastResume.current = Date.now();
       setActiveIndex(index);
       setWord(null);
       statusRef.current = "playing";
       setStatus("playing");
       utteranceRef.current = utterance;
+      const words = text.split(/\s+/).length;
+      const expected = Math.max(2200, (words / 2.1) * 1000 + 700);
+      clearWatch();
+      watchRef.current = window.setInterval(() => {
+        if (run !== runId.current || statusRef.current !== "playing" || indexRef.current !== index) return;
+        if (synth.paused) return;
+        if (synth.speaking) {
+          if (Date.now() - lastResume.current > 8000) {
+            synth.resume();
+            lastResume.current = Date.now();
+          }
+          return;
+        }
+        const elapsed = Date.now() - chunkStarted.current;
+        if (elapsed < 600) return;
+        if (elapsed < expected * 0.55 && !retried.current) {
+          retried.current = true;
+          utterGen.current += 1;
+          clearWatch();
+          synth.cancel();
+          window.setTimeout(() => {
+            if (run !== runId.current || indexRef.current !== index) return;
+            void speakFrom(index);
+          }, 60);
+          return;
+        }
+        advance();
+      }, 500);
       synth.speak(utterance);
     },
-    [sentences, stop],
+    [sentences, stop, clearWatch],
   );
 
   const onRead = () => {
@@ -176,6 +252,11 @@ export function SummaryReadAloud({ paragraphs }: { paragraphs: string[] }) {
       synth.resume();
       statusRef.current = "playing";
       setStatus("playing");
+      const index = indexRef.current;
+      window.setTimeout(() => {
+        if (statusRef.current !== "playing" || indexRef.current !== index) return;
+        if (!synth.speaking) void speakFrom(index);
+      }, 250);
       return;
     }
     const run = runId.current + 1;
