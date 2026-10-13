@@ -1,0 +1,14 @@
+node_modules
+.next
+out
+next-env.d.ts
+*.tsbuildinfo
+.env*.local
+.env
+backend/.env
+backend/dist
+backend/node_modules
+backend/data
+.vercel
+*.docx
+npm-debug.log*

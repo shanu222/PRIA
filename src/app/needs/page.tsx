@@ -1,0 +1,81 @@
+import type { Metadata } from "next";
+import { Droplet } from "lucide-react";
+import { getPage, needs } from "@/data/pria";
+import { Icon } from "@/lib/icons";
+import { cn } from "@/lib/utils";
+import { PageHeader } from "@/components/layout/PageHeader";
+import { Stagger, StaggerItem } from "@/components/pria/Motion";
+import { TopoPattern } from "@/components/pria/TopoPattern";
+
+const page = getPage("needs");
+export const metadata: Metadata = { title: page.title, description: page.description };
+
+const waterNeeds = new Set(["water-recycling", "water-storage"]);
+
+export default function NeedsPage() {
+  return (
+    <div className="mx-auto flex max-w-7xl flex-col gap-10">
+      <PageHeader eyebrow={page.eyebrow} title={page.title} description={page.description} icon={page.icon} />
+
+      <Stagger className="grid gap-5 md:grid-cols-2">
+        {needs.map((n, i) => {
+          const water = waterNeeds.has(n.id);
+          const wide = i === needs.length - 1;
+          return (
+            <StaggerItem key={n.id} className={cn(wide && "md:col-span-2")}>
+              <article
+                id={n.id}
+                className={cn(
+                  "group relative flex h-full scroll-mt-24 flex-col overflow-hidden rounded-2xl border bg-card p-7 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-lift sm:p-8",
+                  water ? "hover:border-water/50" : "hover:border-primary/45",
+                )}
+              >
+                <TopoPattern
+                  className={cn(
+                    "opacity-0 transition-opacity duration-500 group-hover:opacity-[0.1]",
+                    water ? "text-water" : "text-[hsl(var(--topo-stroke))]",
+                  )}
+                />
+                <div className="relative flex items-start justify-between gap-4">
+                  <span
+                    className={cn(
+                      "flex h-14 w-14 items-center justify-center rounded-2xl",
+                      water
+                        ? "bg-cyan-50 text-water dark:bg-cyan-500/10"
+                        : "bg-primary-tint text-primary dark:text-accent-foreground",
+                    )}
+                  >
+                    <Icon name={n.icon} className="h-7 w-7" />
+                  </span>
+                  <span
+                    className="font-heading text-4xl font-extrabold uppercase text-muted-foreground/30"
+                    aria-hidden="true"
+                  >
+                    {n.code}
+                  </span>
+                </div>
+                <h2 className="relative mt-6 text-balance text-xl font-bold leading-snug sm:text-2xl">
+                  <span className="sr-only">{n.code}. </span>
+                  {n.title}
+                </h2>
+                {n.chips && (
+                  <ul className="relative mt-6 flex flex-wrap gap-2" aria-label="Water storage options">
+                    {n.chips.map((chip) => (
+                      <li
+                        key={chip}
+                        className="inline-flex items-center gap-1.5 rounded-full border border-water/25 bg-cyan-50 px-3.5 py-1.5 text-sm font-medium text-water dark:bg-cyan-500/10"
+                      >
+                        <Droplet className="h-3.5 w-3.5" aria-hidden />
+                        {chip}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </article>
+            </StaggerItem>
+          );
+        })}
+      </Stagger>
+    </div>
+  );
+}
