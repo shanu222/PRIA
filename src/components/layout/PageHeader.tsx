@@ -10,6 +10,7 @@ export function PageHeader({
   children,
   aside,
   className,
+  demo,
 }: {
   eyebrow: string;
   title: string;
@@ -18,9 +19,11 @@ export function PageHeader({
   children?: React.ReactNode;
   aside?: React.ReactNode;
   className?: string;
+  demo?: string;
 }) {
   return (
     <header
+      data-demo={demo}
       className={cn(
         "relative overflow-hidden rounded-2xl border bg-gradient-to-br from-primary-tint via-card to-card px-6 py-10 shadow-soft sm:px-10 sm:py-12",
         className,

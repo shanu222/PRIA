@@ -76,9 +76,9 @@ function Fact({ icon: I, value, label }: { icon: typeof Users; value: string; la
 export default function OutlookPage() {
   return (
     <div className="mx-auto flex max-w-7xl flex-col gap-14">
-      <PageHeader eyebrow={page.eyebrow} title={page.title} description={page.description} icon={page.icon} />
+      <PageHeader demo="intro" eyebrow={page.eyebrow} title={page.title} description={page.description} icon={page.icon} />
 
-      <section aria-label="Headline figures">
+      <section data-demo="headlines" aria-label="Headline figures">
         <Stagger className="grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-5">
           {headline.map((s, i) => (
             <StaggerItem key={s.id} className={i === headline.length - 1 ? "col-span-2 md:col-span-1" : undefined}>
@@ -88,7 +88,7 @@ export default function OutlookPage() {
         </Stagger>
       </section>
 
-      <section aria-labelledby="population">
+      <section data-demo="population" aria-labelledby="population">
         <SectionHeader
           id="population"
           eyebrow="Population"
@@ -112,7 +112,7 @@ export default function OutlookPage() {
         </div>
       </section>
 
-      <section aria-labelledby="provinces" className="scroll-mt-24">
+      <section data-demo="provinces" aria-labelledby="provinces" className="scroll-mt-24">
         <SectionHeader
           id="provinces"
           eyebrow="By province"
@@ -153,7 +153,7 @@ export default function OutlookPage() {
         </Reveal>
       </section>
 
-      <section aria-labelledby="housing">
+      <section data-demo="housing" aria-labelledby="housing">
         <SectionHeader
           id="housing"
           eyebrow="Buildings & housing"
@@ -222,7 +222,7 @@ export default function OutlookPage() {
         </Reveal>
       </section>
 
-      <section aria-labelledby="urban">
+      <section data-demo="urban" aria-labelledby="urban">
         <SectionHeader
           id="urban"
           eyebrow="Urbanisation"
@@ -279,7 +279,7 @@ export default function OutlookPage() {
         </Source>
       </section>
 
-      <section aria-labelledby="coverage">
+      <section data-demo="coverage" aria-labelledby="coverage">
         <SectionHeader
           id="coverage"
           eyebrow="Built-up coverage"
@@ -294,7 +294,7 @@ export default function OutlookPage() {
         </Reveal>
       </section>
 
-      <section aria-labelledby="districts">
+      <section data-demo="districts" aria-labelledby="districts">
         <SectionHeader
           id="districts"
           eyebrow="Districts"

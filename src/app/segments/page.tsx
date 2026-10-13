@@ -15,6 +15,7 @@ export default async function SegmentsPage() {
   return (
     <div className="mx-auto flex max-w-7xl flex-col gap-10">
       <PageHeader
+        demo="intro"
         eyebrow={page.eyebrow}
         title={page.title}
         description={page.description}

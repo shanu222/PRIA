@@ -16,9 +16,9 @@ export const metadata: Metadata = { title: page.title, description: page.descrip
 export default function HazardsPage() {
   return (
     <div className="mx-auto flex max-w-7xl flex-col gap-14">
-      <PageHeader eyebrow={page.eyebrow} title={page.title} description={page.description} icon={page.icon} />
+      <PageHeader demo="intro" eyebrow={page.eyebrow} title={page.title} description={page.description} icon={page.icon} />
 
-      <section aria-labelledby="timeline">
+      <section data-demo="timeline" aria-labelledby="timeline">
         <SectionHeader
           id="timeline"
           eyebrow="Recorded disasters"
@@ -65,7 +65,7 @@ export default function HazardsPage() {
         </ol>
       </section>
 
-      <section aria-labelledby="profiles">
+      <section data-demo="profiles" aria-labelledby="profiles">
         <SectionHeader
           id="profiles"
           eyebrow="By regional segment"
@@ -84,7 +84,7 @@ export default function HazardsPage() {
       </section>
 
       <Reveal>
-        <div className="flex flex-col items-start justify-between gap-4 rounded-2xl border-2 border-primary/25 bg-gradient-to-r from-primary-tint to-card p-6 sm:flex-row sm:items-center">
+        <div data-demo="vulnerable" className="flex flex-col items-start justify-between gap-4 rounded-2xl border-2 border-primary/25 bg-gradient-to-r from-primary-tint to-card p-6 sm:flex-row sm:items-center">
           <div>
             <h2 className="text-lg font-bold">Where housing is most vulnerable</h2>
             <p className="mt-1 text-sm text-muted-foreground">

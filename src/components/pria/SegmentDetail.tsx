@@ -15,6 +15,7 @@ import { TopoPattern } from "./TopoPattern";
 function SegmentHero({ segment }: { segment: Segment }) {
   return (
     <header
+      data-demo="hero"
       className="relative overflow-hidden rounded-2xl px-6 py-10 text-white shadow-lift sm:px-10 sm:py-12"
       style={{ background: `linear-gradient(135deg, ${segment.colorStrong} 0%, ${segment.color} 70%, ${segment.color} 100%)` }}
     >
@@ -135,10 +136,13 @@ export function SegmentDetail({ segment, category }: { segment: Segment; categor
   return (
     <div style={segmentStyle(segment)} className="mx-auto flex max-w-7xl flex-col gap-6">
       <SegmentHero segment={segment} />
-      <CategoryTabs segment={segment} activeId={category.id} />
+      <div data-demo="tabs">
+        <CategoryTabs segment={segment} activeId={category.id} />
+      </div>
 
       <div className="grid gap-6 2xl:grid-cols-[minmax(0,1fr)_280px]">
         <Reveal key={category.id} className="min-w-0">
+          <div data-demo="content">
           <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.16em] seg-text">
@@ -160,6 +164,7 @@ export function SegmentDetail({ segment, category }: { segment: Segment; categor
             />
           </div>
           <SubSectionPanel key={`${segment.id}-${category.id}`} segment={segment} category={category} />
+          </div>
         </Reveal>
         <div className="hidden 2xl:block">
           <div className="sticky top-24">
@@ -172,7 +177,7 @@ export function SegmentDetail({ segment, category }: { segment: Segment; categor
         <SegmentRail segment={segment} activeCategoryId={category.id} className="md:grid md:grid-cols-2 md:items-start" />
       </div>
 
-      <section aria-labelledby="segment-hazards" className="mt-4">
+      <section data-demo="hazards" aria-labelledby="segment-hazards" className="mt-4">
         <p className="text-xs font-semibold uppercase tracking-[0.16em] seg-text">Why these recommendations</p>
         <h2 id="segment-hazards" className="mb-4 mt-1.5 text-2xl font-bold">
           Hazard profile
@@ -180,7 +185,7 @@ export function SegmentDetail({ segment, category }: { segment: Segment; categor
         <HazardProfile segment={segment} />
       </section>
 
-      <section aria-label="DRIM resilient house models" className="mt-4">
+      <section data-demo="models" aria-label="DRIM resilient house models" className="mt-4">
         <DrimStrip segment={segment} />
       </section>
     </div>

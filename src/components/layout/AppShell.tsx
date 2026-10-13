@@ -9,6 +9,7 @@ import { Sidebar, SidebarBrand, SidebarNav } from "./Sidebar";
 import { Topbar } from "./Topbar";
 import { CommandMenu } from "./CommandMenu";
 import { PrevNext } from "./PrevNext";
+import { PageDemo } from "@/components/pria/HomeDemo";
 
 const STORAGE_KEY = "pria.sidebar.collapsed";
 
@@ -64,6 +65,7 @@ export function AppShell({ children, footer }: { children: React.ReactNode; foot
       </div>
 
       <CommandMenu open={searchOpen} onOpenChange={setSearchOpen} />
+      <PageDemo />
     </div>
   );
 }

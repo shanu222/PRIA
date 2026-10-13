@@ -23,9 +23,9 @@ const stats = [
 export default function DrimPage() {
   return (
     <div className="mx-auto flex max-w-7xl flex-col gap-14">
-      <PageHeader eyebrow={page.eyebrow} title={page.title} description={page.description} icon={page.icon} />
+      <PageHeader demo="intro" eyebrow={page.eyebrow} title={page.title} description={page.description} icon={page.icon} />
 
-      <section aria-label="DRIM at a glance">
+      <section data-demo="glance" aria-label="DRIM at a glance">
         <Stagger className="grid grid-cols-2 gap-4 lg:grid-cols-4">
           {stats.map((s, i) => (
             <StaggerItem key={s.id}>
@@ -35,7 +35,7 @@ export default function DrimPage() {
         </Stagger>
       </section>
 
-      <section aria-labelledby="explore">
+      <section data-demo="explore" aria-labelledby="explore">
         <SectionHeader
           id="explore"
           eyebrow="Explore the models"
@@ -47,7 +47,7 @@ export default function DrimPage() {
         </Suspense>
       </section>
 
-      <section aria-labelledby="by-province">
+      <section data-demo="provinces" aria-labelledby="by-province">
         <SectionHeader
           id="by-province"
           eyebrow="By province"

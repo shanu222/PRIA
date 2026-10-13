@@ -15,7 +15,7 @@ export async function SummaryPage({ id, visionBanner = false }: { id: keyof type
     <div className="mx-auto flex max-w-7xl flex-col gap-10">
       {visionBanner && (
         <Reveal>
-          <div className="relative flex items-center justify-between gap-4 overflow-hidden rounded-xl bg-gradient-to-r from-[#063521] via-[#0B5D3B] to-[#0E7490] px-6 py-4 text-white shadow-soft">
+          <div data-demo="vision" className="relative flex items-center justify-between gap-4 overflow-hidden rounded-xl bg-gradient-to-r from-[#063521] via-[#0B5D3B] to-[#0E7490] px-6 py-4 text-white shadow-soft">
             <TopoPattern className="text-white opacity-[0.15]" />
             <p className="relative font-heading text-sm font-semibold uppercase tracking-[0.18em]">{site.vision}</p>
             <p className="relative text-sm text-white/85">{site.closingLine}</p>
@@ -23,10 +23,10 @@ export async function SummaryPage({ id, visionBanner = false }: { id: keyof type
         </Reveal>
       )}
 
-      <PageHeader eyebrow={page.eyebrow} title={block.title} icon={page.icon} />
+      <PageHeader demo="intro" eyebrow={page.eyebrow} title={block.title} icon={page.icon} />
 
       <Reveal>
-        <article className="card-pro rounded-2xl bg-card p-6 sm:p-10">
+        <article data-demo="body" className="card-pro rounded-2xl bg-card p-6 sm:p-10">
           {block.paragraphs.length > 0 ? (
             <SummaryReadAloud paragraphs={block.paragraphs} />
           ) : (

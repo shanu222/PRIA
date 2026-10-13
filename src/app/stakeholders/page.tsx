@@ -20,10 +20,11 @@ const flowStyles = [
 export default function StakeholdersPage() {
   return (
     <div className="mx-auto flex max-w-7xl flex-col gap-10">
-      <PageHeader eyebrow={page.eyebrow} title={page.title} description={page.description} icon={page.icon} />
+      <PageHeader demo="intro" eyebrow={page.eyebrow} title={page.title} description={page.description} icon={page.icon} />
 
       <Reveal>
         <section
+          data-demo="flow"
           id="flow"
           aria-label="Stakeholder flow"
           className="card-pro scroll-mt-24 rounded-2xl bg-card p-6 sm:p-8"
@@ -59,7 +60,7 @@ export default function StakeholdersPage() {
         </section>
       </Reveal>
 
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div data-demo="tiers" className="grid gap-6 lg:grid-cols-2">
         {stakeholders.tiers.map((tier, i) => (
           <StakeholderTier key={tier.id} tier={tier} tone={i === 0 ? "primary" : "water"} />
         ))}

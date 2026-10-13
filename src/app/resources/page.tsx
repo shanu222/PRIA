@@ -10,7 +10,8 @@ export const metadata: Metadata = { title: page.title, description: page.descrip
 export default function ResourcesPage() {
   return (
     <div className="mx-auto flex max-w-7xl flex-col gap-10">
-      <PageHeader eyebrow={page.eyebrow} title={page.title} description={page.description} icon={page.icon} />
+      <PageHeader demo="intro" eyebrow={page.eyebrow} title={page.title} description={page.description} icon={page.icon} />
+      <div data-demo="gaps">
       <Stagger className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {resourceObservations.map((r, i) => (
           <StaggerItem key={r.id}>
@@ -18,6 +19,7 @@ export default function ResourcesPage() {
           </StaggerItem>
         ))}
       </Stagger>
+      </div>
     </div>
   );
 }

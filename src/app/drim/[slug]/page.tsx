@@ -44,7 +44,7 @@ export default async function DrimModelPage({ params }: Props) {
 
   return (
     <div className="mx-auto flex max-w-7xl flex-col gap-10">
-      <header className="relative overflow-hidden rounded-3xl bg-[#07402A] px-6 py-10 text-white shadow-lift sm:px-10">
+      <header data-demo="intro" className="relative overflow-hidden rounded-3xl bg-[#07402A] px-6 py-10 text-white shadow-lift sm:px-10">
         <div
           aria-hidden="true"
           className="absolute inset-0 bg-[radial-gradient(110%_90%_at_100%_0%,#B45309_0%,transparent_50%),radial-gradient(90%_80%_at_0%_100%,#0E7490_0%,transparent_60%),linear-gradient(135deg,#063521,#0B5D3B)] opacity-90"
@@ -79,11 +79,14 @@ export default async function DrimModelPage({ params }: Props) {
 
       <div className="grid gap-8 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
         <Reveal className="min-w-0">
-          <DrimViewer model={model} />
+          <div data-demo="viewer">
+            <DrimViewer model={model} />
+          </div>
         </Reveal>
 
         <Reveal delay={0.08} className="flex flex-col gap-5">
             <section
+              data-demo="regions"
               aria-labelledby="regions"
               style={{ "--tone": "#b45309", "--tone-2": "#ea580c" } as React.CSSProperties}
               className="card-pro rounded-2xl bg-card p-5"
@@ -142,7 +145,7 @@ export default async function DrimModelPage({ params }: Props) {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
-        <section aria-labelledby="features">
+        <section data-demo="features" aria-labelledby="features">
           <h2 id="features" className="mb-4 text-2xl font-bold">
             Salient features
           </h2>
@@ -160,7 +163,7 @@ export default async function DrimModelPage({ params }: Props) {
           </Stagger>
         </section>
 
-        <section aria-labelledby="materials">
+        <section data-demo="materials" aria-labelledby="materials">
           <h2 id="materials" className="mb-4 text-2xl font-bold">
             Materials
           </h2>

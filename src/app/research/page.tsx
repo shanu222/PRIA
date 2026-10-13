@@ -11,11 +11,11 @@ export const metadata: Metadata = { title: page.title, description: page.descrip
 export default function ResearchPage() {
   return (
     <div className="mx-auto flex max-w-7xl flex-col gap-12">
-      <PageHeader eyebrow={page.eyebrow} title={page.title} description={page.description} icon={page.icon} />
+      <PageHeader demo="intro" eyebrow={page.eyebrow} title={page.title} description={page.description} icon={page.icon} />
       <Suspense fallback={<div className="h-14 animate-pulse rounded-2xl bg-muted" />}>
         <CityEvidence />
       </Suspense>
-      <section aria-label="Evidence library" className="flex flex-col gap-4">
+      <section data-demo="library" aria-label="Evidence library" className="flex flex-col gap-4">
         <div>
           <h2 className="font-heading text-2xl font-bold">Evidence library</h2>
           <p className="mt-1 max-w-3xl text-sm leading-relaxed text-muted-foreground">

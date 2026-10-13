@@ -2,54 +2,11 @@
 
 import * as React from "react";
 import { createPortal } from "react-dom";
+import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 import { Play, Square } from "lucide-react";
 import { Button } from "@/components/ui/button";
-
-const STEPS = [
-  {
-    id: "hero",
-    title: "The atlas",
-    script:
-      "This is the Pakistan Resilient Infrastructure Atlas, prepared for the National Disaster Management Authority. It sets where and how Pakistan should build, through Vision 2047.",
-  },
-  {
-    id: "figures",
-    title: "The scale",
-    script:
-      "These figures frame the work. About 255 million people in 2026. About 31 million houses still needed. The horizon is 2047, when Pakistan turns one hundred. The country is read as four regional segments and six kinds of infrastructure.",
-  },
-  {
-    id: "glance",
-    title: "The path through the portal",
-    script:
-      "At a glance, the portal moves from the national picture, to the challenges and needs, to the scope and the stakeholders, and on to the summary of NDMA’s role.",
-  },
-  {
-    id: "segments",
-    title: "Four grounds",
-    script:
-      "Pakistan is divided into four grounds. The mountain segment is selected here. Then riverine and plains, desert and arid, and the coast. A house that is safe on one ground can fail on another.",
-  },
-  {
-    id: "models",
-    title: "How to build",
-    script:
-      "NDMA’s disaster resilient house models show how to build for earthquakes, floods, landslides, and extreme heat and cold. Each model is matched to the provinces it suits.",
-  },
-  {
-    id: "disasters",
-    title: "Why resilience",
-    script:
-      "The atlas is shaped by recorded disasters. The 2005 earthquake, the Indus floods, the 2015 heatwave, the 2022 floods, and Cyclone Biparjoy. The aim is to avoid building back into the same hazard.",
-  },
-  {
-    id: "roadmap",
-    title: "How the portal is organised",
-    script:
-      "Follow the portal in this order. National context, needs, scope, stakeholders, the regional segments, and the summary. That is the path through PRIA.",
-  },
-] as const;
+import { stepsForPath, type DemoStep } from "./demo-steps";
 
 function pickVoice(voices: SpeechSynthesisVoice[]) {
   const scored = voices
@@ -118,7 +75,7 @@ function speakChunks(text: string, run: number, runRef: React.MutableRefObject<n
   });
 }
 
-function ZoomShot({ sourceId }: { sourceId: string }) {
+function ZoomShot({ sourceId, tick }: { sourceId: string; tick: number }) {
   const frameRef = React.useRef<HTMLDivElement>(null);
   const hostRef = React.useRef<HTMLDivElement>(null);
   const [shot, setShot] = React.useState<{ width: number; height: number; fit: number } | null>(null);
@@ -132,7 +89,7 @@ function ZoomShot({ sourceId }: { sourceId: string }) {
     const maxHeight = Math.max(Math.min(window.innerHeight * 0.62, 680) - 24, 1);
     const fit = Math.min(maxWidth / Math.max(source.offsetWidth, 1), maxHeight / Math.max(source.offsetHeight, 1));
     setShot({ width: source.offsetWidth, height: source.offsetHeight, fit });
-  }, [sourceId]);
+  }, [sourceId, tick]);
 
   React.useLayoutEffect(() => {
     const source = document.querySelector(`[data-demo="${sourceId}"]`) as HTMLElement | null;
@@ -144,7 +101,7 @@ function ZoomShot({ sourceId }: { sourceId: string }) {
     clone.style.width = `${shot.width}px`;
     clone.style.maxWidth = "none";
     host.replaceChildren(clone);
-  }, [sourceId, shot]);
+  }, [sourceId, shot, tick]);
 
   const frameHeight = shot ? Math.ceil(shot.height * shot.fit) + 24 : 240;
 
@@ -176,18 +133,26 @@ function ZoomShot({ sourceId }: { sourceId: string }) {
   );
 }
 
-export function HomeDemo() {
+export function PageDemo() {
+  const pathname = usePathname();
+  const steps = stepsForPath(pathname);
   const [step, setStep] = React.useState<number | null>(null);
   const [mounted, setMounted] = React.useState(false);
   const runRef = React.useRef(0);
 
   React.useEffect(() => {
     setMounted(true);
+  }, []);
+
+  React.useEffect(() => {
+    setStep(null);
+    runRef.current += 1;
+    window.speechSynthesis?.cancel();
     return () => {
       runRef.current += 1;
       window.speechSynthesis?.cancel();
     };
-  }, []);
+  }, [pathname]);
 
   const finish = React.useCallback(() => {
     runRef.current += 1;
@@ -198,15 +163,26 @@ export function HomeDemo() {
 
   const start = async () => {
     const run = ++runRef.current;
+    const tour: DemoStep[] = stepsForPath(window.location.pathname);
     window.speechSynthesis?.cancel();
-    for (let index = 0; index < STEPS.length; index++) {
+    for (let index = 0; index < tour.length; index++) {
       if (run !== runRef.current) return;
-      const current = STEPS[index];
-      setStep(index);
-      if (current.id === "segments") {
-        window.dispatchEvent(new CustomEvent("pria-demo-segment", { detail: "mountain" }));
+      const current = tour[index];
+      current.prepare?.();
+      let source = document.querySelector(`[data-demo="${current.id}"]`);
+      if (current.prepare) {
+        const readyAt = Date.now() + 2000;
+        while (run === runRef.current && Date.now() < readyAt && !source) {
+          await wait(100);
+          source = document.querySelector(`[data-demo="${current.id}"]`);
+        }
+        await wait(450);
+        source = document.querySelector(`[data-demo="${current.id}"]`);
       }
-      document.querySelector(`[data-demo="${current.id}"]`)?.scrollIntoView({ behavior: "smooth", block: "center" });
+      if (run !== runRef.current) return;
+      if (!source) continue;
+      setStep(index);
+      source.scrollIntoView({ behavior: "smooth", block: "center" });
       await wait(700);
       if (run !== runRef.current) return;
       await speakChunks(current.script, run, runRef);
@@ -214,7 +190,8 @@ export function HomeDemo() {
     if (run === runRef.current) finish();
   };
 
-  const active = step == null ? null : STEPS[step];
+  const active = step == null ? null : steps[step];
+  if (steps.length === 0) return null;
 
   return (
     <>
@@ -232,13 +209,13 @@ export function HomeDemo() {
             <div className="flex w-full max-w-5xl flex-col gap-3">
               <div className="flex items-center justify-between gap-3 text-white">
                 <p className="text-xs font-semibold uppercase tracking-[0.16em] text-teal-100">
-                  Portal demo · {(step ?? 0) + 1} of {STEPS.length}
+                  {pathname === "/" ? "Portal demo" : "Page demo"} · {(step ?? 0) + 1} of {steps.length}
                 </p>
                 <Button type="button" variant="outline" onClick={finish} className="border-white/30 bg-white text-[#042f2e]">
                   <Square /> Stop
                 </Button>
               </div>
-              <ZoomShot sourceId={active.id} />
+              <ZoomShot sourceId={active.id} tick={step ?? 0} />
               <div className="rounded-2xl bg-white px-5 py-4 text-[#042f2e] shadow-lift">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-emerald-800">{active.title}</p>
                 <p className="mt-1 text-base leading-relaxed sm:text-lg">{active.script}</p>

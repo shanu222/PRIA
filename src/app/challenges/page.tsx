@@ -16,9 +16,9 @@ export default async function ChallengesPage() {
   const g = challenges.growingNeeds;
   return (
     <div className="mx-auto flex max-w-7xl flex-col gap-14">
-      <PageHeader eyebrow={page.eyebrow} title={page.title} description={page.description} icon={page.icon} />
+      <PageHeader demo="intro" eyebrow={page.eyebrow} title={page.title} description={page.description} icon={page.icon} />
 
-      <section aria-label="Challenges" className="grid gap-4 lg:grid-cols-3">
+      <section data-demo="pressures" aria-label="Challenges" className="grid gap-4 lg:grid-cols-3">
         <Reveal className="lg:row-span-2">
           <article
             id={g.id}
@@ -48,7 +48,7 @@ export default async function ChallengesPage() {
         </Stagger>
       </section>
 
-      <section aria-label="Projected province and region outlook">
+      <section data-demo="outlook" aria-label="Projected province and region outlook">
         <SectionHeader eyebrow="Towards 2047" title={projectedTable.title} />
         <Reveal>
           <ProvinceTable table={projectedTable} />

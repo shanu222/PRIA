@@ -9,8 +9,8 @@ export const metadata: Metadata = { title: page.title, description: page.descrip
 export default function ScopePage() {
   return (
     <div className="mx-auto flex max-w-7xl flex-col gap-10">
-      <PageHeader eyebrow={page.eyebrow} title={page.title} description={page.description} icon={page.icon} />
-      <div className="mx-auto w-full max-w-4xl">
+      <PageHeader demo="intro" eyebrow={page.eyebrow} title={page.title} description={page.description} icon={page.icon} />
+      <div data-demo="scope" className="mx-auto w-full max-w-4xl">
         <ScopeTimeline />
       </div>
     </div>

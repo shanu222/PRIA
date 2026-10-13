@@ -16,8 +16,17 @@ export function SegmentsHubView({ cards, compare }: { cards: React.ReactNode; co
     return () => window.removeEventListener("hashchange", sync);
   }, []);
 
+  React.useEffect(() => {
+    const onDemo = (event: Event) => {
+      const next = (event as CustomEvent<string>).detail;
+      if (next === "cards" || next === "compare") setView(next);
+    };
+    window.addEventListener("pria-demo-segments-view", onDemo);
+    return () => window.removeEventListener("pria-demo-segments-view", onDemo);
+  }, []);
+
   return (
-    <Tabs value={view} onValueChange={setView} id="compare" className="scroll-mt-24">
+    <Tabs value={view} onValueChange={setView} id="compare" data-demo="board" className="scroll-mt-24">
       <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-sm text-muted-foreground">
           {view === "cards" ? "Open a segment to explore its infrastructure categories." : "4 segments × 6 infrastructure categories."}

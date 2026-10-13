@@ -18,6 +18,7 @@ export default async function LandscapePage() {
   return (
     <div className="mx-auto flex max-w-7xl flex-col gap-14">
       <PageHeader
+        demo="intro"
         eyebrow={page.eyebrow}
         title={page.title}
         description={page.description}
@@ -29,7 +30,7 @@ export default async function LandscapePage() {
         }
       />
 
-      <section aria-labelledby="census" className="scroll-mt-24">
+      <section data-demo="census" aria-labelledby="census" className="scroll-mt-24">
         <SectionHeader
           id="census"
           eyebrow="Census 2023"
@@ -45,7 +46,7 @@ export default async function LandscapePage() {
         </Stagger>
       </section>
 
-      <section aria-labelledby="types" className="scroll-mt-24">
+      <section data-demo="types" aria-labelledby="types" className="scroll-mt-24">
         <SectionHeader id="types" eyebrow="Classification" title="Types of Infrastructure" />
         <Stagger className="grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-5">
           {landscape.infrastructureTypes.map((t) => (
@@ -56,7 +57,7 @@ export default async function LandscapePage() {
         </Stagger>
       </section>
 
-      <section aria-labelledby="province-map" className="scroll-mt-24">
+      <section data-demo="map" aria-labelledby="province-map" className="scroll-mt-24">
         <SectionHeader
           id="province-map"
           eyebrow="Interactive map"
@@ -68,7 +69,7 @@ export default async function LandscapePage() {
         </Reveal>
       </section>
 
-      <section aria-labelledby="residential-split" className="scroll-mt-24">
+      <section data-demo="split" aria-labelledby="residential-split" className="scroll-mt-24">
         <SectionHeader
           id="residential-split"
           eyebrow="Residential"
@@ -82,7 +83,7 @@ export default async function LandscapePage() {
         </Reveal>
       </section>
 
-      <section aria-label="Housing and built stock by province">
+      <section data-demo="housing" aria-label="Housing and built stock by province">
         <SectionHeader eyebrow="By province" title={housingTable.title} />
         <Reveal>
           <ProvinceTable table={housingTable} />

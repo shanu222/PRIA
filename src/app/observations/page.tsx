@@ -16,8 +16,9 @@ export default function ObservationsPage() {
 
   return (
     <div className="mx-auto flex max-w-7xl flex-col gap-10">
-      <PageHeader eyebrow={page.eyebrow} title={page.title} description={page.description} icon={page.icon} />
+      <PageHeader demo="intro" eyebrow={page.eyebrow} title={page.title} description={page.description} icon={page.icon} />
 
+      <div data-demo="cards">
       <Stagger className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {observations.items.map((o) => (
           <StaggerItem key={o.id}>
@@ -25,9 +26,11 @@ export default function ObservationsPage() {
           </StaggerItem>
         ))}
       </Stagger>
+      </div>
 
       <Reveal>
         <article
+          data-demo="trajectory"
           id={t.id}
           className="relative scroll-mt-24 overflow-hidden rounded-2xl border border-primary/25 bg-gradient-to-br from-primary-tint via-card to-card p-6 shadow-soft sm:p-10"
         >

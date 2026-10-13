@@ -11,7 +11,6 @@ import { StatTile } from "@/components/pria/StatTile";
 import { TopoPattern } from "@/components/pria/TopoPattern";
 import { LogoEmblem } from "@/components/layout/Logo";
 import { DrimCard } from "@/components/pria/DrimCard";
-import { HomeDemo } from "@/components/pria/HomeDemo";
 import { drimModels } from "@/data/drim";
 
 export default function HomePage() {
@@ -281,7 +280,6 @@ export default function HomePage() {
           </ol>
         </Reveal>
       </section>
-      <HomeDemo />
     </div>
   );
 }

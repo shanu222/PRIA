@@ -101,6 +101,19 @@ export function CityEvidence() {
     setQuery(selected?.name ?? "");
   }, [selected?.id, selected?.name]);
 
+  React.useEffect(() => {
+    const onDemo = (event: Event) => {
+      const id = (event as CustomEvent<string | null>).detail;
+      const city = id ? getEvidenceCity(id) : undefined;
+      if (!city) return;
+      setQuery(city.name);
+      setOpen(false);
+      router.replace(`/research?city=${city.id}`, { scroll: false });
+    };
+    window.addEventListener("pria-demo-city", onDemo);
+    return () => window.removeEventListener("pria-demo-city", onDemo);
+  }, [router]);
+
   const choose = (city: CityRecord) => {
     setQuery(city.name);
     setOpen(false);
@@ -169,7 +182,7 @@ export function CityEvidence() {
         )}
       </div>
 
-      <div className="overflow-hidden rounded-2xl border bg-card p-3 shadow-soft sm:p-4">
+      <div data-demo="map" className="overflow-hidden rounded-2xl border bg-card p-3 shadow-soft sm:p-4">
         <PakistanMap
           ariaLabel="Map of Pakistan. Select a city to read its evidence."
           fills={() => ({ fill: "hsl(var(--primary))", opacity: 0.16, strokeWidth: 1.5 })}
@@ -246,7 +259,7 @@ export function CityEvidence() {
       )}
 
       {view && (
-        <div className="flex flex-col gap-8">
+        <div data-demo="findings" className="flex flex-col gap-8">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <h2 className="font-heading text-3xl font-extrabold tracking-tight">{view.city.name}</h2>

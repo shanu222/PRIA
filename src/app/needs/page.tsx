@@ -15,8 +15,9 @@ const waterNeeds = new Set(["water-recycling", "water-storage"]);
 export default function NeedsPage() {
   return (
     <div className="mx-auto flex max-w-7xl flex-col gap-10">
-      <PageHeader eyebrow={page.eyebrow} title={page.title} description={page.description} icon={page.icon} />
+      <PageHeader demo="intro" eyebrow={page.eyebrow} title={page.title} description={page.description} icon={page.icon} />
 
+      <div data-demo="needs">
       <Stagger className="grid gap-5 md:grid-cols-2">
         {needs.map((n, i) => {
           const water = waterNeeds.has(n.id);
@@ -73,6 +74,7 @@ export default function NeedsPage() {
           );
         })}
       </Stagger>
+      </div>
     </div>
   );
 }
