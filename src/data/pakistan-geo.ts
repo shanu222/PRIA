@@ -8,6 +8,25 @@
  */
 export const MAP_VIEWBOX = { width: 1105, height: 905 } as const;
 
+/** Same equirectangular fit used to draw the province paths. */
+export function projectLonLat(lon: number, lat: number): [number, number] {
+  const minLon = 60.87688104972074;
+  const minLat = 23.731318744064822;
+  const maxLon = 77.81493018957667;
+  const maxLat = 37.003781127497064;
+  const midLat = (minLat + maxLat) / 2;
+  const kx = Math.cos((midLat * Math.PI) / 180);
+  const width = 1000;
+  const height = 905;
+  const pad = 36;
+  const spanX = (maxLon - minLon) * kx;
+  const spanY = maxLat - minLat;
+  const scale = Math.min((width - pad * 2) / spanX, (height - pad * 2) / spanY);
+  const offX = (width - spanX * scale) / 2;
+  const offY = (height - spanY * scale) / 2;
+  return [offX + (lon - minLon) * kx * scale, offY + (maxLat - lat) * scale];
+}
+
 export const provinceShapes: { id: string; d: string; centroid: [number, number] }[] = [
   {
     "id": "balochistan",

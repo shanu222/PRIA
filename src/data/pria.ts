@@ -82,7 +82,7 @@ export type InfoItem = {
   icon: IconName;
 };
 
-export type NavGroupId = "overview" | "national-context" | "framework" | "segments" | "solutions" | "summary";
+export type NavGroupId = "overview" | "national-context" | "research" | "framework" | "segments" | "solutions" | "summary";
 
 export type PageMeta = {
   id: string;
@@ -355,6 +355,7 @@ export function segmentStatus(segment: Segment): ContentStatus {
 export const navGroups: { id: NavGroupId; label: string }[] = [
   { id: "overview", label: "Overview" },
   { id: "national-context", label: "National Context" },
+  { id: "research", label: "Infra Research Bank" },
   { id: "framework", label: "Framework" },
   { id: "segments", label: "Regional Segments" },
   { id: "solutions", label: "Resilient Models" },
@@ -424,14 +425,14 @@ export const pages: PageMeta[] = [
     icon: "Activity",
   },
   {
-    id: "cities",
-    href: "/cities",
-    title: "City Evidence",
-    navLabel: "City Evidence",
-    group: "national-context",
-    eyebrow: "National Context",
+    id: "research",
+    href: "/research",
+    title: "Infra Research Bank",
+    navLabel: "City Research",
+    group: "research",
+    eyebrow: "Infra Research Bank",
     description:
-      "Search a city and read the infrastructure problems that published papers and official assessments actually report for it.",
+      "The full map of Pakistan. Choose a city to read problems and remedies from the cited papers, and two indicated new-town sites off the hazard line.",
     icon: "BookOpen",
   },
   {

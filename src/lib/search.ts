@@ -152,8 +152,8 @@ export function buildSearchIndex(): SearchGroup[] {
   const cityEntries: SearchEntry[] = evidenceCities.map((c) => ({
     id: `city-${c.id}`,
     label: c.name,
-    hint: `${getProvince(c.province)?.name ?? "Pakistan"} · City evidence`,
-    href: `/cities?city=${c.id}`,
+    hint: `${getProvince(c.province)?.name ?? "Pakistan"} · Infra Research Bank`,
+    href: `/research?city=${c.id}`,
     icon: "BookOpen",
     keywords: ["city", "paper", "problem", c.province, ...(c.aliases ?? [])],
   }));
