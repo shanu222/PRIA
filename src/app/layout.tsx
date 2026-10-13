@@ -34,6 +34,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" suppressHydrationWarning className={`${inter.variable} ${jakarta.variable}`}>
       <body className="min-h-screen font-sans">
+        <div className="portal-sky" aria-hidden="true">
+          <span className="portal-orb portal-orb-a" />
+          <span className="portal-orb portal-orb-b" />
+          <span className="portal-orb portal-orb-c" />
+          <span className="portal-orb portal-orb-d" />
+          <span className="portal-grid" />
+          <span className="portal-glass" />
+          <span className="portal-sheen" />
+        </div>
         <Providers>
           <AppShell footer={<Footer />}>{children}</AppShell>
         </Providers>
