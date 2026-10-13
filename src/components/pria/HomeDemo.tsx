@@ -121,15 +121,17 @@ function speakChunks(text: string, run: number, runRef: React.MutableRefObject<n
 function ZoomShot({ sourceId }: { sourceId: string }) {
   const frameRef = React.useRef<HTMLDivElement>(null);
   const hostRef = React.useRef<HTMLDivElement>(null);
-  const [shot, setShot] = React.useState<{ width: number; fit: number } | null>(null);
+  const [shot, setShot] = React.useState<{ width: number; height: number; fit: number } | null>(null);
 
   React.useLayoutEffect(() => {
     setShot(null);
     const source = document.querySelector(`[data-demo="${sourceId}"]`) as HTMLElement | null;
     const frame = frameRef.current;
     if (!source || !frame) return;
-    const fit = Math.min(1, frame.clientWidth / Math.max(source.offsetWidth, 1));
-    setShot({ width: source.offsetWidth, fit });
+    const maxWidth = Math.max(frame.clientWidth - 24, 1);
+    const maxHeight = Math.max(Math.min(window.innerHeight * 0.62, 680) - 24, 1);
+    const fit = Math.min(maxWidth / Math.max(source.offsetWidth, 1), maxHeight / Math.max(source.offsetHeight, 1));
+    setShot({ width: source.offsetWidth, height: source.offsetHeight, fit });
   }, [sourceId]);
 
   React.useLayoutEffect(() => {
@@ -144,18 +146,30 @@ function ZoomShot({ sourceId }: { sourceId: string }) {
     host.replaceChildren(clone);
   }, [sourceId, shot]);
 
+  const frameHeight = shot ? Math.ceil(shot.height * shot.fit) + 24 : 240;
+
   return (
     <div
       ref={frameRef}
-      className="relative h-[min(58vh,540px)] overflow-hidden rounded-2xl bg-[#042f2e] shadow-[0_30px_80px_-24px_rgba(4,47,46,0.85)] ring-1 ring-white/20"
+      className="relative w-full overflow-hidden rounded-2xl bg-card shadow-[0_30px_80px_-24px_rgba(4,47,46,0.45)] ring-1 ring-black/10"
+      style={{ height: frameHeight }}
     >
       {shot && (
         <motion.div
           ref={hostRef}
-          initial={{ scale: shot.fit * 0.86, opacity: 0.7 }}
-          animate={{ scale: shot.fit * 1.08, opacity: 1 }}
-          transition={{ duration: 7, ease: [0.16, 1, 0.3, 1] }}
-          style={{ transformOrigin: "center top", width: shot.width }}
+          initial={{ scale: shot.fit * 0.94, opacity: 0.85 }}
+          animate={{ scale: shot.fit, opacity: 1 }}
+          transition={{ duration: 6, ease: [0.16, 1, 0.3, 1] }}
+          style={{
+            position: "absolute",
+            left: "50%",
+            top: "50%",
+            width: shot.width,
+            height: shot.height,
+            marginLeft: -shot.width / 2,
+            marginTop: -shot.height / 2,
+            transformOrigin: "center center",
+          }}
         />
       )}
     </div>
