@@ -424,6 +424,17 @@ export const pages: PageMeta[] = [
     icon: "Activity",
   },
   {
+    id: "cities",
+    href: "/cities",
+    title: "City Evidence",
+    navLabel: "City Evidence",
+    group: "national-context",
+    eyebrow: "National Context",
+    description:
+      "Search a city and read the infrastructure problems that published papers and official assessments actually report for it.",
+    icon: "BookOpen",
+  },
+  {
     id: "resources",
     href: "/resources",
     title: "Resource Observations",

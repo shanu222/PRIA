@@ -9,7 +9,8 @@ import {
   segments,
   stakeholders,
 } from "@/data/pria";
-import { housingTable } from "@/data/census";
+import { getProvince, housingTable } from "@/data/census";
+import { evidenceCities } from "@/data/city-evidence";
 import { disasterTimeline } from "@/data/hazards";
 import { drimHazards, drimModels, drimSystems } from "@/data/drim";
 
@@ -148,6 +149,15 @@ export function buildSearchIndex(): SearchGroup[] {
     ),
   ];
 
+  const cityEntries: SearchEntry[] = evidenceCities.map((c) => ({
+    id: `city-${c.id}`,
+    label: c.name,
+    hint: `${getProvince(c.province)?.name ?? "Pakistan"} · City evidence`,
+    href: `/cities?city=${c.id}`,
+    icon: "BookOpen",
+    keywords: ["city", "paper", "problem", c.province, ...(c.aliases ?? [])],
+  }));
+
   const drimEntries: SearchEntry[] = drimModels.map((m) => ({
     id: `drim-${m.slug}`,
     label: m.title,
@@ -159,6 +169,7 @@ export function buildSearchIndex(): SearchGroup[] {
 
   return [
     { id: "pages", heading: "Pages", entries: pageEntries },
+    { id: "cities", heading: "City evidence", entries: cityEntries },
     { id: "drim", heading: "DRIM Resilient Models", entries: drimEntries },
     { id: "segments", heading: "Regional Segments", entries: segmentEntries },
     { id: "categories", heading: "Infrastructure Categories", entries: categoryEntries },
