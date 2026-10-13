@@ -1,9 +1,9 @@
 "use client";
 
-import type { CSSProperties } from "react";
+import { useState, useSyncExternalStore, type CSSProperties } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { PanelLeftClose, PanelLeftOpen } from "lucide-react";
+import { ChevronDown, PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import { navGroups, pages, segments, site } from "@/data/pria";
 import { Icon } from "@/lib/icons";
 import { matchPage } from "@/lib/navigation";
@@ -25,34 +25,90 @@ const labelClass: Record<SidebarMode, string> = {
   rail: "sr-only",
 };
 
+/** Desktop-first so the labelled sidebar renders collapsed sections without a flash. */
+function useIsLargeScreen() {
+  return useSyncExternalStore(
+    (onChange) => {
+      const query = window.matchMedia("(min-width: 1024px)");
+      query.addEventListener("change", onChange);
+      return () => query.removeEventListener("change", onChange);
+    },
+    () => window.matchMedia("(min-width: 1024px)").matches,
+    () => true,
+  );
+}
+
 export function SidebarNav({ mode, onNavigate }: { mode: SidebarMode; onNavigate?: () => void }) {
   const pathname = usePathname();
   const active = matchPage(pathname);
+  const activeGroup = active?.group;
+  const isLarge = useIsLargeScreen();
+  const [open, setOpen] = useState<ReadonlySet<string>>(() => new Set(activeGroup ? [activeGroup] : []));
+  const [trackedGroup, setTrackedGroup] = useState(activeGroup);
+
+  if (activeGroup && activeGroup !== trackedGroup) {
+    setTrackedGroup(activeGroup);
+    setOpen((current) => {
+      const next = new Set(current);
+      next.add(activeGroup);
+      return next;
+    });
+  }
+
+  function toggle(id: string) {
+    setOpen((current) => {
+      const next = new Set(current);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
 
   return (
-    <nav aria-label="Primary" className="flex flex-col gap-5 px-3 py-4">
+    <nav aria-label="Primary" className="flex flex-col gap-2 px-3 py-4">
       {navGroups.map((group) => {
         const items = pages.filter((p) => p.group === group.id);
+        const isOpen = open.has(group.id);
+        const containsActive = items.some((page) => page.id === active?.id);
+        const headingsVisible = mode === "full" || (mode === "responsive" && isLarge);
+        const showItems = !headingsVisible || isOpen;
         return (
           <div key={group.id}>
-            <p
-              className={cn(
-                "mb-1.5 px-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground",
-                mode === "rail" && "sr-only",
-                mode === "responsive" && "sr-only lg:not-sr-only lg:block",
-              )}
-            >
-              {group.label}
-            </p>
+            {headingsVisible ? (
+              <button
+                type="button"
+                onClick={() => toggle(group.id)}
+                aria-expanded={isOpen}
+                aria-controls={`nav-group-${group.id}`}
+                className={cn(
+                  "flex w-full items-center justify-between gap-2 rounded-md px-3 py-2 text-left text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground transition-colors hover:bg-muted hover:text-foreground",
+                  containsActive && "text-foreground",
+                )}
+              >
+                <span>{group.label}</span>
+                <ChevronDown
+                  aria-hidden="true"
+                  className={cn("h-3.5 w-3.5 shrink-0 transition-transform duration-200", isOpen && "rotate-180")}
+                />
+              </button>
+            ) : (
+              <p className="sr-only">{group.label}</p>
+            )}
             <div
               aria-hidden="true"
               className={cn(
-                "mx-auto mb-2 h-px w-8 bg-border",
+                "mx-auto my-2 h-px w-8 bg-border",
                 mode === "full" && "hidden",
                 mode === "responsive" && "lg:hidden",
               )}
             />
-            <ul className="flex flex-col gap-0.5">
+            <div
+              className={cn(
+                "grid transition-[grid-template-rows] duration-300 ease-out",
+                showItems ? "grid-rows-[1fr]" : "grid-rows-[0fr]",
+              )}
+            >
+            <ul id={`nav-group-${group.id}`} inert={!showItems} className="flex min-h-0 flex-col gap-0.5 overflow-hidden">
               {items.map((page) => {
                 const isActive = active?.id === page.id;
                 const segment = page.segmentId ? segments.find((s) => s.id === page.segmentId) : undefined;
@@ -102,6 +158,7 @@ export function SidebarNav({ mode, onNavigate }: { mode: SidebarMode; onNavigate
                 );
               })}
             </ul>
+            </div>
           </div>
         );
       })}
