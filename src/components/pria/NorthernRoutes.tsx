@@ -1,29 +1,26 @@
 "use client";
 
 import * as React from "react";
-import { routeLines } from "@/data/route-lines";
-import {
-  corridorEdges,
-  lineForPath,
-  northRoutes,
-  placeById,
-  routeNodes,
-  routesBetween,
-  type RouteGroup,
-} from "@/data/northern-routes";
+import { libraryFor } from "@/data/segment-corridors";
+import { lineForPath, routesBetween } from "@/data/northern-routes";
 import { loadRouteWeather, type RouteReport } from "@/lib/route-weather";
 import { cn } from "@/lib/utils";
 import { RouteGisMap } from "./RouteGisMap";
-
-const GROUPS: RouteGroup[] = ["Capital", "Gilgit-Baltistan", "North Khyber Pakhtunkhwa", "Azad Jammu & Kashmir"];
 
 function toLatLng(line: [number, number][]) {
   return line.map(([lon, lat]) => [lat, lon] as [number, number]);
 }
 
-export function NorthernRoutes() {
-  const [start, setStart] = React.useState("islamabad");
-  const [end, setEnd] = React.useState("hunza");
+export function NorthernRoutes({ segmentId = "mountain" }: { segmentId?: string }) {
+  const library = libraryFor(segmentId);
+  const placeById = React.useCallback(
+    (id: string) => library.nodes.find((node) => node.id === id),
+    [library],
+  );
+  const groups = React.useMemo(() => [...new Set(library.nodes.map((node) => node.group))], [library]);
+  const regions = React.useMemo(() => [...new Set(library.routes.map((route) => route.region))], [library]);
+  const [start, setStart] = React.useState(library.defaultStart);
+  const [end, setEnd] = React.useState(library.defaultEnd);
   const [focus, setFocus] = React.useState(0);
   const [basemap, setBasemap] = React.useState<"topo" | "imagery">("topo");
   const [weatherStatus, setWeatherStatus] = React.useState<"idle" | "loading" | "ready" | "error">("idle");
@@ -31,24 +28,27 @@ export function NorthernRoutes() {
   const [bestIndex, setBestIndex] = React.useState<number | null>(null);
   const [weatherReason, setWeatherReason] = React.useState("");
 
-  const paths = React.useMemo(() => routesBetween(start, end), [start, end]);
+  const paths = React.useMemo(
+    () => routesBetween(start, end, library.edges, library.spurNodes),
+    [start, end, library],
+  );
   const active = paths[focus] ?? paths[0];
   const origin = placeById(start);
   const destination = placeById(end);
-  const site = northRoutes.find((route) => route.id === end);
+  const site = library.routes.find((route) => route.id === end);
 
   const network = React.useMemo(
-    () => corridorEdges.map((edge) => toLatLng(routeLines[edge.id] ?? [])),
-    [],
+    () => library.edges.map((edge) => toLatLng(library.lines[edge.id] ?? [])),
+    [library],
   );
   const drawn = React.useMemo(
     () =>
       paths.map((path, index) => ({
-        positions: toLatLng(lineForPath(path.nodes)),
+        positions: toLatLng(lineForPath(path.nodes, library.edges, library.lines)),
         seasonal: path.seasonal,
         active: index === (paths[focus] ? focus : 0),
       })),
-    [paths, focus],
+    [paths, focus, library],
   );
   const stops = React.useMemo(() => {
     const ids = new Set<string>();
@@ -56,7 +56,7 @@ export function NorthernRoutes() {
     ids.delete(start);
     ids.delete(end);
     return [...ids].map((id) => placeById(id)).filter((place) => place != null);
-  }, [paths, start, end]);
+  }, [paths, start, end, placeById]);
 
   React.useEffect(() => {
     if (paths.length === 0) {
@@ -68,7 +68,7 @@ export function NorthernRoutes() {
     }
     const controller = new AbortController();
     setWeatherStatus("loading");
-    const lines = paths.map((path) => lineForPath(path.nodes));
+    const lines = paths.map((path) => lineForPath(path.nodes, library.edges, library.lines));
     loadRouteWeather(
       lines,
       paths.map((path) => path.seasonal),
@@ -88,10 +88,10 @@ export function NorthernRoutes() {
         setWeatherStatus("error");
       });
     return () => controller.abort();
-  }, [paths]);
+  }, [paths, library]);
 
   const chooseDestination = (id: string) => {
-    setStart("islamabad");
+    setStart(library.defaultStart);
     setEnd(id);
     setFocus(0);
   };
@@ -100,12 +100,8 @@ export function NorthernRoutes() {
     <div className="mb-8 flex flex-col gap-4">
       <div>
         <p className="text-[11px] font-semibold uppercase tracking-[0.16em] seg-text">Infrastructure corridors</p>
-        <h3 className="mt-1 font-heading text-xl font-bold">Corridors from Islamabad</h3>
-        <p className="mt-1 max-w-3xl text-sm leading-relaxed text-muted-foreground">
-          Choose a destination to draw every highway in this library from Islamabad, or set both ends. The lines follow
-          the mapped roads. Live weather is read along each road, and the calmer corridor is marked for this moment.
-          Babusar is dashed and is a summer link only. This is the infrastructure corridor, not a live travel bulletin.
-        </p>
+        <h3 className="mt-1 font-heading text-xl font-bold">{library.title}</h3>
+        <p className="mt-1 max-w-3xl text-sm leading-relaxed text-muted-foreground">{library.intro}</p>
       </div>
 
       <div className="grid gap-4 xl:grid-cols-[minmax(0,1.25fr)_minmax(280px,0.75fr)]">
@@ -139,11 +135,7 @@ export function NorthernRoutes() {
             stops={stops.map((place) => ({ name: place.name, lat: place.lat, lon: place.lon }))}
             basemap={basemap}
           />
-          <p className="border-t px-4 py-2 text-[11px] leading-relaxed text-muted-foreground">
-            Blue is the start and teal is the destination. A teal line is a year-round highway. An amber dashed line is
-            Babusar, summer only. Roads: N-35, N-15, N-95, the Swat Expressway, N-45 through the Lowari Tunnel, the
-            Murree–Kohala highway, the Gilgit–Skardu road, the Gilgit–Ghizer road and the Neelum valley road.
-          </p>
+          <p className="border-t px-4 py-2 text-[11px] leading-relaxed text-muted-foreground">{library.legend}</p>
         </div>
 
         <div className="flex min-w-0 flex-col gap-3">
@@ -158,9 +150,9 @@ export function NorthernRoutes() {
                 }}
                 className="rounded-xl border bg-card px-3 py-2 text-sm font-semibold normal-case tracking-normal text-foreground"
               >
-                {GROUPS.map((group) => (
+                {groups.map((group) => (
                   <optgroup key={group} label={group}>
-                    {routeNodes
+                    {library.nodes
                       .filter((node) => node.group === group)
                       .map((node) => (
                         <option key={node.id} value={node.id} disabled={node.id === end}>
@@ -181,9 +173,9 @@ export function NorthernRoutes() {
                 }}
                 className="rounded-xl border bg-card px-3 py-2 text-sm font-semibold normal-case tracking-normal text-foreground"
               >
-                {GROUPS.map((group) => (
+                {groups.map((group) => (
                   <optgroup key={group} label={group}>
-                    {routeNodes
+                    {library.nodes
                       .filter((node) => node.group === group)
                       .map((node) => (
                         <option key={node.id} value={node.id} disabled={node.id === start}>
@@ -254,14 +246,14 @@ export function NorthernRoutes() {
           </div>
 
           <div className="flex max-h-[240px] flex-col gap-3 overflow-auto pr-1">
-            {GROUPS.filter((group) => group !== "Capital").map((group) => (
+            {regions.map((group) => (
               <div key={group}>
                 <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">{group}</p>
                 <div className="flex flex-col gap-1">
-                  {northRoutes
+                  {library.routes
                     .filter((route) => route.region === group)
                     .map((route) => {
-                      const isActive = end === route.id && start === "islamabad";
+                      const isActive = end === route.id && start === library.defaultStart;
                       return (
                         <button
                           key={route.id}

@@ -22,7 +22,7 @@ function SubSectionBody({
   category: InfraCategory;
 }) {
   const showDrim = category.id === "residential" && sub.id === "design-options";
-  const showRoutes = segment.id === "mountain" && sub.id === "tourism-templates";
+  const showRoutes = sub.id === "tourism-templates";
   const showBuild = category.id === "residential" && sub.id === "construction-methodology";
   if (sub.items.length === 0 && !showDrim && !showRoutes && !showBuild) {
     return <ContentPending title={sub.title} icon={getIcon(sub.icon)} accent={segment.color} />;
@@ -31,7 +31,7 @@ function SubSectionBody({
     <div className="flex flex-col gap-8">
       {showDrim && <DrimStrip segment={segment} compact />}
       {sub.items.length > 0 && <ItemList sub={sub} />}
-      {showRoutes && <NorthernRoutes />}
+      {showRoutes && <NorthernRoutes key={segment.id} segmentId={segment.id} />}
       {showBuild && <SegmentConstruction segment={segment} />}
     </div>
   );

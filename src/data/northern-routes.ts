@@ -9,9 +9,7 @@
 
 import { routeLines } from "./route-lines";
 
-export type RouteGroup = "Capital" | "Gilgit-Baltistan" | "North Khyber Pakhtunkhwa" | "Azad Jammu & Kashmir";
-
-export type RouteNode = { id: string; name: string; lon: number; lat: number; group: RouteGroup };
+export type RouteNode = { id: string; name: string; lon: number; lat: number; group: string };
 
 export const routeNodes: RouteNode[] = [
   { id: "islamabad", name: "Islamabad", lon: 73.0479, lat: 33.6844, group: "Capital" },
@@ -35,7 +33,7 @@ export const routeNodes: RouteNode[] = [
 export type NorthRoute = {
   id: string;
   site: string;
-  region: "Gilgit-Baltistan" | "North Khyber Pakhtunkhwa" | "Azad Jammu & Kashmir";
+  region: string;
   road: string;
   /** Node ids from the approach to the site. */
   path: string[];
@@ -198,15 +196,20 @@ export function placeById(id: string) {
   return nodeById[id];
 }
 
-export function routesBetween(start: string, end: string): CorridorPath[] {
+export function routesBetween(
+  start: string,
+  end: string,
+  edges: CorridorEdge[] = corridorEdges,
+  spurNodes: readonly string[] = ["muzaffarabad", "sharda"],
+): CorridorPath[] {
   if (!start || !end || start === end) return [];
-  const spur = new Set(["muzaffarabad", "sharda"]);
-  const edges =
-    spur.has(start) || spur.has(end)
-      ? corridorEdges
-      : corridorEdges.filter((edge) => !edge.id.includes("muzaffarabad") && edge.id !== "muzaffarabad-sharda");
+  const spur = new Set(spurNodes);
+  const usable =
+    spur.size === 0 || spur.has(start) || spur.has(end)
+      ? edges
+      : edges.filter((edge) => !spur.has(edge.a) && !spur.has(edge.b));
   const adjacent = new Map<string, CorridorEdge[]>();
-  for (const edge of edges) {
+  for (const edge of usable) {
     for (const id of [edge.a, edge.b]) {
       const list = adjacent.get(id) ?? [];
       list.push(edge);
@@ -241,14 +244,18 @@ export function routesBetween(start: string, end: string): CorridorPath[] {
   return found;
 }
 
-export function lineForPath(nodes: string[]): [number, number][] {
+export function lineForPath(
+  nodes: string[],
+  edges: CorridorEdge[] = corridorEdges,
+  lines: Record<string, [number, number][]> = routeLines,
+): [number, number][] {
   const line: [number, number][] = [];
   for (let i = 0; i < nodes.length - 1; i++) {
     const a = nodes[i];
     const b = nodes[i + 1];
-    const edge = corridorEdges.find((item) => (item.a === a && item.b === b) || (item.a === b && item.b === a));
+    const edge = edges.find((item) => (item.a === a && item.b === b) || (item.a === b && item.b === a));
     if (!edge) continue;
-    const raw = routeLines[edge.id];
+    const raw = lines[edge.id];
     if (!raw) continue;
     const segment = edge.a === a ? raw : [...raw].reverse();
     for (const point of segment) {
