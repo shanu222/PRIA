@@ -4,6 +4,8 @@ import { categoryStatus, segments, type InfraCategory, type Segment } from "@/da
 import { Icon } from "@/lib/icons";
 import { cn } from "@/lib/utils";
 import { CategoryTabs } from "./CategoryTabs";
+import { DrimStrip } from "./DrimStrip";
+import { HazardProfile } from "./HazardProfile";
 import { Reveal } from "./Motion";
 import { RegionChips, segmentStyle } from "./SegmentCard";
 import { StatusBadge } from "./StatusBadge";
@@ -48,10 +50,18 @@ function SegmentHero({ segment }: { segment: Segment }) {
   );
 }
 
-function SegmentRail({ segment, activeCategoryId }: { segment: Segment; activeCategoryId: string }) {
+function SegmentRail({
+  segment,
+  activeCategoryId,
+  className,
+}: {
+  segment: Segment;
+  activeCategoryId: string;
+  className?: string;
+}) {
   const others = segments.filter((s) => s.id !== segment.id);
   return (
-    <aside aria-label="In this segment" className="flex flex-col gap-4">
+    <aside aria-label="In this segment" className={cn("flex flex-col gap-4", className)}>
       <div className="rounded-xl border bg-card p-5 shadow-soft">
         <h2 className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">In this segment</h2>
         <p className="mt-4 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Regions</p>
@@ -127,7 +137,7 @@ export function SegmentDetail({ segment, category }: { segment: Segment; categor
       <SegmentHero segment={segment} />
       <CategoryTabs segment={segment} activeId={category.id} />
 
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_280px]">
+      <div className="grid gap-6 2xl:grid-cols-[minmax(0,1fr)_280px]">
         <Reveal key={category.id} className="min-w-0">
           <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
             <div>
@@ -140,20 +150,39 @@ export function SegmentDetail({ segment, category }: { segment: Segment; categor
                 {category.subSections.length} sub-sections
               </p>
             </div>
-            <StatusBadge status={status} label={status === "pending" ? "Recommendations pending" : undefined} />
+            <StatusBadge
+              status={status}
+              label={
+                status === "pending"
+                  ? "Recommendations pending"
+                  : `${category.subSections.reduce((n, s) => n + s.items.length, 0)} recommendations`
+              }
+            />
           </div>
           <SubSectionPanel key={`${segment.id}-${category.id}`} segment={segment} category={category} />
         </Reveal>
-        <div className="hidden xl:block">
+        <div className="hidden 2xl:block">
           <div className="sticky top-24">
             <SegmentRail segment={segment} activeCategoryId={category.id} />
           </div>
         </div>
       </div>
 
-      <div className="xl:hidden">
-        <SegmentRail segment={segment} activeCategoryId={category.id} />
+      <div className="2xl:hidden">
+        <SegmentRail segment={segment} activeCategoryId={category.id} className="md:grid md:grid-cols-2 md:items-start" />
       </div>
+
+      <section aria-labelledby="segment-hazards" className="mt-4">
+        <p className="text-xs font-semibold uppercase tracking-[0.16em] seg-text">Why these recommendations</p>
+        <h2 id="segment-hazards" className="mb-4 mt-1.5 text-2xl font-bold">
+          Hazard profile
+        </h2>
+        <HazardProfile segment={segment} />
+      </section>
+
+      <section aria-label="DRIM resilient house models" className="mt-4">
+        <DrimStrip segment={segment} />
+      </section>
     </div>
   );
 }

@@ -79,7 +79,7 @@ export function SegmentCard({ segment }: { segment: Segment }) {
   return (
     <article
       style={segmentStyle(segment)}
-      className="group flex h-full flex-col overflow-hidden rounded-2xl border bg-card shadow-soft transition-all duration-300 hover:-translate-y-1 hover:border-[var(--seg)] hover:shadow-lift"
+      className="group flex h-full flex-col overflow-hidden rounded-2xl border-2 bg-card shadow-soft transition-all duration-300 hover:-translate-y-1 hover:border-[var(--seg)] hover:shadow-lift"
     >
       <div
         className="relative overflow-hidden px-6 pb-6 pt-7 text-white"

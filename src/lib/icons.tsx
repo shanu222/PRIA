@@ -1,4 +1,9 @@
 import {
+  Activity,
+  CloudRain,
+  Snowflake,
+  Thermometer,
+  Wind,
   Anchor,
   ArrowUpFromLine,
   Ban,
@@ -69,6 +74,11 @@ import {
 } from "lucide-react";
 
 export const iconRegistry: Record<string, LucideIcon> = {
+  Activity,
+  CloudRain,
+  Snowflake,
+  Thermometer,
+  Wind,
   Anchor,
   ArrowUpFromLine,
   Ban,

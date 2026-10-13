@@ -43,7 +43,7 @@ export function InsightCard({
     <article
       id={id}
       className={cn(
-        "group relative flex h-full scroll-mt-24 flex-col rounded-xl border bg-card p-6 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-lift",
+        "group relative flex h-full scroll-mt-24 flex-col rounded-xl border-2 bg-card p-6 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-lift",
         t.card,
         className,
       )}

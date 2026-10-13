@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import { getPage, landscape } from "@/data/pria";
 import { getPriaContent } from "@/data/content";
+import { censusSource, housingTable } from "@/data/census";
 import { PageHeader, SectionHeader } from "@/components/layout/PageHeader";
 import { InsightCard } from "@/components/pria/InsightCard";
 import { Reveal, Stagger, StaggerItem } from "@/components/pria/Motion";
+import { ProvinceCensusMap } from "@/components/pria/ProvinceCensusMap";
 import { ProvinceTable } from "@/components/pria/ProvinceTable";
 import { ResidentialDonut } from "@/components/pria/ResidentialDonut";
 import { StatTile } from "@/components/pria/StatTile";
@@ -27,6 +29,22 @@ export default async function LandscapePage() {
         }
       />
 
+      <section aria-labelledby="census" className="scroll-mt-24">
+        <SectionHeader
+          id="census"
+          eyebrow="Census 2023"
+          title="Population and housing at a glance"
+          description={`${censusSource.label}.`}
+        />
+        <Stagger className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+          {landscape.censusStats.map((s) => (
+            <StaggerItem key={s.id}>
+              <StatTile stat={s} />
+            </StaggerItem>
+          ))}
+        </Stagger>
+      </section>
+
       <section aria-labelledby="types" className="scroll-mt-24">
         <SectionHeader id="types" eyebrow="Classification" title="Types of Infrastructure" />
         <Stagger className="grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-5">
@@ -38,8 +56,25 @@ export default async function LandscapePage() {
         </Stagger>
       </section>
 
+      <section aria-labelledby="province-map" className="scroll-mt-24">
+        <SectionHeader
+          id="province-map"
+          eyebrow="Interactive map"
+          title="Provinces by density and housing quality"
+          description="Choose a measure, then hover or select a province to compare it with the rest of Pakistan."
+        />
+        <Reveal>
+          <ProvinceCensusMap />
+        </Reveal>
+      </section>
+
       <section aria-labelledby="residential-split" className="scroll-mt-24">
-        <SectionHeader id="residential-split" eyebrow="Residential" title="Urban and rural split" />
+        <SectionHeader
+          id="residential-split"
+          eyebrow="Residential"
+          title="Urban and rural split"
+          description="Share of the 38.29 million housing units in urban and rural areas, Census 2023."
+        />
         <Reveal>
           <div className="rounded-2xl border bg-card p-6 shadow-soft sm:p-8">
             <ResidentialDonut data={landscape.residentialSplit} />
@@ -47,12 +82,21 @@ export default async function LandscapePage() {
         </Reveal>
       </section>
 
-      <section aria-label="Province and region breakdown">
-        <SectionHeader eyebrow="By province & region" title={provinceTable.title} />
+      <section aria-label="Housing and built stock by province">
+        <SectionHeader eyebrow="By province" title={housingTable.title} />
         <Reveal>
-          <ProvinceTable table={provinceTable} />
+          <ProvinceTable table={housingTable} />
         </Reveal>
       </section>
+
+      {provinceTable.status === "available" && (
+        <section aria-label="Province and region breakdown">
+          <SectionHeader eyebrow="By province & region" title={provinceTable.title} />
+          <Reveal>
+            <ProvinceTable table={provinceTable} />
+          </Reveal>
+        </section>
+      )}
     </div>
   );
 }

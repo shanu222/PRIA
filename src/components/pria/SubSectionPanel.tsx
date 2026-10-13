@@ -6,29 +6,52 @@ import type { InfraCategory, Segment, SubSection } from "@/data/pria";
 import { getIcon, Icon } from "@/lib/icons";
 import { cn } from "@/lib/utils";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Badge } from "@/components/ui/badge";
 import { ContentPending } from "./ContentPending";
+import { DrimStrip } from "./DrimStrip";
 import { StatusBadge } from "./StatusBadge";
 
-function SubSectionBody({ sub, segment }: { sub: SubSection; segment: Segment }) {
-  if (sub.items.length === 0) {
+function SubSectionBody({ sub, segment, showDrim }: { sub: SubSection; segment: Segment; showDrim: boolean }) {
+  if (sub.items.length === 0 && !showDrim) {
     return <ContentPending title={sub.title} icon={getIcon(sub.icon)} accent={segment.color} />;
   }
   return (
+    <div className="flex flex-col gap-8">
+      {showDrim && <DrimStrip segment={segment} compact />}
+      {sub.items.length > 0 && <ItemList sub={sub} />}
+    </div>
+  );
+}
+
+function ItemList({ sub }: { sub: SubSection }) {
+  return (
     <ul className="grid gap-3">
-      {sub.items.map((item) => (
-        <li key={item.id} className="rounded-xl border bg-card p-5 shadow-soft">
-          <h4 className="font-semibold">{item.title}</h4>
-          {item.description && <p className="mt-1.5 text-sm text-muted-foreground">{item.description}</p>}
-          {item.tags && item.tags.length > 0 && (
-            <div className="mt-3 flex flex-wrap gap-1.5">
-              {item.tags.map((tag) => (
-                <Badge key={tag} variant="secondary">
-                  {tag}
-                </Badge>
-              ))}
-            </div>
-          )}
+      {sub.items.map((item, i) => (
+        <li
+          key={item.id}
+          className="group relative flex gap-4 rounded-xl border-2 border-[color-mix(in_srgb,var(--seg)_18%,hsl(var(--border)))] bg-card p-5 shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:border-[var(--seg)] hover:shadow-lift"
+        >
+          <span
+            aria-hidden="true"
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[color-mix(in_srgb,var(--seg)_12%,transparent)] font-heading text-sm font-bold seg-text transition-colors group-hover:bg-[var(--seg-strong)] group-hover:text-white"
+          >
+            {i + 1}
+          </span>
+          <div className="min-w-0">
+            <h4 className="font-semibold leading-snug">{item.title}</h4>
+            {item.description && <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{item.description}</p>}
+            {item.tags && item.tags.length > 0 && (
+              <div className="mt-3 flex flex-wrap gap-1.5">
+                {item.tags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="inline-flex items-center rounded-full border border-[color-mix(in_srgb,var(--seg)_35%,transparent)] bg-[color-mix(in_srgb,var(--seg)_6%,transparent)] px-2.5 py-0.5 text-xs font-semibold seg-text"
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
         </li>
       ))}
     </ul>
@@ -51,6 +74,8 @@ function SubSectionHeading({ sub, as: Heading = "h3" }: { sub: SubSection; as?: 
   );
 }
 
+const isDrimSub = (category: InfraCategory, sub: SubSection) => category.id === "residential" && sub.id === "design-options";
+
 export function SubSectionPanel({ segment, category }: { segment: Segment; category: InfraCategory }) {
   const [activeId, setActiveId] = React.useState(category.subSections[0]?.id);
   const active = category.subSections.find((s) => s.id === activeId) ?? category.subSections[0];
@@ -59,7 +84,7 @@ export function SubSectionPanel({ segment, category }: { segment: Segment; categ
     <>
       {/* Desktop: mini-nav + content */}
       <div className="hidden gap-6 lg:grid lg:grid-cols-[260px_minmax(0,1fr)]">
-        <nav aria-label={`${category.shortTitle} sub-sections`} className="self-start rounded-xl border bg-card p-2 shadow-soft">
+        <nav aria-label={`${category.shortTitle} sub-sections`} className="self-start rounded-xl border-2 bg-card p-2 shadow-soft">
           <ul className="flex flex-col gap-0.5">
             {category.subSections.map((sub) => {
               const isActive = sub.id === active.id;
@@ -102,7 +127,7 @@ export function SubSectionPanel({ segment, category }: { segment: Segment; categ
           </ul>
         </nav>
 
-        <section aria-live="polite" className="min-w-0 rounded-xl border bg-card p-6 shadow-soft">
+        <section aria-live="polite" className="min-w-0 rounded-xl border-2 border-[color-mix(in_srgb,var(--seg)_25%,hsl(var(--border)))] bg-card p-6 shadow-soft">
           <AnimatePresence mode="wait">
             <motion.div
               key={active.id}
@@ -115,7 +140,7 @@ export function SubSectionPanel({ segment, category }: { segment: Segment; categ
                 <SubSectionHeading sub={active} />
                 <StatusBadge status={active.status} />
               </div>
-              <SubSectionBody sub={active} segment={segment} />
+              <SubSectionBody sub={active} segment={segment} showDrim={isDrimSub(category, active)} />
             </motion.div>
           </AnimatePresence>
         </section>
@@ -134,7 +159,7 @@ export function SubSectionPanel({ segment, category }: { segment: Segment; categ
               <SubSectionHeading sub={sub} as="span" />
             </AccordionTrigger>
             <AccordionContent>
-              <SubSectionBody sub={sub} segment={segment} />
+              <SubSectionBody sub={sub} segment={segment} showDrim={isDrimSub(category, sub)} />
             </AccordionContent>
           </AccordionItem>
         ))}

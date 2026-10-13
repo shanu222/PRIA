@@ -120,7 +120,7 @@ export function SidebarBrand({ mode }: { mode: SidebarMode }) {
         mode === "responsive" && "justify-center lg:justify-start",
       )}
     >
-      <LogoMark className="h-10 w-10" />
+      <LogoMark swivel className="h-10 w-10" />
       <Wordmark className={cn(mode === "rail" && "hidden", mode === "responsive" && "hidden lg:flex")} />
     </Link>
   );

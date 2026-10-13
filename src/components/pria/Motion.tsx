@@ -97,6 +97,7 @@ export function CountUp({
   prefix = "",
   suffix = "",
   plain = false,
+  decimals = 0,
   duration = 1.4,
   className,
 }: {
@@ -104,6 +105,7 @@ export function CountUp({
   prefix?: string;
   suffix?: string;
   plain?: boolean;
+  decimals?: number;
   duration?: number;
   className?: string;
 }) {
@@ -111,8 +113,11 @@ export function CountUp({
   const inView = useInView(ref, { once: true, margin: "-20px" });
   const reduce = useReducedMotion();
   const format = React.useCallback(
-    (n: number) => (plain ? String(Math.round(n)) : Math.round(n).toLocaleString("en-US")),
-    [plain],
+    (n: number) =>
+      plain
+        ? String(Math.round(n))
+        : n.toLocaleString("en-US", { minimumFractionDigits: decimals, maximumFractionDigits: decimals }),
+    [plain, decimals],
   );
   const [display, setDisplay] = React.useState(() => format(value));
   const done = React.useRef(false);

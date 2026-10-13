@@ -7,14 +7,14 @@ import { StatusBadge } from "./StatusBadge";
 
 export function SegmentCompareMatrix({ segments }: { segments: Segment[] }) {
   return (
-    <div className="overflow-hidden rounded-xl border bg-card shadow-soft">
+    <div className="overflow-hidden rounded-2xl border-2 bg-card shadow-soft transition-shadow hover:shadow-lift">
       <Table>
         <TableCaption className="sr-only">
           Status of recommendations for each regional segment and infrastructure category
         </TableCaption>
         <TableHeader>
           <TableRow className="hover:bg-transparent">
-            <TableHead scope="col" className="sticky left-0 z-10 min-w-[200px] bg-card">
+            <TableHead scope="col" className="sticky left-0 z-10 min-w-[200px] bg-[#0B5D3B]">
               Segment
             </TableHead>
             {infraCategories.map((c) => (
@@ -30,7 +30,7 @@ export function SegmentCompareMatrix({ segments }: { segments: Segment[] }) {
         <TableBody>
           {segments.map((s) => (
             <TableRow key={s.id} style={segmentStyle(s)}>
-              <th scope="row" className="sticky left-0 z-10 bg-card px-4 py-3 text-left">
+              <th scope="row" className="sticky left-0 z-10 bg-card px-4 py-3 text-left transition-colors group-hover:bg-primary-tint">
                 <Link
                   href={`/segments/${s.slug}`}
                   className="flex items-center gap-2.5 rounded font-semibold hover:underline"

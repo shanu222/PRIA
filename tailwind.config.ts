@@ -94,10 +94,25 @@ const config: Config = {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
         },
+        swivel: {
+          "0%, 100%": { transform: "perspective(700px) rotateY(-24deg)" },
+          "50%": { transform: "perspective(700px) rotateY(24deg)" },
+        },
+        "swivel-spin": {
+          from: { transform: "perspective(700px) rotateY(0deg)" },
+          to: { transform: "perspective(700px) rotateY(360deg)" },
+        },
+        "glow-pulse": {
+          "0%, 100%": { opacity: "0.45", transform: "scale(1)" },
+          "50%": { opacity: "0.85", transform: "scale(1.08)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        swivel: "swivel 5s ease-in-out infinite",
+        "swivel-spin": "swivel-spin 1.1s cubic-bezier(0.16, 1, 0.3, 1)",
+        "glow-pulse": "glow-pulse 4s ease-in-out infinite",
       },
     },
   },

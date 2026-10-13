@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowRight, ArrowUpRight, ListChecks } from "lucide-react";
 import { getPage, home, observations, site } from "@/data/pria";
+import { disasterTimeline } from "@/data/hazards";
 import { Icon } from "@/lib/icons";
 import { Button } from "@/components/ui/button";
 import { SectionHeader } from "@/components/layout/PageHeader";
@@ -8,6 +9,9 @@ import { Reveal, Stagger, StaggerItem } from "@/components/pria/Motion";
 import { SegmentExplorer } from "@/components/pria/SegmentExplorer";
 import { StatTile } from "@/components/pria/StatTile";
 import { TopoPattern } from "@/components/pria/TopoPattern";
+import { LogoEmblem } from "@/components/layout/Logo";
+import { DrimCard } from "@/components/pria/DrimCard";
+import { drimModels } from "@/data/drim";
 
 export default function HomePage() {
   const { hero, stats, glanceLinks, roadmap } = home;
@@ -24,6 +28,7 @@ export default function HomePage() {
         <TopoPattern className="-z-10 text-white opacity-[0.14]" />
         <div className="grid items-center gap-12 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
           <div>
+            <LogoEmblem className="mb-6 h-16 w-16 lg:hidden" />
             <Reveal>
               <p className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-white/90 backdrop-blur">
                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-300" aria-hidden />
@@ -65,12 +70,10 @@ export default function HomePage() {
                   style={{ inset: `${i * 12}%` }}
                 />
               ))}
-              <div className="absolute inset-[36%] flex flex-col items-center justify-center rounded-full bg-white/10 text-center ring-1 ring-white/25 backdrop-blur">
-                <span className="font-heading text-3xl font-extrabold">{to.year}</span>
-                <span className="mt-1 px-2 text-[10px] font-medium uppercase tracking-wider text-white/75">
-                  {site.vision}
-                </span>
-              </div>
+              <LogoEmblem className="absolute inset-[30%]" />
+              <span className="absolute left-1/2 top-[6%] -translate-x-1/2 rounded-full bg-white/10 px-3 py-1 text-center text-xs font-bold ring-1 ring-white/25 backdrop-blur">
+                {to.year} · {site.vision}
+              </span>
               <span className="absolute left-[6%] top-[46%] rounded-full bg-white/10 px-2.5 py-1 text-xs font-semibold ring-1 ring-white/25 backdrop-blur">
                 {from.year}
               </span>
@@ -108,7 +111,7 @@ export default function HomePage() {
               <StaggerItem key={link.pageId}>
                 <Link
                   href={page.href}
-                  className="group flex h-full flex-col rounded-xl border bg-card p-6 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:border-primary/45 hover:shadow-lift"
+                  className="group flex h-full flex-col rounded-xl border-2 bg-card p-6 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:border-primary hover:bg-gradient-to-br hover:from-primary-tint/70 hover:to-card hover:shadow-lift"
                 >
                   <div className="flex items-start justify-between">
                     <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary-tint text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground dark:text-accent-foreground dark:group-hover:text-primary-foreground">
@@ -150,6 +153,79 @@ export default function HomePage() {
         <Reveal>
           <SegmentExplorer />
         </Reveal>
+      </section>
+
+      {/* DRIM */}
+      <section aria-labelledby="drim-title">
+        <SectionHeader
+          id="drim-title"
+          eyebrow="Resilient models"
+          title="NDMA's disaster resilient house models"
+          description={`${drimModels.length} full-scale models for earthquakes, floods, landslides and extreme heat and cold, each matched to the provinces it suits.`}
+          action={
+            <Button asChild variant="outline">
+              <Link href="/drim">
+                Explore all models
+                <ArrowRight />
+              </Link>
+            </Button>
+          }
+        />
+        <Stagger className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {["loh-kaat-timber-house-structure", "elevated-flood-resilient-house-structure", "floating-amphibious-structure", "geogrid-reinforced-retaining-wall-structure"].map((slug) => {
+            const model = drimModels.find((m) => m.slug === slug)!;
+            return (
+              <StaggerItem key={slug}>
+                <DrimCard model={model} />
+              </StaggerItem>
+            );
+          })}
+        </Stagger>
+      </section>
+
+      {/* Disasters */}
+      <section aria-labelledby="disasters-title">
+        <SectionHeader
+          id="disasters-title"
+          eyebrow="Why resilience"
+          title="Lessons from recent disasters"
+          description="Recorded losses that show what PRIA is designed to prevent."
+          action={
+            <Button asChild variant="outline">
+              <Link href="/hazards">
+                Hazards & disasters
+                <ArrowRight />
+              </Link>
+            </Button>
+          }
+        />
+        <Stagger className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+          {disasterTimeline.map((event) => {
+            const lead = event.facts[0];
+            return (
+              <StaggerItem key={event.id}>
+                <Link
+                  href={`/hazards#${event.id}`}
+                  className="group flex h-full flex-col rounded-xl border-2 bg-card p-5 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:border-water hover:shadow-lift"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="font-heading text-2xl font-extrabold text-water">{event.year}</span>
+                    <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-water/10 text-water transition-colors group-hover:bg-water group-hover:text-white">
+                      <Icon name={event.icon} className="h-4 w-4" />
+                    </span>
+                  </div>
+                  <h3 className="mt-3 font-semibold leading-snug">{event.title}</h3>
+                  {lead && (
+                    <p className="mt-auto pt-4">
+                      <span className="block font-heading text-xl font-bold">{lead.value}</span>
+                      <span className="block text-xs text-muted-foreground">{lead.label}</span>
+                    </p>
+                  )}
+                </Link>
+              </StaggerItem>
+            );
+          })}
+        </Stagger>
       </section>
 
       {/* Roadmap */}

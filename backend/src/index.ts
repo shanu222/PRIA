@@ -7,6 +7,7 @@ import { HTTPException } from "hono/http-exception";
 import { logger } from "hono/logger";
 import { secureHeaders } from "hono/secure-headers";
 import { z } from "zod";
+import { assets, isPublicAssetKey } from "./assets.js";
 import { corsOrigins, env } from "./env.js";
 import { revalidateFrontend } from "./revalidate.js";
 import {
@@ -23,7 +24,10 @@ import { categories, segmentIds, structure, summaryIds } from "./structure.js";
 const app = new Hono();
 
 app.use("*", logger());
-app.use("*", secureHeaders());
+const apiSecureHeaders = secureHeaders();
+// Media is embedded by the portal (images, PDF viewer), so it must not carry frame or same-origin resource policies.
+const assetSecureHeaders = secureHeaders({ xFrameOptions: false, crossOriginResourcePolicy: "cross-origin" });
+app.use("*", (c, next) => (c.req.path.startsWith("/assets/") ? assetSecureHeaders : apiSecureHeaders)(c, next));
 app.use(
   "/api/*",
   cors({
@@ -65,7 +69,7 @@ async function saved(doc: ContentDocument) {
 
 /* ---------------------------------- Public --------------------------------- */
 
-app.get("/", (c) => c.json({ name: "PRIA API", docs: "/api/structure", health: "/health" }));
+app.get("/", (c) => c.json({ name: "PRIA API", docs: "/api/structure", health: "/health", assets: "/assets/{key}" }));
 
 app.get("/health", async (c) => {
   try {
@@ -83,6 +87,27 @@ app.get("/api/content", async (c) => {
   const doc = await store.read();
   c.header("Cache-Control", "public, max-age=30, stale-while-revalidate=60");
   return c.json(doc);
+});
+
+app.get("/assets/*", async (c) => {
+  const key = decodeURIComponent(c.req.path.slice("/assets/".length));
+  if (!isPublicAssetKey(key)) return c.json({ error: "Not found" }, 404);
+
+  const asset = await assets.get(key, c.req.header("If-None-Match"));
+  if (asset === "not-modified") return c.body(null, 304);
+  if (!asset) return c.json({ error: "Not found" }, 404);
+
+  c.header("Content-Type", asset.contentType);
+  c.header("Cache-Control", "public, max-age=86400, stale-while-revalidate=604800");
+  c.header("Access-Control-Allow-Origin", "*");
+  if (asset.contentLength !== undefined) c.header("Content-Length", String(asset.contentLength));
+  if (asset.etag) c.header("ETag", asset.etag);
+  if (asset.lastModified) c.header("Last-Modified", asset.lastModified.toUTCString());
+  if (asset.contentType === "application/pdf") {
+    const filename = key.split("/").pop()!;
+    c.header("Content-Disposition", `${c.req.query("download") !== undefined ? "attachment" : "inline"}; filename="${filename}"`);
+  }
+  return c.body(asset.body);
 });
 
 /* ---------------------------------- Admin ---------------------------------- */

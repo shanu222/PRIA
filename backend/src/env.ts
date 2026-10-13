@@ -16,6 +16,7 @@ const schema = z
 
     STORAGE_DRIVER: z.enum(["r2", "file"]).default("file"),
     DATA_FILE: z.string().default("./data/pria-content.json"),
+    ASSETS_DIR: z.string().default("./data/assets"),
     CACHE_TTL_SECONDS: z.coerce.number().int().min(0).default(30),
 
     R2_ACCOUNT_ID: optionalString,

@@ -7,6 +7,10 @@
  * state from that, so filling data here replaces the pending UI automatically.
  */
 
+import { national, provinces, type ProvinceCensus } from "./census";
+import { getProvinceOutlook } from "./outlook";
+import { baselineRecommendations } from "./recommendations";
+
 /* -------------------------------------------------------------------------- */
 /*                                    Types                                   */
 /* -------------------------------------------------------------------------- */
@@ -67,6 +71,8 @@ export type Stat = {
   status: ContentStatus;
   /** Render the value without thousands separators (e.g. years). */
   plain?: boolean;
+  decimals?: number;
+  source?: string;
 };
 
 export type InfoItem = {
@@ -76,7 +82,7 @@ export type InfoItem = {
   icon: IconName;
 };
 
-export type NavGroupId = "overview" | "national-context" | "framework" | "segments" | "summary";
+export type NavGroupId = "overview" | "national-context" | "framework" | "segments" | "solutions" | "summary";
 
 export type PageMeta = {
   id: string;
@@ -231,7 +237,7 @@ export type RecommendationContent = Partial<
   Record<string, Partial<Record<string, Partial<Record<string, RecommendationItem[]>>>>>
 >;
 
-const recommendationContent: RecommendationContent = {};
+const recommendationContent: RecommendationContent = baselineRecommendations;
 
 function buildCategories(segmentId: SegmentId, content: RecommendationContent): InfraCategory[] {
   return categoryTemplates.map((category) => ({
@@ -351,6 +357,7 @@ export const navGroups: { id: NavGroupId; label: string }[] = [
   { id: "national-context", label: "National Context" },
   { id: "framework", label: "Framework" },
   { id: "segments", label: "Regional Segments" },
+  { id: "solutions", label: "Resilient Models" },
   { id: "summary", label: "Summary" },
 ];
 
@@ -377,6 +384,16 @@ export const pages: PageMeta[] = [
     icon: "Map",
   },
   {
+    id: "outlook",
+    href: "/outlook",
+    title: "Growth Outlook 2047",
+    navLabel: "Growth Outlook 2047",
+    group: "national-context",
+    eyebrow: "National Context",
+    description: "Population, buildings, housing need and built-up growth from 2026 to 2047, nationally and by province.",
+    icon: "TrendingUp",
+  },
+  {
     id: "observations",
     href: "/observations",
     title: "Observations",
@@ -395,6 +412,16 @@ export const pages: PageMeta[] = [
     eyebrow: "National Context",
     description: "The pressures shaping infrastructure needs in the coming years.",
     icon: "TriangleAlert",
+  },
+  {
+    id: "hazards",
+    href: "/hazards",
+    title: "Hazards & Disasters",
+    navLabel: "Hazards & Disasters",
+    group: "national-context",
+    eyebrow: "National Context",
+    description: "Recorded disasters, hazard exposure and housing vulnerability across Pakistan.",
+    icon: "Activity",
   },
   {
     id: "resources",
@@ -457,6 +484,17 @@ export const pages: PageMeta[] = [
     icon: s.icon,
     segmentId: s.id,
   })),
+  {
+    id: "drim",
+    href: "/drim",
+    title: "Disaster Resilient Infrastructure Models",
+    navLabel: "DRIM Models",
+    group: "solutions",
+    eyebrow: "Resilient Models",
+    description:
+      "NDMA's full-scale resilient house models, with their features, materials and the provinces and regions each one suits.",
+    icon: "HousePlus",
+  },
   {
     id: "ndma-role",
     href: "/summary/ndma-role",
@@ -584,10 +622,53 @@ export const landscape = {
     { id: "communication", title: "Communication", icon: "RadioTower" },
     { id: "misc", title: "Misc", icon: "Shapes" },
   ] satisfies InfoItem[],
+  /** Share of housing units, Census 2023 (PBS National Census Report, Table 5.2). */
   residentialSplit: [
-    { id: "urban", label: "Urban", value: 36, status: "provisional" as ContentStatus },
-    { id: "rural", label: "Rural", value: 64, status: "available" as ContentStatus },
+    { id: "urban", label: "Urban", value: national.householdsUrbanPct, status: "available" as ContentStatus },
+    { id: "rural", label: "Rural", value: national.householdsRuralPct, status: "available" as ContentStatus },
   ],
+  censusStats: [
+    {
+      id: "census-population",
+      label: "Population (Census 2023)",
+      value: national.populationTotal / 1_000_000,
+      suffix: " Mn",
+      decimals: 2,
+      note: "Incl. AJK & Gilgit-Baltistan",
+      status: "available",
+      source: "PBS",
+    },
+    {
+      id: "housing-units",
+      label: "Housing units",
+      value: national.households / 1_000_000,
+      suffix: " Mn",
+      decimals: 2,
+      note: "Up from 31.92 Mn in 2017",
+      status: "available",
+      source: "PBS",
+    },
+    {
+      id: "pacca",
+      label: "Pacca houses",
+      value: national.paccaPct,
+      suffix: "%",
+      decimals: 1,
+      note: `${national.kachaPct}% kacha, ${national.semiPaccaPct}% semi-pacca`,
+      status: "available",
+      source: "PBS",
+    },
+    {
+      id: "single-room",
+      label: "Single-room homes",
+      value: national.singleRoomPct,
+      suffix: "%",
+      decimals: 1,
+      note: `Average household: ${national.householdSize} persons`,
+      status: "available",
+      source: "PBS",
+    },
+  ] satisfies Stat[],
   provinceTable: {
     id: "province-breakdown",
     title: "Province & Region Breakdown",
@@ -625,6 +706,61 @@ export const observations = {
 /*                                 Challenges                                 */
 /* -------------------------------------------------------------------------- */
 
+function housingStatus(p?: ProvinceCensus): string | null {
+  if (!p) return null;
+  const pop = `${(p.population / 1_000_000).toFixed(2)} Mn people`;
+  if (!p.households) return `${pop} (Census 2023)`;
+  return `${pop}; ${(p.households / 1_000_000).toFixed(2)} Mn housing units; ${p.paccaPct}% pacca, ${p.kachaPct}% kacha`;
+}
+
+const byName = (name: string) => provinces.find((p) => p.name === name);
+
+function projectedNeed(name: string): string | null {
+  const census = byName(name);
+  const o = census ? getProvinceOutlook(census.id) : undefined;
+  if (!o) return null;
+  const mn = (n: number) => (n / 1_000_000).toFixed(2);
+  return `${o.pop2047.toFixed(2)} Mn people (${o.pop2026.toFixed(2)} Mn in 2026); buildings ${mn(o.buildings2026)} → ${mn(o.buildings2047)} Mn; built-up ${o.coverage2026}% → ${o.coverage2047}% of area`;
+}
+
+const regionOutlook: Record<string, Record<string, string | null>> = {
+  Punjab: {
+    "current-status": housingStatus(byName("Punjab")),
+    "key-challenge":
+      "Riverine floods on the Indus, Jhelum, Chenab, Ravi and Sutlej and hill torrents from the Koh-e-Suleman (223 deaths in 2022); urban flooding, heat and smog in fast-growing cities.",
+  },
+  Sindh: {
+    "current-status": housingStatus(byName("Sindh")),
+    "key-challenge":
+      "Worst hit in 2022 (799 deaths); 61% of rural houses are kacha and 50% of homes have a single room; extreme heat (2015 heatwave) and cyclone and surge exposure on the coast.",
+  },
+  "Khyber Pakhtunkhwa": {
+    "current-status": housingStatus(byName("Khyber Pakhtunkhwa")),
+    "key-challenge":
+      "Flash floods and landslides (309 deaths and 326,897 houses damaged in 2022), GLOF risk in the north and high seismic hazard in Hazara and Malakand.",
+  },
+  Balochistan: {
+    "current-status": housingStatus(byName("Balochistan")),
+    "key-challenge":
+      "Least durable housing stock (61% mud or unbaked-brick walls); 426,897 houses damaged and 336 deaths in 2022; drought and extreme heat (53.7 °C at Turbat, 2017).",
+  },
+  "Gilgit-Baltistan": {
+    "current-status": housingStatus(byName("Gilgit-Baltistan")),
+    "key-challenge":
+      "Glacial lake outburst floods (3,044 glacial lakes in GB and KP, 33 hazardous), landslides that cut the Karakoram Highway, and seismic hazard.",
+  },
+  "Azad Jammu & Kashmir": {
+    "current-status": housingStatus(byName("Azad Jammu & Kashmir")),
+    "key-challenge":
+      "Epicentre of the 2005 Mw 7.6 earthquake (33,724 deaths in Muzaffarabad district alone); landslides and flash floods in the Neelum and Jhelum valleys.",
+  },
+  "Islamabad Capital Territory": {
+    "current-status": housingStatus(byName("Islamabad Capital Territory")),
+    "key-challenge":
+      "Highest density in the country (2,609 persons per km²) and the largest share of structures under construction (6.56%), putting pressure on land, drainage and building control.",
+  },
+};
+
 const projectedColumns: TableColumn[] = [
   { id: "current-status", label: "Current Status" },
   { id: "projected-need", label: "Projected Need (2047)" },
@@ -660,11 +796,15 @@ export const challenges = {
   projectedTable: {
     id: "projected-breakdown",
     title: "Projected Province & Region Outlook",
-    caption: "Current status, projected need towards 2047 and key challenge per province and region.",
+    caption:
+      "Current status (PBS Census 2023), projected 2047 population, buildings and built-up coverage (PRIA GHSL and Open Buildings series) and key challenge per province and region.",
     rowHeader: "Province / Region",
     columns: projectedColumns,
-    rows: regions.map((region) => ({ region, cells: pendingCells(projectedColumns) })),
-    status: "pending",
+    rows: regions.map((region) => ({
+      region,
+      cells: { ...pendingCells(projectedColumns), ...regionOutlook[region], "projected-need": projectedNeed(region) },
+    })),
+    status: "available",
   } satisfies PendingTable,
 };
 
@@ -881,13 +1021,47 @@ export const stakeholders = {
 /* -------------------------------------------------------------------------- */
 
 export const summary: Record<"ndma-role" | "responsibilities" | "conclusion" | "end-state", TextBlock> = {
-  "ndma-role": { id: "ndma-role", title: "Role of NDMA", status: "pending", paragraphs: [] },
+  "ndma-role": {
+    id: "ndma-role",
+    title: "Role of NDMA",
+    status: "available",
+    paragraphs: [
+      "The National Disaster Management Authority is the lead federal agency for disaster management in Pakistan under the National Disaster Management Act, 2010. It is the executive arm of the National Disaster Management Commission, chaired by the Prime Minister, and works through the Provincial Disaster Management Authorities, the State Disaster Management Authority in Azad Jammu & Kashmir, the Gilgit-Baltistan Disaster Management Authority and the District Disaster Management Authorities.",
+      "Under the Act, NDMA prepares the National Disaster Management Plan, lays down guidelines for federal ministries, provincial governments and their authorities, and coordinates preparedness, response and recovery. PRIA extends that mandate from responding to disasters to shaping what is built, so that the 2.29 million houses, 13,115 km of roads and 439 bridges damaged in the 2022 floods are not exposed in the same way again.",
+      "Within PRIA, NDMA sits at the head of the stakeholder chain, ahead of the Policy Tier and the Execution Tier. It owns the atlas, sets the hazard-informed recommendations for each of the four regional segments and six infrastructure categories, defines the no-go areas and protected flow zones, and runs the periodic E-Infra Audit that checks whether recommendations are being applied on the ground.",
+      "NDMA also anchors the data behind PRIA: Census 2023 housing statistics, hazard and damage records from past disasters, and the Digital Twin and AI models used to identify Pakistan's infrastructure geometry towards 2047.",
+    ],
+  },
   responsibilities: {
     id: "responsibilities",
     title: "Responsibilities of National Stakeholders & Area Governments",
-    status: "pending",
-    paragraphs: [],
+    status: "available",
+    paragraphs: [
+      "Policy Tier. The Federal Ministries of Housing, Planning, Finance and Inter Provincial Coordination translate PRIA into national housing policy, the development programme, financing windows and inter-provincial agreements. Provincial Governments, the Government of AJ&K and the Government of GB adopt PRIA's segment recommendations into their building by-laws, land-use plans and annual development programmes, and enforce no-go areas through their building control authorities.",
+      "Execution Tier. Academia builds the curricula and training for resilient design and construction; national designer groups and architects turn the recommendations into approved design templates; the private sector, goods and materials provider associations and raw-material quarry sites supply tested, affordable resilient materials; and law enforcement agencies support building control authorities in removing and preventing encroachments on protected flow zones.",
+      "Area governments carry the day-to-day responsibility: issuing permits only against PRIA-compliant designs, maintaining drains, embankments and slopes before each monsoon and winter, keeping registers of the housing stock, and reporting through the E-Infra Audit so that NDMA can update the atlas.",
+      "All stakeholders share responsibility for data: using Census 2023 housing figures, hazard maps and post-disaster damage assessments as the common baseline, so that federal, provincial and district plans describe the same Pakistan.",
+    ],
   },
-  conclusion: { id: "conclusion", title: "Conclusion", status: "pending", paragraphs: [] },
-  "end-state": { id: "end-state", title: "Desired End State", status: "pending", paragraphs: [] },
+  conclusion: {
+    id: "conclusion",
+    title: "Conclusion",
+    status: "available",
+    paragraphs: [
+      "Pakistan's population reached 241.5 million in the four provinces and ICT at the 2023 Census, growing at 2.55% a year, and the country counted 38.3 million housing units, one in five of them kacha. Growth has been fragmented, a few cities are over-saturated, land is shrinking and there is no formal spatial planning. At the same time, the 2005 earthquake, the 2010 and 2022 floods, the 2015 heatwave and Cyclone Biparjoy in 2023 have shown how exposed that growth is.",
+      "PRIA responds by dividing the country into four regional resilience segments (Mountain, Riverine & Plains, Desert & Arid, and Coastal) and setting recommendations for six infrastructure categories in each, from material options and DRIM design options to construction methods, no-go areas, maintenance and periodic audit.",
+      "Resilience will come less from new dams and embankments alone than from millions of everyday decisions about where and how houses, markets, roads and networks are built. PRIA gives those decisions a common, hazard-informed reference for the next twenty years.",
+    ],
+  },
+  "end-state": {
+    id: "end-state",
+    title: "Desired End State",
+    status: "available",
+    paragraphs: [
+      "By 2047, when Pakistan turns 100, every new building and infrastructure project is planned against the hazards of its regional segment and built to its PRIA recommendations, using Digital Twins and AI models to place growth where land, water and safety allow.",
+      "Major urban areas grow within known saturation thresholds, while new and smaller towns develop near new wetlands and agricultural land. Vertical solutions replace sprawl, and protected flow zones along rivers, hill torrents, glacial outburst paths and the coast stay free of construction.",
+      "Kacha and unsafe housing has been replaced or retrofitted with culturally acceptable, cost-effective designs that make the most of local materials. Water is harvested, stored and reused in every type of infrastructure, and storage extends beyond dams to wetlands, glacial and hill-torrent basins, coastal harvest belts and desalination.",
+      "Federal institutes train builders, contractors and on-site experts; standards are enforced by building control authorities; development budgets carry inbuilt resilience and a margin for recurring disaster losses; and the E-Infra Audit keeps the atlas current, so that the next flood, earthquake or cyclone finds Pakistan prepared.",
+    ],
+  },
 };

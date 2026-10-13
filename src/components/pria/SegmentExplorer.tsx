@@ -9,8 +9,8 @@ export function SegmentExplorer() {
   const [active, setActive] = React.useState<SegmentId | null>(null);
   return (
     <div className="grid grid-cols-1 items-center gap-8 lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)]">
-      <div className="rounded-2xl border bg-card p-4 shadow-soft sm:p-6">
-        <PakistanSegmentMap activeId={active} onActiveChange={setActive} className="mx-auto max-w-sm" />
+      <div className="rounded-2xl border-2 bg-gradient-to-br from-primary-tint/60 via-card to-card p-4 shadow-soft transition-colors hover:border-primary/35 sm:p-6">
+        <PakistanSegmentMap activeId={active} onActiveChange={setActive} className="mx-auto max-w-xl" />
       </div>
       <ul className="flex flex-col gap-3">
         {segments.map((s) => (

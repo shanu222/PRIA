@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useReducedMotion } from "framer-motion";
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
 import type { ContentStatus } from "@/data/pria";
 import { cn } from "@/lib/utils";
@@ -17,6 +18,7 @@ const COLORS: Record<string, string> = {
 export function ResidentialDonut({ data }: { data: Slice[] }) {
   const [active, setActive] = React.useState<string | null>(null);
   const [mounted, setMounted] = React.useState(false);
+  const reduce = useReducedMotion();
   React.useEffect(() => setMounted(true), []);
 
   const summary = data.map((d) => `${d.label} ${d.value}%${d.status === "provisional" ? " (provisional)" : ""}`).join(", ");
@@ -40,7 +42,7 @@ export function ResidentialDonut({ data }: { data: Slice[] }) {
                 stroke="none"
                 onMouseEnter={(_, i) => setActive(data[i]?.id ?? null)}
                 onMouseLeave={() => setActive(null)}
-                isAnimationActive
+                isAnimationActive={!reduce}
                 animationDuration={900}
               >
                 {data.map((d) => (
@@ -92,7 +94,7 @@ export function ResidentialDonut({ data }: { data: Slice[] }) {
               {d.status === "provisional" && <StatusBadge status="provisional" />}
             </div>
             <span className="font-heading text-3xl font-bold">
-              <CountUp value={d.value} suffix="%" />
+              <CountUp value={d.value} suffix="%" decimals={Number.isInteger(d.value) ? 0 : 1} />
             </span>
           </li>
         ))}

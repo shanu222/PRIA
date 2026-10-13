@@ -30,7 +30,7 @@ export function Topbar({ onOpenMenu, onOpenSearch }: { onOpenMenu: () => void; o
         <Menu />
       </Button>
       <Link href="/" className="flex items-center gap-2 md:hidden" aria-label={`${site.shortName} home`}>
-        <LogoMark className="h-8 w-8" />
+        <LogoMark swivel className="h-8 w-8" />
         <span className="font-heading text-base font-extrabold">{site.shortName}</span>
       </Link>
 
