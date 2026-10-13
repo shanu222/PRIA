@@ -17,9 +17,9 @@ const buttonVariants = cva(
         ghost: "text-foreground hover:bg-muted active:bg-muted/80",
         link: "text-primary underline-offset-4 hover:underline",
         onDark:
-          "bg-white text-[#0B5D3B] shadow-sm hover:bg-white/90 dark:bg-white dark:text-[#0B5D3B]",
+          "border-0 bg-gradient-to-b from-[#99f6e4] via-[#2dd4bf] to-[#0d9488] text-[#042f2e] shadow-[inset_0_1px_0_rgba(255,255,255,0.75),0_5px_0_#115e59,0_14px_24px_-8px_rgba(15,118,110,0.75)] hover:-translate-y-0.5 hover:from-[#ccfbf1] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.85),0_8px_0_#115e59,0_20px_28px_-8px_rgba(13,148,136,0.8)] active:translate-y-1 active:shadow-[inset_0_2px_4px_rgba(4,47,46,0.25),0_1px_0_#115e59]",
         outlineOnDark:
-          "border border-white/40 bg-white/5 text-white backdrop-blur hover:bg-white/15 hover:border-white/70",
+          "border-0 bg-gradient-to-b from-[#fcd34d] via-[#f59e0b] to-[#d97706] text-[#431407] shadow-[inset_0_1px_0_rgba(255,255,255,0.65),0_5px_0_#b45309,0_14px_24px_-8px_rgba(217,119,6,0.7)] hover:-translate-y-0.5 hover:from-[#fde68a] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.75),0_8px_0_#b45309,0_20px_28px_-8px_rgba(245,158,11,0.75)] active:translate-y-1 active:shadow-[inset_0_2px_4px_rgba(120,53,15,0.28),0_1px_0_#b45309]",
       },
       size: {
         default: "h-10 px-4 py-2",
