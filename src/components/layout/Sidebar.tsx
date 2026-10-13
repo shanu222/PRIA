@@ -19,6 +19,8 @@ import { LogoMark, Wordmark } from "./Logo";
  */
 export type SidebarMode = "full" | "responsive" | "rail";
 
+const NAV_FACES = ["#059669", "#0891b2", "#4f46e5", "#d97706", "#e11d48", "#7c3aed"];
+
 const labelClass: Record<SidebarMode, string> = {
   full: "",
   responsive: "sr-only lg:not-sr-only",
@@ -112,6 +114,7 @@ export function SidebarNav({ mode, onNavigate }: { mode: SidebarMode; onNavigate
               {items.map((page) => {
                 const isActive = active?.id === page.id;
                 const segment = page.segmentId ? segments.find((s) => s.id === page.segmentId) : undefined;
+                const face = segment?.color ?? NAV_FACES[Math.max(pages.findIndex((item) => item.id === page.id), 0) % NAV_FACES.length];
                 const link = (
                   <Link
                     href={page.href}
@@ -133,9 +136,13 @@ export function SidebarNav({ mode, onNavigate }: { mode: SidebarMode; onNavigate
                     )}
                     <span
                       className={cn(
-                        "flex h-7 w-7 shrink-0 items-center justify-center rounded-md transition-colors",
-                        segment && "text-[var(--seg)]",
+                        "flex h-8 w-8 shrink-0 items-center justify-center rounded-[10px] text-white",
+                        "bg-gradient-to-b from-[color-mix(in_srgb,var(--ico)_58%,white)] to-[var(--ico)]",
+                        "shadow-[inset_0_1px_0_rgba(255,255,255,0.72),0_3px_0_rgba(15,23,42,0.22),0_8px_12px_-6px_var(--ico)]",
+                        "transition-transform duration-200 group-hover:-translate-y-0.5 group-active:translate-y-px",
+                        isActive && "shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_4px_0_rgba(15,23,42,0.28),0_12px_16px_-6px_var(--ico)]",
                       )}
+                      style={{ "--ico": face } as CSSProperties}
                     >
                       <Icon name={page.icon} className="h-[18px] w-[18px]" />
                     </span>
