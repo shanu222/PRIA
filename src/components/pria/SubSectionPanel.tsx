@@ -8,16 +8,31 @@ import { cn } from "@/lib/utils";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { ContentPending } from "./ContentPending";
 import { DrimStrip } from "./DrimStrip";
+import { NorthernRoutes } from "./NorthernRoutes";
+import { SegmentConstruction } from "./SegmentConstruction";
 import { StatusBadge } from "./StatusBadge";
 
-function SubSectionBody({ sub, segment, showDrim }: { sub: SubSection; segment: Segment; showDrim: boolean }) {
-  if (sub.items.length === 0 && !showDrim) {
+function SubSectionBody({
+  sub,
+  segment,
+  category,
+}: {
+  sub: SubSection;
+  segment: Segment;
+  category: InfraCategory;
+}) {
+  const showDrim = category.id === "residential" && sub.id === "design-options";
+  const showRoutes = segment.id === "mountain" && sub.id === "tourism-templates";
+  const showBuild = category.id === "residential" && sub.id === "construction-methodology";
+  if (sub.items.length === 0 && !showDrim && !showRoutes && !showBuild) {
     return <ContentPending title={sub.title} icon={getIcon(sub.icon)} accent={segment.color} />;
   }
   return (
     <div className="flex flex-col gap-8">
       {showDrim && <DrimStrip segment={segment} compact />}
       {sub.items.length > 0 && <ItemList sub={sub} />}
+      {showRoutes && <NorthernRoutes />}
+      {showBuild && <SegmentConstruction segment={segment} />}
     </div>
   );
 }
@@ -73,8 +88,6 @@ function SubSectionHeading({ sub, as: Heading = "h3" }: { sub: SubSection; as?: 
     </div>
   );
 }
-
-const isDrimSub = (category: InfraCategory, sub: SubSection) => category.id === "residential" && sub.id === "design-options";
 
 export function SubSectionPanel({ segment, category }: { segment: Segment; category: InfraCategory }) {
   const [activeId, setActiveId] = React.useState(category.subSections[0]?.id);
@@ -140,7 +153,7 @@ export function SubSectionPanel({ segment, category }: { segment: Segment; categ
                 <SubSectionHeading sub={active} />
                 <StatusBadge status={active.status} />
               </div>
-              <SubSectionBody sub={active} segment={segment} showDrim={isDrimSub(category, active)} />
+              <SubSectionBody sub={active} segment={segment} category={category} />
             </motion.div>
           </AnimatePresence>
         </section>
@@ -159,7 +172,7 @@ export function SubSectionPanel({ segment, category }: { segment: Segment; categ
               <SubSectionHeading sub={sub} as="span" />
             </AccordionTrigger>
             <AccordionContent>
-              <SubSectionBody sub={sub} segment={segment} showDrim={isDrimSub(category, sub)} />
+              <SubSectionBody sub={sub} segment={segment} category={category} />
             </AccordionContent>
           </AccordionItem>
         ))}
