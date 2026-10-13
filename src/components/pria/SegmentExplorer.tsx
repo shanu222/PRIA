@@ -7,6 +7,14 @@ import { SegmentCardCompact } from "./SegmentCard";
 
 export function SegmentExplorer() {
   const [active, setActive] = React.useState<SegmentId | null>(null);
+  React.useEffect(() => {
+    const onPick = (event: Event) => {
+      const id = (event as CustomEvent<SegmentId | null>).detail;
+      setActive(id);
+    };
+    window.addEventListener("pria-demo-segment", onPick);
+    return () => window.removeEventListener("pria-demo-segment", onPick);
+  }, []);
   return (
     <div className="grid grid-cols-1 items-center gap-8 lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)]">
       <div className="rounded-2xl border-2 bg-gradient-to-br from-primary-tint/60 via-card to-card p-4 shadow-soft transition-colors hover:border-primary/35 sm:p-6">

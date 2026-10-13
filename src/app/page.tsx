@@ -11,6 +11,7 @@ import { StatTile } from "@/components/pria/StatTile";
 import { TopoPattern } from "@/components/pria/TopoPattern";
 import { LogoEmblem } from "@/components/layout/Logo";
 import { DrimCard } from "@/components/pria/DrimCard";
+import { HomeDemo } from "@/components/pria/HomeDemo";
 import { drimModels } from "@/data/drim";
 
 export default function HomePage() {
@@ -20,7 +21,7 @@ export default function HomePage() {
   return (
     <div className="mx-auto flex max-w-7xl flex-col gap-16 sm:gap-20">
       {/* Hero */}
-      <section className="relative isolate overflow-hidden rounded-[1.7rem] p-[3px] shadow-[0_24px_60px_-28px_rgba(13,148,136,0.65)]">
+      <section data-demo="hero" className="relative isolate scroll-mt-20 overflow-hidden rounded-[1.7rem] p-[3px] shadow-[0_24px_60px_-28px_rgba(13,148,136,0.65)]">
         <div
           aria-hidden="true"
           className="pointer-events-none absolute -inset-1/2 bg-[conic-gradient(from_90deg,#99f6e4,#2dd4bf,#fbbf24,#22d3ee,#5eead4,#99f6e4)] motion-safe:animate-[spin_8s_linear_infinite]"
@@ -106,7 +107,7 @@ export default function HomePage() {
       </section>
 
       {/* Stats */}
-      <section aria-label="Key figures" className="-mt-8 sm:-mt-10">
+      <section data-demo="figures" aria-label="Key figures" className="-mt-8 scroll-mt-20 sm:-mt-10">
         <Stagger className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 xl:grid-cols-5">
           {stats.map((stat, i) => (
             <StaggerItem key={stat.id} className={i === stats.length - 1 ? "col-span-2 md:col-span-1" : undefined}>
@@ -117,7 +118,7 @@ export default function HomePage() {
       </section>
 
       {/* At a glance */}
-      <section aria-labelledby="glance-title">
+      <section data-demo="glance" aria-labelledby="glance-title" className="scroll-mt-20">
         <SectionHeader
           id="glance-title"
           eyebrow="Explore"
@@ -155,7 +156,7 @@ export default function HomePage() {
       </section>
 
       {/* Segments preview */}
-      <section aria-labelledby="segments-title">
+      <section data-demo="segments" aria-labelledby="segments-title" className="scroll-mt-20">
         <SectionHeader
           id="segments-title"
           eyebrow="Regional Segments"
@@ -176,7 +177,7 @@ export default function HomePage() {
       </section>
 
       {/* DRIM */}
-      <section aria-labelledby="drim-title">
+      <section data-demo="models" aria-labelledby="drim-title" className="scroll-mt-20">
         <SectionHeader
           id="drim-title"
           eyebrow="Resilient models"
@@ -204,7 +205,7 @@ export default function HomePage() {
       </section>
 
       {/* Disasters */}
-      <section aria-labelledby="disasters-title">
+      <section data-demo="disasters" aria-labelledby="disasters-title" className="scroll-mt-20">
         <SectionHeader
           id="disasters-title"
           eyebrow="Why resilience"
@@ -249,7 +250,7 @@ export default function HomePage() {
       </section>
 
       {/* Roadmap */}
-      <section aria-labelledby="roadmap-title">
+      <section data-demo="roadmap" aria-labelledby="roadmap-title" className="scroll-mt-20">
         <SectionHeader
           id="roadmap-title"
           eyebrow="Document roadmap"
@@ -280,6 +281,7 @@ export default function HomePage() {
           </ol>
         </Reveal>
       </section>
+      <HomeDemo />
     </div>
   );
 }
