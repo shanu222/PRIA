@@ -34,6 +34,114 @@ function wait(ms: number) {
   return new Promise((resolve) => window.setTimeout(resolve, ms));
 }
 
+/** Framer Motion leaves off-screen sections at opacity 0. A clone would otherwise be a blank card. */
+function releaseMotion(root: HTMLElement) {
+  const nodes = [root, ...Array.from(root.querySelectorAll<HTMLElement>("*"))];
+  for (const el of nodes) {
+    const opacity = el.style.opacity;
+    if (opacity === "" || Number(opacity) >= 0.99) continue;
+    el.style.opacity = "1";
+    const transform = (el.style.transform || "").trim();
+    if (transform.startsWith("translate") || transform.startsWith("matrix") || transform.startsWith("scale")) {
+      el.style.transform = "none";
+    }
+    if (el.style.translate) el.style.translate = "none";
+    el.style.visibility = "visible";
+  }
+}
+
+function copyCanvases(source: HTMLElement, clone: HTMLElement) {
+  const from = source.querySelectorAll("canvas");
+  const to = clone.querySelectorAll("canvas");
+  from.forEach((src, index) => {
+    const dest = to[index];
+    if (!dest || src.width === 0 || src.height === 0) return;
+    dest.width = src.width;
+    dest.height = src.height;
+    try {
+      dest.getContext("2d")?.drawImage(src, 0, 0);
+    } catch {
+      /* A tainted canvas cannot be copied. The rest of the section still shows. */
+    }
+  });
+}
+
+function startDemoMusic() {
+  const ctx = new window.AudioContext();
+  void ctx.resume();
+  const master = ctx.createGain();
+  const warm = ctx.createBiquadFilter();
+  warm.type = "lowpass";
+  warm.frequency.value = 1600;
+  master.connect(warm);
+  warm.connect(ctx.destination);
+  const now = ctx.currentTime;
+  master.gain.setValueAtTime(0.0001, now);
+  master.gain.exponentialRampToValueAtTime(0.72, now + 1.1);
+
+  const oscs: OscillatorNode[] = [];
+  const pad = (freq: number, amount: number, type: OscillatorType) => {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = type;
+    osc.frequency.value = freq;
+    gain.gain.value = amount;
+    osc.connect(gain);
+    gain.connect(master);
+    osc.start();
+    oscs.push(osc);
+    return gain;
+  };
+  const low = pad(110, 0.11, "sine");
+  pad(164.81, 0.07, "sine");
+  pad(220, 0.04, "triangle");
+
+  const lfo = ctx.createOscillator();
+  const lfoGain = ctx.createGain();
+  lfo.frequency.value = 0.07;
+  lfoGain.gain.value = 0.035;
+  lfo.connect(lfoGain);
+  lfoGain.connect(low.gain);
+  lfo.start();
+  oscs.push(lfo);
+
+  const melody = [440, 493.88, 554.37, 659.25, 554.37, 493.88, 392, 440];
+  let note = 0;
+  const timer = window.setInterval(() => {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    const time = ctx.currentTime;
+    osc.type = "sine";
+    osc.frequency.value = melody[note % melody.length];
+    note += 1;
+    gain.gain.setValueAtTime(0.0001, time);
+    gain.gain.exponentialRampToValueAtTime(0.16, time + 0.04);
+    gain.gain.exponentialRampToValueAtTime(0.0001, time + 1.5);
+    osc.connect(gain);
+    gain.connect(master);
+    osc.start(time);
+    osc.stop(time + 1.6);
+  }, 1100);
+
+  return () => {
+    window.clearInterval(timer);
+    const time = ctx.currentTime;
+    master.gain.cancelScheduledValues(time);
+    master.gain.setValueAtTime(Math.max(master.gain.value, 0.0001), time);
+    master.gain.exponentialRampToValueAtTime(0.0001, time + 0.45);
+    window.setTimeout(() => {
+      oscs.forEach((osc) => {
+        try {
+          osc.stop();
+        } catch {
+          /* already stopped */
+        }
+      });
+      void ctx.close();
+    }, 500);
+  };
+}
+
 function speakChunks(text: string, run: number, runRef: React.MutableRefObject<number>) {
   const synth = window.speechSynthesis;
   const parts = chunksOf(text);
@@ -52,6 +160,7 @@ function speakChunks(text: string, run: number, runRef: React.MutableRefObject<n
       } else {
         utterance.lang = "en-GB";
       }
+      utterance.volume = 1;
       utterance.rate = 0.94;
       utterance.pitch = 1.02;
       const part = parts[index];
@@ -86,7 +195,7 @@ function ZoomShot({ sourceId, tick }: { sourceId: string; tick: number }) {
     const frame = frameRef.current;
     if (!source || !frame) return;
     const maxWidth = Math.max(frame.clientWidth - 24, 1);
-    const maxHeight = Math.max(Math.min(window.innerHeight * 0.62, 680) - 24, 1);
+    const maxHeight = Math.max(Math.min(window.innerHeight - 230, 560), 200);
     const fit = Math.min(maxWidth / Math.max(source.offsetWidth, 1), maxHeight / Math.max(source.offsetHeight, 1));
     setShot({ width: source.offsetWidth, height: source.offsetHeight, fit });
   }, [sourceId, tick]);
@@ -100,7 +209,14 @@ function ZoomShot({ sourceId, tick }: { sourceId: string; tick: number }) {
     clone.style.margin = "0";
     clone.style.width = `${shot.width}px`;
     clone.style.maxWidth = "none";
+    releaseMotion(clone);
+    copyCanvases(source, clone);
     host.replaceChildren(clone);
+    const again = window.setTimeout(() => {
+      releaseMotion(clone);
+      copyCanvases(source, clone);
+    }, 500);
+    return () => window.clearTimeout(again);
   }, [sourceId, shot, tick]);
 
   const frameHeight = shot ? Math.ceil(shot.height * shot.fit) + 24 : 240;
@@ -139,6 +255,12 @@ export function PageDemo() {
   const [step, setStep] = React.useState<number | null>(null);
   const [mounted, setMounted] = React.useState(false);
   const runRef = React.useRef(0);
+  const musicRef = React.useRef<(() => void) | null>(null);
+
+  const stopMusic = React.useCallback(() => {
+    musicRef.current?.();
+    musicRef.current = null;
+  }, []);
 
   React.useEffect(() => {
     setMounted(true);
@@ -147,24 +269,33 @@ export function PageDemo() {
   React.useEffect(() => {
     setStep(null);
     runRef.current += 1;
+    stopMusic();
     window.speechSynthesis?.cancel();
     return () => {
       runRef.current += 1;
+      stopMusic();
       window.speechSynthesis?.cancel();
     };
-  }, [pathname]);
+  }, [pathname, stopMusic]);
 
   const finish = React.useCallback(() => {
     runRef.current += 1;
+    stopMusic();
     window.speechSynthesis?.cancel();
     setStep(null);
     window.dispatchEvent(new CustomEvent("pria-demo-segment", { detail: null }));
-  }, []);
+  }, [stopMusic]);
 
   const start = async () => {
     const run = ++runRef.current;
     const tour: DemoStep[] = stepsForPath(window.location.pathname);
     window.speechSynthesis?.cancel();
+    stopMusic();
+    try {
+      musicRef.current = startDemoMusic();
+    } catch {
+      musicRef.current = null;
+    }
     for (let index = 0; index < tour.length; index++) {
       if (run !== runRef.current) return;
       const current = tour[index];
@@ -181,9 +312,11 @@ export function PageDemo() {
       }
       if (run !== runRef.current) return;
       if (!source) continue;
-      setStep(index);
-      source.scrollIntoView({ behavior: "smooth", block: "center" });
+      source.scrollIntoView({ behavior: "auto", block: "center" });
       await wait(700);
+      if (run !== runRef.current) return;
+      setStep(index);
+      await wait(400);
       if (run !== runRef.current) return;
       await speakChunks(current.script, run, runRef);
     }
