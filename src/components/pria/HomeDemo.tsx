@@ -8,6 +8,7 @@ import { Play, Square } from "lucide-react";
 import { pages } from "@/data/pria";
 import { Button } from "@/components/ui/button";
 import { stepsForPath, type DemoStep } from "./demo-steps";
+import { INTRO_SRC } from "./HomeIntro";
 
 function pickVoice(voices: SpeechSynthesisVoice[]) {
   const scored = voices
@@ -241,7 +242,12 @@ function pageLabel(pathname: string) {
   return pages.find((page) => page.href === pathname)?.navLabel ?? "This page";
 }
 
-function speakChunks(text: string, run: number, runRef: React.MutableRefObject<number>) {
+function speakChunks(
+  text: string,
+  run: number,
+  runRef: React.MutableRefObject<number>,
+  voiceRef: React.MutableRefObject<{ rate: number; volume: number }>,
+) {
   const synth = window.speechSynthesis;
   const parts = chunksOf(text);
   return new Promise<void>((resolve) => {
@@ -259,9 +265,9 @@ function speakChunks(text: string, run: number, runRef: React.MutableRefObject<n
       } else {
         utterance.lang = "en-GB";
       }
-      utterance.volume = 1;
-      utterance.rate = 0.94;
-      utterance.pitch = 1.02;
+      utterance.volume = voiceRef.current.volume;
+      utterance.rate = voiceRef.current.rate;
+      utterance.pitch = 1;
       const part = parts[index];
       index += 1;
       let settled = false;
@@ -272,7 +278,7 @@ function speakChunks(text: string, run: number, runRef: React.MutableRefObject<n
       };
       utterance.onend = finish;
       utterance.onerror = finish;
-      const expected = Math.max(2500, (part.split(/\s+/).length / 2.1) * 1000 + 900);
+      const expected = Math.max(1800, (part.split(/\s+/).length / (2.2 * voiceRef.current.rate)) * 1000 + 900);
       window.setTimeout(() => {
         if (!settled && run === runRef.current && !synth.speaking) finish();
       }, expected);
@@ -348,6 +354,89 @@ function ZoomShot({ sourceId, tick }: { sourceId: string; tick: number }) {
   );
 }
 
+function VoiceControls({
+  rate,
+  volume,
+  onRate,
+  onVolume,
+  onDark = false,
+}: {
+  rate: number;
+  volume: number;
+  onRate: (value: number) => void;
+  onVolume: (value: number) => void;
+  onDark?: boolean;
+}) {
+  const label = onDark ? "text-white/80" : "text-muted-foreground";
+  return (
+    <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+      <label className={`flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wide ${label}`}>
+        Speed
+        <input
+          type="range"
+          min={0.8}
+          max={1.6}
+          step={0.05}
+          value={rate}
+          aria-label="Explanation speed"
+          onChange={(event) => onRate(Number(event.target.value))}
+          className="h-1 w-16 accent-emerald-600"
+        />
+        <span className="w-7 tabular-nums">{rate.toFixed(1)}×</span>
+      </label>
+      <label className={`flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wide ${label}`}>
+        Volume
+        <input
+          type="range"
+          min={0.4}
+          max={1}
+          step={0.05}
+          value={volume}
+          aria-label="Explanation volume"
+          onChange={(event) => onVolume(Number(event.target.value))}
+          className="h-1 w-16 accent-emerald-600"
+        />
+        <span className="w-8 tabular-nums">{Math.round(volume * 100)}%</span>
+      </label>
+    </div>
+  );
+}
+
+function IntroFilm({ volume, onDone }: { volume: number; onDone: () => void }) {
+  const videoRef = React.useRef<HTMLVideoElement>(null);
+  const stageRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    const video = videoRef.current;
+    const stage = stageRef.current;
+    if (!video) return;
+    video.muted = false;
+    video.volume = volume;
+    void video.play().catch(() => undefined);
+    void stage?.requestFullscreen?.().catch(() => undefined);
+    return () => {
+      if (document.fullscreenElement) void document.exitFullscreen().catch(() => undefined);
+    };
+  }, []);
+
+  React.useEffect(() => {
+    if (videoRef.current) videoRef.current.volume = volume;
+  }, [volume]);
+
+  return createPortal(
+    <div ref={stageRef} className="fixed inset-0 z-[70] flex items-center justify-center bg-black">
+      <video ref={videoRef} src={INTRO_SRC} playsInline className="h-full w-full bg-black object-contain" onEnded={onDone} />
+      <div className="absolute inset-x-0 top-0 flex items-center justify-between gap-3 bg-gradient-to-b from-black/70 to-transparent p-4">
+        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-white/85">PRIA introduction</p>
+        <Button type="button" variant="outline" onClick={onDone} className="border-white/30 bg-white text-[#042f2e]">
+          Continue
+        </Button>
+      </div>
+    </div>,
+    document.body,
+  );
+}
+
 export function PageDemo() {
   const pathname = usePathname();
   const router = useRouter();
@@ -356,9 +445,15 @@ export function PageDemo() {
   const [running, setRunning] = React.useState(false);
   const [tourMark, setTourMark] = React.useState<{ mode: "page" | "all"; index: number; total: number } | null>(null);
   const [mounted, setMounted] = React.useState(false);
+  const [intro, setIntro] = React.useState(false);
+  const [rate, setRate] = React.useState(1);
+  const [volume, setVolume] = React.useState(1);
   const runRef = React.useRef(0);
   const carryRef = React.useRef(false);
   const musicRef = React.useRef<Score | null>(null);
+  const introDone = React.useRef<(() => void) | null>(null);
+  const voiceRef = React.useRef({ rate: 1, volume: 1 });
+  voiceRef.current = { rate, volume };
 
   const stopMusic = React.useCallback(() => {
     musicRef.current?.stop();
@@ -376,7 +471,10 @@ export function PageDemo() {
     } else {
       setStep(null);
       setRunning(false);
+      setIntro(false);
       setTourMark(null);
+      introDone.current?.();
+      introDone.current = null;
       runRef.current += 1;
       stopMusic();
       window.speechSynthesis?.cancel();
@@ -391,10 +489,14 @@ export function PageDemo() {
 
   const finish = React.useCallback(() => {
     runRef.current += 1;
+    introDone.current?.();
+    introDone.current = null;
     stopMusic();
     setRunning(false);
+    setIntro(false);
     setTourMark(null);
     setStep(null);
+    if (document.fullscreenElement) void document.exitFullscreen().catch(() => undefined);
     window.speechSynthesis?.cancel();
     window.dispatchEvent(new CustomEvent("pria-demo-segment", { detail: null }));
   }, [stopMusic]);
@@ -433,7 +535,7 @@ export function PageDemo() {
       setStep(index);
       await wait(400);
       if (run !== runRef.current) return;
-      await speakChunks(current.script, run, runRef);
+      await speakChunks(current.script, run, runRef, voiceRef);
     }
   };
 
@@ -441,9 +543,17 @@ export function PageDemo() {
     const run = ++runRef.current;
     const paths = mode === "page" ? [window.location.pathname] : portalTour(window.location.pathname);
     setRunning(true);
+    setIntro(true);
     setTourMark({ mode, index: 0, total: paths.length });
     window.speechSynthesis?.cancel();
     stopMusic();
+    await new Promise<void>((resolve) => {
+      introDone.current = resolve;
+    });
+    introDone.current = null;
+    setIntro(false);
+    if (document.fullscreenElement) await document.exitFullscreen().catch(() => undefined);
+    if (run !== runRef.current) return;
     try {
       musicRef.current = createScore();
       musicRef.current.setScene(window.location.pathname, 0);
@@ -475,31 +585,39 @@ export function PageDemo() {
 
   return (
     <>
+      {mounted && intro && <IntroFilm volume={volume} onDone={() => introDone.current?.()} />}
       {!running && (
-        <div className="fixed bottom-5 right-5 z-40 flex items-center gap-2 rounded-full border bg-card/95 p-1.5 shadow-lift backdrop-blur">
-          <span className="hidden pl-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground sm:inline">
-            Demo
-          </span>
-          <Button type="button" size="sm" className="rounded-full" onClick={() => void start("page")}>
-            <Play /> This page
-          </Button>
-          <Button type="button" size="sm" variant="outline" className="rounded-full" onClick={() => void start("all")}>
-            All pages
-          </Button>
+        <div className="fixed bottom-5 right-5 z-40 flex max-w-[calc(100vw-1.5rem)] flex-col items-end gap-2">
+          <div className="flex items-center gap-2 rounded-2xl border bg-card/95 px-3 py-2 shadow-lift backdrop-blur">
+            <VoiceControls rate={rate} volume={volume} onRate={setRate} onVolume={setVolume} />
+          </div>
+          <div className="flex items-center gap-2 rounded-full border bg-card/95 p-1.5 shadow-lift backdrop-blur">
+            <span className="hidden pl-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground sm:inline">
+              Demo
+            </span>
+            <Button type="button" size="sm" className="rounded-full" onClick={() => void start("page")}>
+              <Play /> This page
+            </Button>
+            <Button type="button" size="sm" variant="outline" className="rounded-full" onClick={() => void start("all")}>
+              All pages
+            </Button>
+          </div>
         </div>
       )}
       {mounted &&
         running &&
+        !intro &&
         createPortal(
           <div className="fixed inset-0 z-50 flex items-end justify-center bg-[#042f2e]/72 p-3 backdrop-blur-[2px] sm:items-center sm:p-6">
             <div className="flex w-full max-w-5xl flex-col gap-3">
-              <div className="flex items-center justify-between gap-3 text-white">
+              <div className="flex flex-wrap items-center justify-between gap-3 text-white">
                 <p className="text-xs font-semibold uppercase tracking-[0.16em] text-teal-100">
                   {tourMark?.mode === "all"
                     ? `Full portal · ${pageLabel(pathname)} · ${(tourMark.index ?? 0) + 1} of ${tourMark.total}`
                     : "This page"}
                   {active ? ` · ${(step ?? 0) + 1} of ${steps.length}` : ""}
                 </p>
+                <VoiceControls rate={rate} volume={volume} onRate={setRate} onVolume={setVolume} onDark />
                 <Button type="button" variant="outline" onClick={finish} className="border-white/30 bg-white text-[#042f2e]">
                   <Square /> Stop
                 </Button>

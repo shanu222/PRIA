@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ArrowRight, ArrowUpRight, ListChecks } from "lucide-react";
-import { getPage, home, observations, site } from "@/data/pria";
+import { getPage, home } from "@/data/pria";
 import { disasterTimeline } from "@/data/hazards";
 import { Icon } from "@/lib/icons";
 import { Button } from "@/components/ui/button";
@@ -10,12 +10,12 @@ import { SegmentExplorer } from "@/components/pria/SegmentExplorer";
 import { StatTile } from "@/components/pria/StatTile";
 import { TopoPattern } from "@/components/pria/TopoPattern";
 import { LogoEmblem } from "@/components/layout/Logo";
+import { HomeIntro } from "@/components/pria/HomeIntro";
 import { DrimCard } from "@/components/pria/DrimCard";
 import { drimModels } from "@/data/drim";
 
 export default function HomePage() {
   const { hero, stats, glanceLinks, roadmap } = home;
-  const { from, to } = observations.trajectory;
 
   return (
     <div className="mx-auto flex max-w-7xl flex-col gap-16 sm:gap-20">
@@ -76,30 +76,8 @@ export default function HomePage() {
             </Reveal>
           </div>
 
-          <Reveal delay={0.2} className="hidden lg:block">
-            <div className="relative mx-auto aspect-square w-full max-w-[340px]" aria-hidden="true">
-              {[0, 1, 2, 3].map((i) => (
-                <span
-                  key={i}
-                  className={
-                    i % 2 === 0
-                      ? "absolute rounded-full border border-dashed border-teal-100/35 motion-safe:animate-[spin_28s_linear_infinite]"
-                      : "absolute rounded-full border border-dashed border-amber-200/30 motion-safe:animate-[spin_36s_linear_infinite_reverse]"
-                  }
-                  style={{ inset: `${i * 12}%` }}
-                />
-              ))}
-              <LogoEmblem className="absolute inset-[30%]" />
-              <span className="absolute left-1/2 top-[6%] -translate-x-1/2 rounded-full bg-white/10 px-3 py-1 text-center text-xs font-bold ring-1 ring-white/25 backdrop-blur">
-                {to.year} · {site.vision}
-              </span>
-              <span className="absolute left-[6%] top-[46%] rounded-full bg-white/10 px-2.5 py-1 text-xs font-semibold ring-1 ring-white/25 backdrop-blur">
-                {from.year}
-              </span>
-              <span className="absolute bottom-[8%] right-[2%] max-w-[9rem] rounded-xl bg-white px-3 py-2 text-xs font-semibold text-[#115e59] shadow-lg">
-                {to.label}
-              </span>
-            </div>
+          <Reveal delay={0.2}>
+            <HomeIntro />
           </Reveal>
         </div>
         </div>
