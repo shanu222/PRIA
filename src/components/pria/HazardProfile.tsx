@@ -19,7 +19,7 @@ export function HazardProfile({
   return (
     <article
       className={cn(
-        "group flex h-full flex-col rounded-2xl border-2 border-[color-mix(in_srgb,var(--seg)_25%,transparent)] bg-card p-6 shadow-soft transition-all duration-300 hover:-translate-y-0.5 hover:border-[var(--seg)] hover:shadow-lift",
+        "card-pro card-pro-lift group flex h-full flex-col rounded-2xl bg-card p-6",
         className,
       )}
     >
@@ -58,7 +58,10 @@ export function HazardProfile({
 
       <dl className="mt-5 grid flex-1 gap-3 sm:grid-cols-2">
         {profile.facts.map((f) => (
-          <div key={f.label} className="rounded-xl border bg-muted/30 p-4 transition-colors group-hover:bg-muted/50">
+          <div
+            key={f.label}
+            className="rounded-xl border-2 border-[color-mix(in_srgb,var(--seg)_20%,transparent)] bg-[color-mix(in_srgb,var(--seg)_5%,hsl(var(--card)))] p-4 transition-colors hover:border-[var(--seg)]"
+          >
             <dt className="sr-only">{f.label}</dt>
             <dd>
               <span className="block font-heading text-xl font-bold seg-text">{f.value}</span>

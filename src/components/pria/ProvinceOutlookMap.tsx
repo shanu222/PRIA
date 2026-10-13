@@ -81,7 +81,7 @@ export function ProvinceOutlookMap() {
 
   return (
     <div className="grid gap-6 lg:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)]">
-      <div className="rounded-2xl border-2 bg-card p-4 shadow-soft sm:p-6">
+      <div className="card-pro rounded-2xl bg-card p-4 sm:p-6">
         <div role="radiogroup" aria-label="Map metric" className="mb-4 flex flex-wrap gap-2">
           {METRICS.map((m) => (
             <button
@@ -129,7 +129,7 @@ export function ProvinceOutlookMap() {
       </div>
 
       <div className="flex flex-col gap-4">
-        <div aria-live="polite" className="rounded-2xl border-2 bg-card p-5 shadow-soft" style={{ borderColor: metric.color }}>
+        <div aria-live="polite" className="card-pro rounded-2xl bg-card p-5" style={{ "--tone": metric.color, "--tone-2": "#0e7490" } as React.CSSProperties}>
           <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider" style={{ color: metric.color }}>
             <MapPin className="h-3.5 w-3.5" aria-hidden />
             {hovered ? "Hovered" : "Selected"} province
@@ -139,7 +139,7 @@ export function ProvinceOutlookMap() {
             <Facts p={focus} />
           </div>
         </div>
-        <div className="rounded-2xl border-2 bg-card p-5 shadow-soft">
+        <div className="card-pro rounded-2xl bg-card p-5" style={{ "--tone": "#4338ca", "--tone-2": "#7c3aed" } as React.CSSProperties}>
           <h3 className="text-sm font-semibold">Ranking: {metric.label}</h3>
           <ol className="mt-3 flex flex-col gap-1.5">
             {ranked.map((p) => {

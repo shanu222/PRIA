@@ -111,18 +111,18 @@ export default function HomePage() {
               <StaggerItem key={link.pageId}>
                 <Link
                   href={page.href}
-                  className="group flex h-full flex-col rounded-xl border-2 bg-card p-6 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:border-primary hover:bg-gradient-to-br hover:from-primary-tint/70 hover:to-card hover:shadow-lift"
+                  className="card-pro card-pro-lift group flex h-full flex-col rounded-xl bg-card p-6"
                 >
                   <div className="flex items-start justify-between">
-                    <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary-tint text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground dark:text-accent-foreground dark:group-hover:text-primary-foreground">
+                    <span className="tone-icon flex h-11 w-11 items-center justify-center rounded-xl">
                       <Icon name={page.icon} className="h-5 w-5" />
                     </span>
                     <ArrowUpRight
-                      className="h-5 w-5 text-muted-foreground transition-all group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-primary dark:group-hover:text-accent-foreground"
+                      className="tone-text h-5 w-5 opacity-50 transition-all group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:opacity-100"
                       aria-hidden
                     />
                   </div>
-                  <p className="mt-5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                  <p className="tone-text mt-5 text-[11px] font-semibold uppercase tracking-wider">
                     {page.eyebrow}
                   </p>
                   <h3 className="mt-1 text-lg font-semibold">{link.title ?? page.title}</h3>
@@ -206,11 +206,11 @@ export default function HomePage() {
               <StaggerItem key={event.id}>
                 <Link
                   href={`/hazards#${event.id}`}
-                  className="group flex h-full flex-col rounded-xl border-2 bg-card p-5 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:border-water hover:shadow-lift"
+                  className="card-pro card-pro-lift group flex h-full flex-col rounded-xl bg-card p-5"
                 >
                   <div className="flex items-center justify-between">
-                    <span className="font-heading text-2xl font-extrabold text-water">{event.year}</span>
-                    <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-water/10 text-water transition-colors group-hover:bg-water group-hover:text-white">
+                    <span className="tone-text font-heading text-2xl font-extrabold">{event.year}</span>
+                    <span className="tone-icon flex h-9 w-9 items-center justify-center rounded-lg">
                       <Icon name={event.icon} className="h-4 w-4" />
                     </span>
                   </div>
@@ -237,10 +237,10 @@ export default function HomePage() {
           description="Follow the concept in the order it is presented."
         />
         <Reveal>
-          <ol className="relative grid gap-3 sm:grid-cols-3 lg:grid-cols-6 lg:gap-0">
+          <ol data-tones="" className="relative grid gap-3 sm:grid-cols-3 lg:grid-cols-6 lg:gap-0">
             <span
               aria-hidden="true"
-              className="absolute left-[8.33%] right-[8.33%] top-6 hidden h-0.5 bg-gradient-to-r from-primary via-water to-primary lg:block"
+              className="absolute left-[8.33%] right-[8.33%] top-6 hidden h-1 rounded-full bg-gradient-to-r from-[#047857] via-[#4338ca] to-[#be123c] opacity-60 lg:block"
             />
             {roadmap.map((step, i) => (
               <li key={step.id} className="relative">
@@ -248,10 +248,10 @@ export default function HomePage() {
                   href={step.href}
                   className="group flex items-center gap-3 rounded-xl border bg-card p-4 shadow-soft transition-all hover:-translate-y-0.5 hover:border-primary/45 hover:shadow-lift lg:flex-col lg:border-0 lg:bg-transparent lg:p-2 lg:text-center lg:shadow-none lg:hover:shadow-none"
                 >
-                  <span className="relative z-10 flex h-12 w-12 shrink-0 items-center justify-center rounded-full border-2 border-primary bg-card font-heading text-base font-bold text-primary shadow-soft transition-colors group-hover:bg-primary group-hover:text-primary-foreground dark:text-accent-foreground dark:group-hover:text-primary-foreground">
+                  <span className="tone-icon relative z-10 flex h-12 w-12 shrink-0 items-center justify-center rounded-full border-2 border-[var(--tone)] bg-card font-heading text-base font-bold shadow-soft">
                     {i + 1}
                   </span>
-                  <span className="font-heading text-sm font-semibold group-hover:text-primary dark:group-hover:text-accent-foreground">
+                  <span className="font-heading text-sm font-semibold transition-colors group-hover:text-[var(--tone)]">
                     {step.label}
                   </span>
                 </Link>

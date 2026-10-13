@@ -26,7 +26,7 @@ export default function StakeholdersPage() {
         <section
           id="flow"
           aria-label="Stakeholder flow"
-          className="scroll-mt-24 rounded-2xl border bg-card p-6 shadow-soft sm:p-8"
+          className="card-pro scroll-mt-24 rounded-2xl bg-card p-6 sm:p-8"
         >
           <ol className="flex flex-col items-stretch gap-3 md:flex-row md:items-center">
             {stakeholders.flow.map((step, i) => (

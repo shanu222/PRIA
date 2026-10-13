@@ -83,7 +83,11 @@ export default async function DrimModelPage({ params }: Props) {
         </Reveal>
 
         <Reveal delay={0.08} className="flex flex-col gap-5">
-          <section aria-labelledby="regions" className="rounded-2xl border-2 border-amber-600/30 bg-card p-5 shadow-soft">
+            <section
+              aria-labelledby="regions"
+              style={{ "--tone": "#b45309", "--tone-2": "#ea580c" } as React.CSSProperties}
+              className="card-pro rounded-2xl bg-card p-5"
+            >
             <h2 id="regions" className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400">
               <MapPin className="h-4 w-4" aria-hidden />
               Suitable regions
@@ -105,7 +109,11 @@ export default async function DrimModelPage({ params }: Props) {
           </section>
 
           {modelSegs.length > 0 && (
-            <section aria-labelledby="segments" className="rounded-2xl border-2 bg-card p-5 shadow-soft">
+            <section
+              aria-labelledby="segments"
+              style={{ "--tone": "#4338ca", "--tone-2": "#0e7490" } as React.CSSProperties}
+              className="card-pro rounded-2xl bg-card p-5"
+            >
               <h2 id="segments" className="text-sm font-bold uppercase tracking-wider text-muted-foreground">
                 PRIA segments
               </h2>
@@ -141,8 +149,8 @@ export default async function DrimModelPage({ params }: Props) {
           <Stagger className="grid gap-3 sm:grid-cols-2">
             {model.features.map((f, i) => (
               <StaggerItem key={f}>
-                <div className="group flex h-full gap-3 rounded-xl border-2 bg-card p-4 shadow-soft transition-all hover:-translate-y-0.5 hover:border-primary hover:shadow-lift">
-                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary-tint font-heading text-sm font-bold text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground dark:text-accent-foreground">
+                <div className="card-pro card-pro-lift group flex h-full gap-3 rounded-xl bg-card p-4">
+                  <span className="tone-icon flex h-8 w-8 shrink-0 items-center justify-center rounded-lg font-heading text-sm font-bold">
                     {i + 1}
                   </span>
                   <p className="text-sm font-medium leading-relaxed">{f}</p>
@@ -157,10 +165,10 @@ export default async function DrimModelPage({ params }: Props) {
             Materials
           </h2>
           <Reveal>
-            <ul className="flex flex-col gap-2 rounded-2xl border-2 bg-gradient-to-br from-primary-tint/60 to-card p-5 shadow-soft">
+            <ul className="card-pro flex flex-col gap-2 rounded-2xl bg-card p-5">
               {model.materials.map((m) => (
                 <li key={m} className="flex items-start gap-3 text-sm">
-                  <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                  <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#047857] to-[#0e7490] text-white">
                     <Check className="h-3 w-3" aria-hidden />
                   </span>
                   {m}
@@ -175,7 +183,7 @@ export default async function DrimModelPage({ params }: Props) {
         </section>
       </div>
 
-      <nav aria-label="Other models" className="grid gap-3 sm:grid-cols-2">
+      <nav aria-label="Other models" data-tones="" className="grid gap-3 sm:grid-cols-2">
         {[
           { m: prev, label: "Previous model", Icon: ArrowLeft, align: "" },
           { m: next, label: "Next model", Icon: ArrowRight, align: "sm:text-right sm:flex-row-reverse" },
@@ -183,9 +191,9 @@ export default async function DrimModelPage({ params }: Props) {
           <Link
             key={label}
             href={`/drim/${m.slug}`}
-            className={`group flex items-center gap-3 rounded-xl border-2 bg-card p-4 shadow-soft transition-all hover:-translate-y-0.5 hover:border-primary hover:shadow-lift ${align}`}
+            className={`card-pro card-pro-lift group flex items-center gap-3 rounded-xl bg-card p-4 ${align}`}
           >
-            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 border-primary/30 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground dark:text-accent-foreground">
+            <span className="tone-icon flex h-10 w-10 shrink-0 items-center justify-center rounded-full">
               <Arrow className="h-4 w-4" aria-hidden />
             </span>
             <span className="min-w-0">

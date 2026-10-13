@@ -62,7 +62,7 @@ function SegmentRail({
   const others = segments.filter((s) => s.id !== segment.id);
   return (
     <aside aria-label="In this segment" className={cn("flex flex-col gap-4", className)}>
-      <div className="rounded-xl border bg-card p-5 shadow-soft">
+      <div className="card-pro rounded-xl bg-card p-5">
         <h2 className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">In this segment</h2>
         <p className="mt-4 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Regions</p>
         <ul className="mt-2 flex flex-col gap-1.5">
@@ -98,7 +98,7 @@ function SegmentRail({
           ))}
         </ul>
       </div>
-      <div className="rounded-xl border bg-card p-5 shadow-soft">
+      <div className="card-pro rounded-xl bg-card p-5">
         <h2 className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">Other segments</h2>
         <ul className="mt-3 flex flex-col gap-2">
           {others.map((s) => (

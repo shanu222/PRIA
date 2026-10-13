@@ -24,7 +24,7 @@ export function DataTable({
 }) {
   const [first, ...rest] = columns;
   return (
-    <section className={cn("overflow-hidden rounded-2xl border-2 bg-card shadow-soft transition-shadow hover:shadow-lift", className)}>
+    <section className={cn("card-pro overflow-hidden rounded-2xl bg-card", className)}>
       <div className="flex items-start gap-3 border-b-2 bg-gradient-to-r from-primary-tint to-card px-5 py-4">
         <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground">
           <Table2 className="h-4 w-4" aria-hidden />

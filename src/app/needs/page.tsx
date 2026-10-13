@@ -26,9 +26,9 @@ export default function NeedsPage() {
               <article
                 id={n.id}
                 className={cn(
-                  "group relative flex h-full scroll-mt-24 flex-col overflow-hidden rounded-2xl border bg-card p-7 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-lift sm:p-8",
-                  water ? "hover:border-water/50" : "hover:border-primary/45",
+                  "card-pro card-pro-lift group relative flex h-full scroll-mt-24 flex-col overflow-hidden rounded-2xl bg-card p-7 sm:p-8",
                 )}
+                style={water ? ({ "--tone": "#0e7490", "--tone-2": "#2563eb" } as React.CSSProperties) : undefined}
               >
                 <TopoPattern
                   className={cn(
@@ -39,10 +39,7 @@ export default function NeedsPage() {
                 <div className="relative flex items-start justify-between gap-4">
                   <span
                     className={cn(
-                      "flex h-14 w-14 items-center justify-center rounded-2xl",
-                      water
-                        ? "bg-cyan-50 text-water dark:bg-cyan-500/10"
-                        : "bg-primary-tint text-primary dark:text-accent-foreground",
+                      "tone-icon flex h-14 w-14 items-center justify-center rounded-2xl",
                     )}
                   >
                     <Icon name={n.icon} className="h-7 w-7" />

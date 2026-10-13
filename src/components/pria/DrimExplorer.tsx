@@ -133,7 +133,7 @@ export function DrimExplorer() {
           <MapSourceNote className="mt-3" />
         </div>
 
-        <div className="flex flex-col gap-5 rounded-2xl border-2 bg-card p-5 shadow-soft sm:p-6">
+        <div className="card-pro flex flex-col gap-5 rounded-2xl bg-card p-5 sm:p-6">
           <fieldset>
             <legend className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Province / region</legend>
             <div className="flex flex-wrap gap-2">

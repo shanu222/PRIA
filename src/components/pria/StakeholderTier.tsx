@@ -7,7 +7,7 @@ import { Stagger, StaggerItem } from "./Motion";
 export function StakeholderTier({ tier, tone }: { tier: StakeholderTierData; tone: "primary" | "water" }) {
   const headingId = `tier-${tier.id}`;
   return (
-    <section aria-labelledby={headingId} className="flex flex-col rounded-2xl border bg-card shadow-soft">
+    <section aria-labelledby={headingId} className="card-pro card-pro-lift flex flex-col rounded-2xl bg-card">
       <header
         className={cn(
           "flex items-center gap-3 rounded-t-2xl border-b px-6 py-5",

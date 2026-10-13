@@ -33,11 +33,13 @@ export function HazardChip({
 
 export function DrimCard({ model, index, className }: { model: DrimModel; index?: number; className?: string }) {
   const regions = model.regions.map((r) => r.label);
+  const tone = drimHazards[model.hazards[0]].color;
   return (
     <Link
       href={`/drim/${model.slug}`}
+      style={{ "--tone": tone, "--tone-2": "#0e7490" } as React.CSSProperties}
       className={cn(
-        "group flex h-full flex-col overflow-hidden rounded-2xl border-2 bg-card shadow-soft transition-all duration-300 hover:-translate-y-1 hover:border-primary hover:shadow-lift focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+        "card-pro card-pro-lift group flex h-full flex-col overflow-hidden rounded-2xl bg-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
         className,
       )}
     >
@@ -62,7 +64,7 @@ export function DrimCard({ model, index, className }: { model: DrimModel; index?
         </span>
       </div>
       <div className="flex flex-1 flex-col p-5">
-        <h3 className="font-heading text-base font-bold leading-snug transition-colors group-hover:text-primary dark:group-hover:text-accent-foreground">
+        <h3 className="font-heading text-base font-bold leading-snug transition-colors group-hover:text-[var(--tone)] dark:group-hover:text-foreground">
           {model.title}
         </h3>
         <div className="mt-2.5 flex flex-wrap gap-1.5">

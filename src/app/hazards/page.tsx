@@ -25,30 +25,31 @@ export default function HazardsPage() {
           title="Two decades of disasters that shaped PRIA"
           description="Each event exposed a different weakness in how and where Pakistan builds."
         />
-        <ol className="relative flex flex-col gap-5 border-l-2 border-dashed border-primary/30 pl-6 sm:pl-10">
+        <ol data-tones="" className="relative flex flex-col gap-5 border-l-2 border-dashed border-primary/30 pl-6 sm:pl-10">
           {disasterTimeline.map((event) => (
             <li key={event.id} id={event.id} className="relative scroll-mt-24">
               <span
                 aria-hidden="true"
-                className="absolute -left-[38px] top-6 flex h-7 w-7 items-center justify-center rounded-full border-2 border-primary bg-card text-primary shadow-soft sm:-left-[54px] dark:text-accent-foreground"
+                className="absolute -left-[38px] top-6 flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-[var(--tone)] to-[var(--tone-2)] text-white shadow-[0_6px_14px_-6px_var(--tone)] ring-4 ring-background sm:-left-[54px]"
               >
                 <Icon name={event.icon} className="h-3.5 w-3.5" />
               </span>
               <Reveal>
-                <article className="group rounded-2xl border-2 border-border bg-card p-6 shadow-soft transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/50 hover:shadow-lift">
+                <article className="card-pro group rounded-2xl bg-card p-6">
                   <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
-                    <span className="font-heading text-3xl font-extrabold text-primary dark:text-accent-foreground">
-                      {event.year}
-                    </span>
+                    <span className="tone-text font-heading text-3xl font-extrabold">{event.year}</span>
                     <h3 className="text-lg font-bold">{event.title}</h3>
                   </div>
                   <p className="mt-2 max-w-3xl text-sm text-muted-foreground sm:text-base">{event.summary}</p>
                   <dl className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                     {event.facts.map((f) => (
-                      <div key={f.label} className="rounded-xl border bg-gradient-to-br from-primary-tint/70 to-card p-4">
+                      <div
+                        key={f.label}
+                        className="rounded-xl border-2 border-[color-mix(in_srgb,var(--tone)_22%,transparent)] bg-[color-mix(in_srgb,var(--tone)_6%,hsl(var(--card)))] p-4 transition-colors hover:border-[var(--tone)]"
+                      >
                         <dt className="sr-only">{f.label}</dt>
                         <dd>
-                          <span className="block font-heading text-2xl font-bold">{f.value}</span>
+                          <span className="tone-text block font-heading text-2xl font-bold">{f.value}</span>
                           <span className="mt-0.5 block text-sm text-muted-foreground">{f.label}</span>
                           <span className="mt-2 block text-[11px] font-medium uppercase tracking-wider text-muted-foreground/80">
                             {f.source}

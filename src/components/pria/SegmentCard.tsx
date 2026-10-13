@@ -9,7 +9,12 @@ import { StatusBadge } from "./StatusBadge";
 import { TopoPattern } from "./TopoPattern";
 
 export function segmentStyle(segment: Segment): CSSProperties {
-  return { "--seg": segment.color, "--seg-strong": segment.colorStrong } as CSSProperties;
+  return {
+    "--seg": segment.color,
+    "--seg-strong": segment.colorStrong,
+    "--tone": segment.colorStrong,
+    "--tone-2": segment.color,
+  } as CSSProperties;
 }
 
 export function RegionChips({ regions, className, onDark }: { regions: string[]; className?: string; onDark?: boolean }) {
@@ -52,12 +57,12 @@ export function SegmentCardCompact({
       onBlur={() => onHover?.(false)}
       style={segmentStyle(segment)}
       className={cn(
-        "group relative flex items-center gap-4 overflow-hidden rounded-xl border bg-card p-4 pl-5 shadow-soft transition-all duration-300 hover:-translate-y-0.5 hover:border-[var(--seg)] hover:shadow-lift",
-        highlighted && "-translate-y-0.5 border-[var(--seg)] shadow-lift",
+        "group relative flex items-center gap-4 overflow-hidden rounded-xl border-2 border-[color-mix(in_srgb,var(--seg)_25%,hsl(var(--border)))] bg-gradient-to-r from-[color-mix(in_srgb,var(--seg)_7%,hsl(var(--card)))] to-card p-4 pl-6 shadow-soft transition-all duration-300 hover:-translate-y-0.5 hover:border-[var(--seg)] hover:shadow-[0_18px_40px_-18px_var(--seg)]",
+        highlighted && "-translate-y-0.5 border-[var(--seg)] shadow-[0_18px_40px_-18px_var(--seg)]",
       )}
     >
-      <span aria-hidden="true" className="absolute inset-y-0 left-0 w-1 bg-[var(--seg)]" />
-      <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[color-mix(in_srgb,var(--seg)_12%,transparent)] seg-text">
+      <span aria-hidden="true" className="absolute inset-y-0 left-0 w-1.5 bg-gradient-to-b from-[var(--seg)] to-[var(--seg-strong)]" />
+      <span className="tone-icon flex h-11 w-11 shrink-0 items-center justify-center rounded-xl">
         <Icon name={segment.icon} className="h-5 w-5" />
       </span>
       <span className="min-w-0 flex-1">
@@ -79,7 +84,7 @@ export function SegmentCard({ segment }: { segment: Segment }) {
   return (
     <article
       style={segmentStyle(segment)}
-      className="group flex h-full flex-col overflow-hidden rounded-2xl border-2 bg-card shadow-soft transition-all duration-300 hover:-translate-y-1 hover:border-[var(--seg)] hover:shadow-lift"
+      className="group flex h-full flex-col overflow-hidden rounded-2xl border-2 border-[color-mix(in_srgb,var(--seg)_30%,hsl(var(--border)))] bg-card shadow-soft transition-all duration-300 hover:-translate-y-1 hover:border-[var(--seg)] hover:shadow-[0_24px_48px_-20px_var(--seg)]"
     >
       <div
         className="relative overflow-hidden px-6 pb-6 pt-7 text-white"
@@ -107,7 +112,7 @@ export function SegmentCard({ segment }: { segment: Segment }) {
         </div>
         <Button
           asChild
-          className="mt-auto w-full bg-[var(--seg-strong)] text-white hover:bg-[var(--seg-strong)] hover:brightness-110 dark:bg-[var(--seg-strong)] dark:text-white"
+          className="mt-auto w-full border-[var(--seg-strong)] bg-gradient-to-r from-[var(--seg-strong)] via-[var(--seg)] to-[var(--seg-strong)] text-white shadow-[0_8px_20px_-10px_var(--seg)] hover:bg-[var(--seg-strong)] hover:brightness-110 hover:shadow-[0_12px_28px_-10px_var(--seg)] dark:text-white"
         >
           <Link href={`/segments/${segment.slug}`}>
             Open Segment

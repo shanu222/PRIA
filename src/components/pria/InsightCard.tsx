@@ -3,22 +3,11 @@ import { cn } from "@/lib/utils";
 
 export type InsightTone = "default" | "warning" | "water";
 
-const toneStyles: Record<InsightTone, { card: string; icon: string; code: string }> = {
-  default: {
-    card: "hover:border-primary/45",
-    icon: "bg-primary-tint text-primary dark:text-accent-foreground",
-    code: "text-primary/70 dark:text-accent-foreground/70",
-  },
-  warning: {
-    card: "border-amber-200/70 bg-gradient-to-b from-amber-50/60 to-card hover:border-amber-400/70 dark:border-amber-500/15 dark:from-amber-500/[0.06]",
-    icon: "bg-amber-100 text-amber-800 dark:bg-amber-500/15 dark:text-amber-300",
-    code: "text-amber-800/70 dark:text-amber-300/70",
-  },
-  water: {
-    card: "hover:border-water/50",
-    icon: "bg-cyan-50 text-water dark:bg-cyan-500/10",
-    code: "text-water/70",
-  },
+/** Fixed tones override the grid's cycling palette. */
+const toneVars: Record<InsightTone, React.CSSProperties | undefined> = {
+  default: undefined,
+  warning: { "--tone": "#b45309", "--tone-2": "#dc2626" } as React.CSSProperties,
+  water: { "--tone": "#0e7490", "--tone-2": "#2563eb" } as React.CSSProperties,
 };
 
 export function InsightCard({
@@ -38,27 +27,21 @@ export function InsightCard({
   className?: string;
   children?: React.ReactNode;
 }) {
-  const t = toneStyles[tone];
   return (
     <article
       id={id}
+      style={toneVars[tone]}
       className={cn(
-        "group relative flex h-full scroll-mt-24 flex-col rounded-xl border-2 bg-card p-6 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-lift",
-        t.card,
+        "card-pro card-pro-lift group relative flex h-full scroll-mt-24 flex-col overflow-hidden rounded-xl bg-card p-6",
         className,
       )}
     >
       <div className="flex items-start justify-between gap-4">
-        <span
-          className={cn(
-            "flex h-11 w-11 shrink-0 items-center justify-center rounded-xl transition-transform duration-300 group-hover:scale-105",
-            t.icon,
-          )}
-        >
+        <span className="tone-icon flex h-11 w-11 shrink-0 items-center justify-center rounded-xl">
           <Icon name={icon} className="h-5 w-5" />
         </span>
         {code && (
-          <span className={cn("font-heading text-2xl font-extrabold tabular-nums", t.code)} aria-hidden="true">
+          <span className="tone-text font-heading text-2xl font-extrabold tabular-nums opacity-60" aria-hidden="true">
             {code.length === 1 && /\d/.test(code) ? `0${code}` : code}
           </span>
         )}
@@ -68,6 +51,10 @@ export function InsightCard({
         {title}
       </h3>
       {children}
+      <span
+        aria-hidden="true"
+        className="tone-bar absolute inset-x-0 bottom-0 h-1 origin-left scale-x-0 transition-transform duration-500 group-hover:scale-x-100"
+      />
     </article>
   );
 }

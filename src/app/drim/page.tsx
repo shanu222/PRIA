@@ -59,13 +59,15 @@ export default function DrimPage() {
             const models = modelsForProvince(p.id);
             return (
               <StaggerItem key={p.id}>
-                <article className="flex h-full flex-col rounded-2xl border-2 bg-card p-5 shadow-soft transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/50 hover:shadow-lift">
+                <article className="card-pro card-pro-lift group flex h-full flex-col rounded-2xl bg-card p-5">
                   <div className="flex items-start justify-between gap-3">
                     <h3 className="flex items-center gap-2 font-heading text-lg font-bold">
-                      <MapPin className="h-4 w-4 text-primary dark:text-accent-foreground" aria-hidden />
+                      <span className="tone-icon flex h-8 w-8 items-center justify-center rounded-lg">
+                        <MapPin className="h-4 w-4" aria-hidden />
+                      </span>
                       {p.name}
                     </h3>
-                    <span className="rounded-full bg-primary-tint px-2.5 py-0.5 text-xs font-bold text-primary dark:text-accent-foreground">
+                    <span className="tone-bar rounded-full px-2.5 py-0.5 text-xs font-bold text-white shadow-sm">
                       {models.length} models
                     </span>
                   </div>
@@ -74,17 +76,17 @@ export default function DrimPage() {
                       <li key={m.slug}>
                         <Link
                           href={`/drim/${m.slug}`}
-                          className="group -mx-2 flex items-center justify-between gap-2 rounded-lg px-2 py-1.5 text-sm transition-colors hover:bg-primary-tint hover:text-primary dark:hover:text-accent-foreground"
+                          className="group/link -mx-2 flex items-center justify-between gap-2 rounded-lg px-2 py-1.5 text-sm transition-colors hover:bg-[color-mix(in_srgb,var(--tone)_10%,transparent)] hover:text-[var(--tone)] dark:hover:text-foreground"
                         >
                           <span>{m.title}</span>
-                          <ArrowUpRight className="h-3.5 w-3.5 shrink-0 opacity-0 transition-opacity group-hover:opacity-100" aria-hidden />
+                          <ArrowUpRight className="h-3.5 w-3.5 shrink-0 opacity-0 transition-opacity group-hover/link:opacity-100" aria-hidden />
                         </Link>
                       </li>
                     ))}
                   </ul>
                   <Link
                     href={`/drim?province=${p.id}#explore`}
-                    className="mt-auto pt-4 text-xs font-semibold text-primary hover:underline dark:text-accent-foreground"
+                    className="tone-text mt-auto pt-4 text-xs font-semibold hover:underline"
                   >
                     Show on map
                   </Link>

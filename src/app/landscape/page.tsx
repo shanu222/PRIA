@@ -76,7 +76,7 @@ export default async function LandscapePage() {
           description="Share of the 38.29 million housing units in urban and rural areas, Census 2023."
         />
         <Reveal>
-          <div className="rounded-2xl border bg-card p-6 shadow-soft sm:p-8">
+          <div className="card-pro rounded-2xl bg-card p-6 sm:p-8">
             <ResidentialDonut data={landscape.residentialSplit} />
           </div>
         </Reveal>

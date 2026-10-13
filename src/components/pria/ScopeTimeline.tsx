@@ -80,7 +80,7 @@ export function ScopeTimeline() {
                 <span className="relative z-10 flex h-11 w-11 shrink-0 items-center justify-center rounded-full border-2 border-primary/30 bg-card font-heading text-sm font-bold uppercase text-primary shadow-soft dark:text-accent-foreground sm:h-14 sm:w-14 sm:text-base">
                   {item.code}
                 </span>
-                <div className="group flex flex-1 items-start gap-4 rounded-xl border bg-card p-5 shadow-soft transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-lift">
+                <div className="card-pro card-pro-lift group flex flex-1 items-start gap-4 rounded-xl bg-card p-5">
                   <span className="hidden h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary-tint text-primary dark:text-accent-foreground sm:flex">
                     <Icon name={item.icon} className="h-5 w-5" />
                   </span>

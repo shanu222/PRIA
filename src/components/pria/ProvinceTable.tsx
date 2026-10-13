@@ -9,7 +9,7 @@ export function ProvinceTable({ table }: { table: PendingTable }) {
     <section
       id={table.id}
       aria-labelledby={headingId}
-      className="scroll-mt-24 overflow-hidden rounded-2xl border-2 bg-card shadow-soft transition-shadow hover:shadow-lift"
+      className="card-pro scroll-mt-24 overflow-hidden rounded-2xl bg-card"
     >
       <div className="flex flex-col gap-3 border-b-2 bg-gradient-to-r from-primary-tint to-card px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-start gap-3">

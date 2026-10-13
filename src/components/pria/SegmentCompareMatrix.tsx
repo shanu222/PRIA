@@ -7,7 +7,7 @@ import { StatusBadge } from "./StatusBadge";
 
 export function SegmentCompareMatrix({ segments }: { segments: Segment[] }) {
   return (
-    <div className="overflow-hidden rounded-2xl border-2 bg-card shadow-soft transition-shadow hover:shadow-lift">
+    <div className="card-pro overflow-hidden rounded-2xl bg-card">
       <Table>
         <TableCaption className="sr-only">
           Status of recommendations for each regional segment and infrastructure category

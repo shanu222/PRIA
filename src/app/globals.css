@@ -105,6 +105,95 @@
   }
 }
 
+@layer components {
+  /* Card grids cycle through a professional palette; cards read it from --tone. */
+  [data-tones] > :nth-child(6n + 1) { --tone: #047857; --tone-2: #0d9488; }
+  [data-tones] > :nth-child(6n + 2) { --tone: #0e7490; --tone-2: #2563eb; }
+  [data-tones] > :nth-child(6n + 3) { --tone: #4338ca; --tone-2: #7c3aed; }
+  [data-tones] > :nth-child(6n + 4) { --tone: #b45309; --tone-2: #ea580c; }
+  [data-tones] > :nth-child(6n + 5) { --tone: #be123c; --tone-2: #db2777; }
+  [data-tones] > :nth-child(6n + 6) { --tone: #6d28d9; --tone-2: #0e7490; }
+
+  .card-pro {
+    position: relative;
+    border-width: 2px;
+    border-color: color-mix(in srgb, var(--tone, #047857) 20%, hsl(var(--border)));
+    border-top: 4px solid var(--tone, #047857);
+    background-image: linear-gradient(
+      165deg,
+      color-mix(in srgb, var(--tone, #047857) 7%, hsl(var(--card))) 0%,
+      hsl(var(--card)) 42%
+    );
+    box-shadow:
+      0 1px 2px rgb(15 23 42 / 0.04),
+      0 6px 16px -6px color-mix(in srgb, var(--tone, #047857) 18%, transparent);
+    transition:
+      transform 300ms cubic-bezier(0.16, 1, 0.3, 1),
+      border-color 200ms,
+      box-shadow 300ms;
+  }
+  .card-pro:hover,
+  .card-pro:focus-visible {
+    border-color: var(--tone, #047857);
+    box-shadow:
+      0 2px 4px rgb(15 23 42 / 0.05),
+      0 22px 44px -18px color-mix(in srgb, var(--tone, #047857) 55%, transparent);
+  }
+  .card-pro-lift:hover {
+    transform: translateY(-4px);
+  }
+
+  /* Icon chip that takes the card's tone and fills with a gradient on hover. */
+  .tone-icon {
+    background: color-mix(in srgb, var(--tone, #047857) 12%, transparent);
+    color: var(--tone, #047857);
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--tone, #047857) 22%, transparent);
+    transition: background 250ms, color 250ms, transform 300ms;
+  }
+  .group:hover .tone-icon,
+  .card-pro:hover .tone-icon {
+    background: linear-gradient(135deg, var(--tone, #047857), var(--tone-2, #0d9488));
+    color: #fff;
+    transform: scale(1.06) rotate(-3deg);
+  }
+  .tone-text {
+    color: var(--tone, #047857);
+  }
+  .tone-bar {
+    background: linear-gradient(90deg, var(--tone, #047857), var(--tone-2, #0d9488));
+  }
+
+  .dark .card-pro {
+    border-color: color-mix(in srgb, var(--tone, #047857) 30%, hsl(var(--border)));
+    background-image: linear-gradient(
+      165deg,
+      color-mix(in srgb, var(--tone, #047857) 14%, hsl(var(--card))) 0%,
+      hsl(var(--card)) 45%
+    );
+  }
+  .dark .tone-icon,
+  .dark .tone-text {
+    color: color-mix(in srgb, var(--tone, #047857) 55%, white);
+  }
+  .dark .card-pro:hover .tone-icon,
+  .dark .group:hover .tone-icon {
+    color: #fff;
+  }
+
+  /* Gradient text for headline figures. */
+  .text-gradient-brand {
+    background: linear-gradient(120deg, #047857 0%, #0e7490 55%, #4338ca 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .dark .text-gradient-brand {
+    background: linear-gradient(120deg, #34d399 0%, #22d3ee 55%, #a5b4fc 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+  }
+}
+
 @layer utilities {
   .text-balance {
     text-wrap: balance;

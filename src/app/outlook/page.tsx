@@ -31,9 +31,25 @@ const headline: Stat[] = [
 const fmt = (n: number) => n.toLocaleString("en-US");
 const mn2 = (n: number) => `${(n / 1_000_000).toFixed(2)} Mn`;
 
-function Panel({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+const TONES = {
+  emerald: ["#047857", "#0d9488"],
+  teal: ["#0e7490", "#2563eb"],
+  indigo: ["#4338ca", "#7c3aed"],
+  amber: ["#b45309", "#ea580c"],
+} as const;
+
+function Panel({
+  children,
+  className = "",
+  tone,
+}: {
+  children: React.ReactNode;
+  className?: string;
+  tone?: keyof typeof TONES;
+}) {
+  const style = tone ? ({ "--tone": TONES[tone][0], "--tone-2": TONES[tone][1] } as React.CSSProperties) : undefined;
   return (
-    <div className={`rounded-2xl border-2 bg-card p-5 shadow-soft transition-all duration-300 hover:border-primary/40 hover:shadow-lift sm:p-6 ${className}`}>
+    <div style={style} className={`card-pro group rounded-2xl bg-card p-5 sm:p-6 ${className}`}>
       {children}
     </div>
   );
@@ -45,12 +61,12 @@ function Source({ children }: { children: React.ReactNode }) {
 
 function Fact({ icon: I, value, label }: { icon: typeof Users; value: string; label: string }) {
   return (
-    <li className="flex items-start gap-3 rounded-xl border-2 bg-muted/30 p-4 transition-colors hover:border-primary/40 hover:bg-primary-tint/50">
-      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+    <li className="card-pro card-pro-lift group flex items-start gap-3 rounded-xl bg-card p-4">
+      <span className="tone-icon flex h-9 w-9 shrink-0 items-center justify-center rounded-lg">
         <I className="h-4 w-4" aria-hidden />
       </span>
       <span>
-        <span className="block font-heading text-xl font-bold">{value}</span>
+        <span className="tone-text block font-heading text-xl font-bold">{value}</span>
         <span className="block text-sm text-muted-foreground">{label}</span>
       </span>
     </li>
@@ -81,13 +97,13 @@ export default function OutlookPage() {
         />
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
           <Reveal>
-            <Panel>
+            <Panel tone="emerald">
               <PopulationChart />
               <Source>{src.ghsl}</Source>
             </Panel>
           </Reveal>
           <Reveal delay={0.08}>
-            <ul className="grid h-full gap-3">
+            <ul data-tones="" className="grid h-full gap-3">
               <Fact icon={TrendingUp} value={`${h.popCagr2026to2047}% / yr`} label="Compound growth 2026→2047" />
               <Fact icon={Users} value="+131 Mn" label="More people by 2047 than in 2026 (255 → 386 Mn)" />
               <Fact icon={TrendingUp} value={`${h.popCagr2020to2047}% / yr`} label="Compound growth 2020→2047 (234.99 → 386 Mn)" />
@@ -146,7 +162,7 @@ export default function OutlookPage() {
         />
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
           <Reveal>
-            <Panel>
+            <Panel tone="teal">
               <BuildingsHousingChart />
               <Source>
                 {src.buildingsNational}; {src.reference}
@@ -171,7 +187,7 @@ export default function OutlookPage() {
             />
           </Reveal>
         </div>
-        <ul className="mt-6 grid gap-3 sm:grid-cols-3">
+        <ul data-tones="" className="mt-6 grid gap-3 sm:grid-cols-3">
           <Fact icon={Building2} value={`${h.buildingsInclAjkGb2026} → ${h.buildingsInclAjkGb2047} Mn`} label="Buildings incl. AJK & GB, 2026 → 2047" />
           <Fact icon={House} value="≈ 0.97 Mn / yr" label="Average additional residential units needed, 2026–2047" />
           <Fact icon={Building} value={mn2(2_159_913)} label="Buildings added in 2047 alone" />
@@ -238,7 +254,7 @@ export default function OutlookPage() {
             </StaggerItem>
           ))}
           <StaggerItem>
-            <Panel className="h-full border-primary/40 bg-gradient-to-br from-primary-tint to-card">
+            <Panel tone="indigo" className="h-full">
               <p className="text-xs font-semibold uppercase tracking-wider text-primary dark:text-accent-foreground">2047 projection</p>
               <p className="mt-1 font-heading text-3xl font-bold">{ur.urbanShare2047}% urban</p>
               <div className="mt-4 flex h-3 overflow-hidden rounded-full bg-muted" aria-hidden="true">
@@ -271,7 +287,7 @@ export default function OutlookPage() {
           description={`Built footprint as a share of total land area, growing ${h.builtCagr2020to2047}% a year from 2020 to 2047.`}
         />
         <Reveal>
-          <Panel>
+          <Panel tone="amber">
             <CoverageChart />
             <Source>{src.ghsl}</Source>
           </Panel>
@@ -287,13 +303,13 @@ export default function OutlookPage() {
         />
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
           <Reveal>
-            <Panel>
+            <Panel tone="indigo">
               <DistrictChart />
               <Source>{src.ghsl}</Source>
             </Panel>
           </Reveal>
           <Reveal delay={0.08}>
-            <Panel className="h-full">
+            <Panel tone="teal" className="h-full">
               <h3 className="font-bold">Fastest-growing large districts</h3>
               <p className="text-sm text-muted-foreground">Population change 2026 → 2047</p>
               <ol className="mt-4 flex flex-col gap-2">

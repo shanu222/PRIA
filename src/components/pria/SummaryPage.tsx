@@ -25,7 +25,7 @@ export async function SummaryPage({ id, visionBanner = false }: { id: keyof type
       <PageHeader eyebrow={page.eyebrow} title={block.title} icon={page.icon} />
 
       <Reveal>
-        <article className="rounded-2xl border bg-card p-6 shadow-soft sm:p-10">
+        <article className="card-pro rounded-2xl bg-card p-6 sm:p-10">
           {block.paragraphs.length > 0 ? (
             <div className="space-y-5 text-lg leading-relaxed text-foreground/90">
               {block.paragraphs.map((p, i) => (

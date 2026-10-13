@@ -12,7 +12,7 @@ export function PrevNext() {
   if (!prev && !next) return null;
 
   const base =
-    "group flex flex-1 flex-col gap-1 rounded-xl border bg-card p-5 shadow-soft transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-lift focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
+    "card-pro card-pro-lift group flex flex-1 flex-col gap-1 rounded-xl bg-card p-5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
 
   return (
     <nav aria-label="Document pages" className="mx-auto mt-16 flex max-w-7xl flex-col gap-4 sm:flex-row">

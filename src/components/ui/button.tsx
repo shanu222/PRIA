@@ -9,10 +9,11 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          "border border-primary-hover bg-primary text-primary-foreground shadow-sm hover:-translate-y-px hover:bg-primary-hover hover:shadow-md active:bg-primary-hover",
+          "border border-[#065f46] bg-primary bg-gradient-to-r from-[#047857] via-[#0b5d3b] to-[#0e7490] bg-[length:200%_100%] bg-left text-white shadow-[0_6px_18px_-8px_rgba(4,120,87,0.7)] hover:-translate-y-px hover:bg-right hover:shadow-[0_12px_26px_-10px_rgba(14,116,144,0.75)] active:translate-y-0 [transition-property:background-position,transform,box-shadow] duration-500",
         outline:
-          "border-2 border-primary/30 bg-card text-foreground shadow-sm hover:-translate-y-px hover:border-primary hover:bg-primary-tint hover:text-primary hover:shadow-md active:bg-primary-tint dark:hover:text-accent-foreground",
-        secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/70",
+          "border-2 border-[#047857]/35 bg-card bg-gradient-to-r from-[#047857]/[0.06] to-[#0e7490]/[0.06] text-[#065f46] shadow-sm hover:-translate-y-px hover:border-[#047857] hover:from-[#047857]/[0.12] hover:to-[#0e7490]/[0.12] hover:shadow-[0_10px_22px_-12px_rgba(4,120,87,0.6)] dark:border-emerald-400/35 dark:text-emerald-200 dark:hover:border-emerald-400",
+        secondary:
+          "border-2 border-[#4338ca]/25 bg-[#4338ca]/[0.07] text-[#3730a3] hover:-translate-y-px hover:border-[#4338ca] hover:bg-[#4338ca]/[0.12] dark:text-indigo-200",
         ghost: "text-foreground hover:bg-muted active:bg-muted/80",
         link: "text-primary underline-offset-4 hover:underline",
         onDark:
