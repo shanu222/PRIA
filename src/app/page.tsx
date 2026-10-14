@@ -14,6 +14,17 @@ import { HomeIntro } from "@/components/pria/HomeIntro";
 import { DrimCard } from "@/components/pria/DrimCard";
 import { drimModels } from "@/data/drim";
 
+const GLANCE_PALETTE = [
+  { from: "#16a34a", to: "#047857", tint: "#bbf7d0", text: "#15803d" },
+  { from: "#3b82f6", to: "#1d4ed8", tint: "#bfdbfe", text: "#1d4ed8" },
+  { from: "#f97316", to: "#c2410c", tint: "#fed7aa", text: "#c2410c" },
+  { from: "#8b5cf6", to: "#6d28d9", tint: "#ddd6fe", text: "#6d28d9" },
+  { from: "#f43f5e", to: "#be123c", tint: "#fecdd3", text: "#be123c" },
+  { from: "#06b6d4", to: "#0e7490", tint: "#a5f3fc", text: "#0e7490" },
+];
+
+const GLANCE_FADE = "linear-gradient(to right, transparent 0%, rgba(0,0,0,0.55) 30%, #000 60%)";
+
 export default function HomePage() {
   const { hero, stats, glanceLinks, roadmap } = home;
 
@@ -102,29 +113,52 @@ export default function HomePage() {
           title="PRIA at a glance"
           description="Navigate the concept from national context to the desired end state."
         />
-        <Stagger className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {glanceLinks.map((link) => {
+        <Stagger className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {glanceLinks.map((link, i) => {
             const page = getPage(link.pageId);
+            const c = GLANCE_PALETTE[i % GLANCE_PALETTE.length];
             return (
               <StaggerItem key={link.pageId}>
                 <Link
                   href={page.href}
-                  className="card-pro card-pro-lift group flex h-full flex-col rounded-xl bg-card p-6"
+                  className="group relative isolate flex h-full min-h-[11.5rem] overflow-hidden rounded-2xl border-2 p-6 transition-all duration-300 hover:-translate-y-1"
+                  style={
+                    {
+                      "--g": c.from,
+                      borderColor: c.from,
+                      background: `linear-gradient(105deg, hsl(var(--card)) 38%, color-mix(in srgb, ${c.tint} 70%, hsl(var(--card))) 100%)`,
+                      boxShadow: `0 10px 26px -14px ${c.from}`,
+                    } as React.CSSProperties
+                  }
                 >
-                  <div className="flex items-start justify-between">
-                    <span className="tone-icon flex h-11 w-11 items-center justify-center rounded-xl">
-                      <Icon name={page.icon} className="h-5 w-5" />
+                  <img
+                    src={`/glance/${link.pageId}.jpg`}
+                    alt=""
+                    loading="lazy"
+                    className="absolute inset-y-0 right-0 -z-10 h-full w-[64%] object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                    style={{ maskImage: GLANCE_FADE, WebkitMaskImage: GLANCE_FADE }}
+                  />
+                  <span
+                    aria-hidden="true"
+                    className="pointer-events-none absolute inset-0 -z-10 rounded-2xl opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                    style={{ boxShadow: `inset 0 0 0 1px ${c.from}, 0 22px 44px -18px ${c.from}` }}
+                  />
+                  <span className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-full bg-slate-900/75 text-white ring-2 ring-white/80 backdrop-blur transition-all duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:bg-[var(--g)]">
+                    <ArrowUpRight className="h-4 w-4" aria-hidden />
+                  </span>
+                  <div className="relative flex max-w-[60%] flex-col">
+                    <span
+                      className="flex h-12 w-12 items-center justify-center rounded-xl text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.45)] transition-transform duration-300 group-hover:-rotate-3 group-hover:scale-105"
+                      style={{ background: `linear-gradient(135deg, ${c.from}, ${c.to})`, boxShadow: `0 8px 18px -8px ${c.to}` }}
+                    >
+                      <Icon name={page.icon} className="h-6 w-6" />
                     </span>
-                    <ArrowUpRight
-                      className="tone-text h-5 w-5 opacity-50 transition-all group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:opacity-100"
-                      aria-hidden
-                    />
+                    <p className="mt-5 text-[11px] font-bold uppercase tracking-wider" style={{ color: c.text }}>
+                      {page.eyebrow}
+                    </p>
+                    <h3 className="mt-1 text-lg font-bold leading-snug">{link.title ?? page.title}</h3>
+                    <p className="mt-1.5 text-sm text-muted-foreground">{link.description ?? page.description}</p>
                   </div>
-                  <p className="tone-text mt-5 text-[11px] font-semibold uppercase tracking-wider">
-                    {page.eyebrow}
-                  </p>
-                  <h3 className="mt-1 text-lg font-semibold">{link.title ?? page.title}</h3>
-                  <p className="mt-1.5 text-sm text-muted-foreground">{link.description ?? page.description}</p>
                 </Link>
               </StaggerItem>
             );
