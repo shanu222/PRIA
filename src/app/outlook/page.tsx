@@ -29,7 +29,6 @@ const headline: Stat[] = [
 ];
 
 const fmt = (n: number) => n.toLocaleString("en-US");
-const mn2 = (n: number) => `${(n / 1_000_000).toFixed(2)} Mn`;
 
 const TONES = {
   emerald: ["#047857", "#0d9488"],
@@ -59,17 +58,95 @@ function Source({ children }: { children: React.ReactNode }) {
   return <p className="mt-3 text-[11px] text-muted-foreground">Source: {children}.</p>;
 }
 
-function Fact({ icon: I, value, label }: { icon: typeof Users; value: string; label: string }) {
+const FACT_COLORS = {
+  emerald: "#34d399",
+  sky: "#38bdf8",
+  violet: "#a78bfa",
+  amber: "#fbbf24",
+} as const;
+
+function Fact({
+  icon: I,
+  value,
+  label,
+  note,
+  color = "emerald",
+}: {
+  icon: typeof Users;
+  value: string;
+  label: string;
+  note?: string;
+  color?: keyof typeof FACT_COLORS;
+}) {
+  const c = FACT_COLORS[color];
   return (
-    <li className="card-pro card-pro-lift group flex items-start gap-3 rounded-xl bg-card p-4">
-      <span className="tone-icon flex h-9 w-9 shrink-0 items-center justify-center rounded-lg">
+    <li
+      className="group flex h-full items-start gap-3 rounded-2xl border p-4 text-white transition-transform duration-300 hover:-translate-y-0.5"
+      style={{
+        borderColor: `color-mix(in srgb, ${c} 55%, transparent)`,
+        background: `radial-gradient(120% 80% at 100% 0%, color-mix(in srgb, ${c} 22%, transparent), transparent 55%), linear-gradient(160deg, color-mix(in srgb, ${c} 16%, #071417), #071417)`,
+        boxShadow: `0 0 22px -12px ${c}, inset 0 1px 0 rgba(255,255,255,0.08)`,
+      }}
+    >
+      <span
+        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl"
+        style={{ color: c, background: `color-mix(in srgb, ${c} 16%, transparent)`, boxShadow: `0 0 14px -4px ${c}` }}
+      >
         <I className="h-4 w-4" aria-hidden />
       </span>
       <span>
-        <span className="tone-text block font-heading text-xl font-bold">{value}</span>
-        <span className="block text-sm text-muted-foreground">{label}</span>
+        <span className="block font-heading text-xl font-bold" style={{ color: c, textShadow: `0 0 14px color-mix(in srgb, ${c} 50%, transparent)` }}>
+          {value}
+        </span>
+        <span className="mt-0.5 block text-sm font-medium text-white/90">{label}</span>
+        {note && <span className="mt-1 block text-xs leading-relaxed text-white/60">{note}</span>}
       </span>
     </li>
+  );
+}
+
+function Band({
+  id,
+  eyebrow,
+  title,
+  highlight,
+  description,
+  image,
+  accent = "#34d399",
+}: {
+  id: string;
+  eyebrow: string;
+  title: string;
+  highlight: string;
+  description: string;
+  image: string;
+  accent?: string;
+}) {
+  const at = title.indexOf(highlight);
+  const before = at >= 0 ? title.slice(0, at) : title;
+  const after = at >= 0 ? title.slice(at + highlight.length) : "";
+  return (
+    <div className="relative mb-6 overflow-hidden rounded-2xl border border-white/10 px-1 py-1">
+      <img
+        src={image}
+        alt=""
+        className="pointer-events-none absolute inset-y-0 right-0 h-full w-[46%] object-cover opacity-80"
+        style={{ maskImage: "linear-gradient(to right, transparent, #000 40%)", WebkitMaskImage: "linear-gradient(to right, transparent, #000 40%)" }}
+      />
+      <div className="relative max-w-3xl px-4 py-3">
+        <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: accent }}>
+          {eyebrow}
+        </p>
+        <h2 id={id} className="mt-1.5 scroll-mt-24 text-2xl font-extrabold leading-tight sm:text-[1.85rem]">
+          {before}
+          {at >= 0 && (
+            <span style={{ color: accent, textShadow: `0 0 18px color-mix(in srgb, ${accent} 55%, transparent)` }}>{highlight}</span>
+          )}
+          {after}
+        </h2>
+        <p className="mt-1.5 max-w-2xl text-sm text-muted-foreground sm:text-base">{description}</p>
+      </div>
+    </div>
   );
 }
 
@@ -89,10 +166,13 @@ export default function OutlookPage() {
       </section>
 
       <section data-demo="population" aria-labelledby="population">
-        <SectionHeader
+        <Band
           id="population"
           eyebrow="Population"
           title="Growing about 2% a year to 386 million"
+          highlight="386 million"
+          accent="#22d3ee"
+          image="/banners/outlook.jpg"
           description="National population, GHSL live-map series. 2020 is a raw GHSL estimate; the data has no values for 2021–2025."
         />
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
@@ -104,9 +184,9 @@ export default function OutlookPage() {
           </Reveal>
           <Reveal delay={0.08}>
             <ul data-tones="" className="grid h-full gap-3">
-              <Fact icon={TrendingUp} value={`${h.popCagr2026to2047}% / yr`} label="Compound growth 2026→2047" />
-              <Fact icon={Users} value="+131 Mn" label="More people by 2047 than in 2026 (255 → 386 Mn)" />
-              <Fact icon={TrendingUp} value={`${h.popCagr2020to2047}% / yr`} label="Compound growth 2020→2047 (234.99 → 386 Mn)" />
+              <Fact color="emerald" icon={TrendingUp} value={`${h.popCagr2026to2047}% / yr`} label="Compound growth 2026 → 2047" note="Population is projected to grow at an average of 1.99% annually." />
+              <Fact color="sky" icon={Users} value="+131 Mn" label="More people by 2047 than in 2026" note="Population is expected to increase from 255 Mn in 2026 to 386 Mn in 2047." />
+              <Fact color="violet" icon={TrendingUp} value={`${h.popCagr2020to2047}% / yr`} label="Compound growth 2020 → 2047" note="Long-term growth rate based on 2020 (234.99 Mn) to 2047 (386 Mn)." />
             </ul>
           </Reveal>
         </div>
@@ -154,10 +234,13 @@ export default function OutlookPage() {
       </section>
 
       <section data-demo="housing" aria-labelledby="housing">
-        <SectionHeader
+        <Band
           id="housing"
           eyebrow="Buildings & housing"
           title="Building stock nearly doubles by 2047"
+          highlight="2047"
+          accent="#38bdf8"
+          image="/banners/outlook.jpg"
           description={`Buildings grow a steady ${h.buildingGrowth}% a year. Residential units required are population ÷ 6.5 persons per unit.`}
         />
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
@@ -188,9 +271,9 @@ export default function OutlookPage() {
           </Reveal>
         </div>
         <ul data-tones="" className="mt-6 grid gap-3 sm:grid-cols-3">
-          <Fact icon={Building2} value={`${h.buildingsInclAjkGb2026} → ${h.buildingsInclAjkGb2047} Mn`} label="Buildings incl. AJK & GB, 2026 → 2047" />
-          <Fact icon={House} value="≈ 0.97 Mn / yr" label="Average additional residential units needed, 2026–2047" />
-          <Fact icon={Building} value={mn2(2_159_913)} label="Buildings added in 2047 alone" />
+          <Fact color="emerald" icon={Building2} value={`+${h.buildingGrowth}% / yr`} label="Average building growth rate" />
+          <Fact color="sky" icon={House} value="+20.37 Mn" label="Additional units needed by 2047 (vs 2026)" />
+          <Fact color="violet" icon={Users} value="≈ 6.5 persons" label="Residential units required per unit" />
         </ul>
 
         <Reveal className="mt-6">
@@ -284,25 +367,41 @@ export default function OutlookPage() {
       </section>
 
       <section data-demo="coverage" aria-labelledby="coverage">
-        <SectionHeader
+        <Band
           id="coverage"
           eyebrow="Built-up coverage"
           title={`Built-up land more than doubles: ×${h.coverageMultiple2047} by 2047`}
+          highlight={`×${h.coverageMultiple2047} by 2047`}
+          accent="#fbbf24"
+          image="/banners/outlook.jpg"
           description={`Built footprint as a share of total land area, growing ${h.builtCagr2020to2047}% a year from 2020 to 2047.`}
         />
-        <Reveal>
-          <Panel tone="amber">
-            <CoverageChart />
-            <Source>{src.ghsl}</Source>
-          </Panel>
-        </Reveal>
+        <div className="grid gap-6 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
+          <Reveal>
+            <Panel tone="amber">
+              <CoverageChart />
+              <Source>{src.ghsl}</Source>
+            </Panel>
+          </Reveal>
+          <Reveal delay={0.08}>
+            <ul className="grid h-full gap-3 sm:grid-cols-2 lg:grid-cols-1">
+              <Fact color="amber" icon={TrendingUp} value={`${h.builtCagr2020to2047}% / yr`} label="Average annual growth rate" note="Built footprint, 2020 → 2047." />
+              <Fact color="sky" icon={Building} value={`×${h.coverageMultiple2047}`} label="Increase in built-up land" note="From 2020 to 2047." />
+              <Fact color="violet" icon={Building2} value="0.71% → 1.54%" label="Built-up land share" note="2020 versus 2047, from the GHSL series." />
+              <Fact color="emerald" icon={House} value={`+${h.builtCagr2020to2047}% / yr`} label="Built footprint growth" note="As a share of total land area." />
+            </ul>
+          </Reveal>
+        </div>
       </section>
 
       <section data-demo="districts" aria-labelledby="districts">
-        <SectionHeader
+        <Band
           id="districts"
           eyebrow="Districts"
           title="The districts that will grow the most"
+          highlight="grow the most"
+          accent="#34d399"
+          image="/segments/riverine-plains.jpg"
           description="Top 15 districts by 2047 population, and the fastest-growing large districts."
         />
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
@@ -318,19 +417,19 @@ export default function OutlookPage() {
               <p className="text-sm text-muted-foreground">Population change 2026 → 2047</p>
               <ol className="mt-4 flex flex-col gap-2">
                 {fastestDistricts.map((d, i) => (
-                  <li key={d.name} className="group rounded-xl border-2 border-transparent p-2 transition-all hover:border-primary/40 hover:bg-primary-tint/50">
+                  <li key={d.name} className="group rounded-xl border border-transparent p-2 transition-all hover:border-emerald-400/40 hover:bg-emerald-400/5">
                     <div className="flex items-center justify-between gap-3 text-sm">
                       <span className="flex items-center gap-2">
-                        <span className="flex h-6 w-6 items-center justify-center rounded-md bg-primary-tint font-heading text-xs font-bold text-primary group-hover:bg-primary group-hover:text-primary-foreground dark:text-accent-foreground">
+                        <span className="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-400 font-heading text-xs font-bold text-[#04231d] shadow-[0_0_12px_-2px_#34d399]">
                           {i + 1}
                         </span>
                         <span className="font-semibold">{d.name}</span>
                         <span className="text-xs text-muted-foreground">{d.province}</span>
                       </span>
-                      <span className="font-heading font-bold tabular-nums text-primary dark:text-accent-foreground">+{d.growth}%</span>
+                      <span className="font-heading font-bold tabular-nums text-emerald-300">+{d.growth}%</span>
                     </div>
-                    <span className="mt-1.5 block h-1.5 rounded-full bg-muted">
-                      <span className="block h-full rounded-full bg-gradient-to-r from-[#0E7490] to-[#0B5D3B]" style={{ width: `${(d.growth / 110.6) * 100}%` }} />
+                    <span className="mt-2 block h-1.5 overflow-hidden rounded-full bg-white/10">
+                      <span className="block h-full rounded-full bg-gradient-to-r from-emerald-500 to-emerald-300 shadow-[0_0_10px_#34d399]" style={{ width: `${(d.growth / 110.6) * 100}%` }} />
                     </span>
                   </li>
                 ))}
