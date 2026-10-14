@@ -17,8 +17,16 @@ export function HomeIntro({ className }: { className?: string }) {
       void video.play().catch(() => undefined);
     };
     start();
-    video.addEventListener("loadeddata", start);
-    return () => video.removeEventListener("loadeddata", start);
+    const events = ["loadedmetadata", "canplay"] as const;
+    events.forEach((e) => video.addEventListener(e, start));
+    const onVisible = () => {
+      if (document.visibilityState === "visible" && video.paused) start();
+    };
+    document.addEventListener("visibilitychange", onVisible);
+    return () => {
+      events.forEach((e) => video.removeEventListener(e, start));
+      document.removeEventListener("visibilitychange", onVisible);
+    };
   }, []);
 
   return (

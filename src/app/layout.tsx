@@ -32,8 +32,7 @@ export const viewport: Viewport = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  preload("/pria-intro.mp4", { as: "video", type: "video/mp4" });
-  preload("/pria-intro-poster.jpg", { as: "image" });
+  preload("/pria-intro-poster.jpg", { as: "image", fetchPriority: "high" });
   return (
     <html lang="en" suppressHydrationWarning className={`${inter.variable} ${jakarta.variable}`}>
       <body className="min-h-screen font-sans">

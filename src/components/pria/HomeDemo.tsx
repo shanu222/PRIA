@@ -587,9 +587,25 @@ function IntroFilm({
     video.muted = false;
     video.volume = volume;
     video.preload = "auto";
-    void video.play().catch(() => undefined);
+    const start = () => {
+      if (!video.paused) return;
+      void video.play().catch(() => {
+        video.muted = true;
+        void video.play().catch(() => undefined);
+      });
+    };
+    const detach = () => {
+      video.removeEventListener("loadedmetadata", start);
+      video.removeEventListener("canplay", start);
+      video.removeEventListener("playing", detach);
+    };
+    start();
+    video.addEventListener("loadedmetadata", start);
+    video.addEventListener("canplay", start);
+    video.addEventListener("playing", detach);
     void stage?.requestFullscreen?.().catch(() => undefined);
     return () => {
+      detach();
       controlRef.current = null;
       if (document.fullscreenElement) void document.exitFullscreen().catch(() => undefined);
     };
@@ -606,6 +622,7 @@ function IntroFilm({
         src={INTRO_SRC}
         poster={INTRO_POSTER}
         preload="auto"
+        autoPlay
         playsInline
         className="h-full w-full bg-black object-contain"
         style={{ backgroundImage: `url(${INTRO_POSTER})`, backgroundSize: "contain", backgroundRepeat: "no-repeat", backgroundPosition: "center" }}

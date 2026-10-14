@@ -68,8 +68,9 @@ export function SidebarNav({ mode, onNavigate }: { mode: SidebarMode; onNavigate
 
   return (
     <nav aria-label="Primary" className="flex flex-col gap-2 px-3 py-4">
-      {navGroups.map((group) => {
+      {navGroups.map((group, groupIndex) => {
         const items = pages.filter((p) => p.group === group.id);
+        const groupFace = NAV_FACES[groupIndex % NAV_FACES.length];
         const isOpen = open.has(group.id);
         const containsActive = items.some((page) => page.id === active?.id);
         const headingsVisible = mode === "full" || (mode === "responsive" && isLarge);
@@ -82,16 +83,43 @@ export function SidebarNav({ mode, onNavigate }: { mode: SidebarMode; onNavigate
                 onClick={() => toggle(group.id)}
                 aria-expanded={isOpen}
                 aria-controls={`nav-group-${group.id}`}
+                style={{ "--grp": groupFace } as CSSProperties}
                 className={cn(
-                  "flex w-full items-center justify-between gap-2 rounded-md px-3 py-2 text-left text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground transition-colors hover:bg-muted hover:text-foreground",
-                  containsActive && "text-foreground",
+                  "group/grp relative isolate mb-1 flex w-full items-center justify-between gap-2 overflow-hidden rounded-xl border-2 px-3 py-2 text-left text-[11px] font-bold uppercase tracking-[0.12em]",
+                  "border-[color-mix(in_srgb,var(--grp)_55%,transparent)] text-[color-mix(in_srgb,var(--grp)_60%,hsl(var(--foreground)))]",
+                  "bg-gradient-to-b from-[color-mix(in_srgb,var(--grp)_16%,hsl(var(--card)))] to-[color-mix(in_srgb,var(--grp)_5%,hsl(var(--card)))]",
+                  "shadow-[inset_0_1px_0_rgba(255,255,255,0.22),0_3px_0_color-mix(in_srgb,var(--grp)_60%,black),0_8px_14px_-8px_var(--grp)]",
+                  "transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-[var(--grp)] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.28),0_4px_0_color-mix(in_srgb,var(--grp)_60%,black),0_12px_20px_-8px_var(--grp)]",
+                  "active:translate-y-[2px] active:shadow-[inset_0_1px_0_rgba(255,255,255,0.2),0_1px_0_color-mix(in_srgb,var(--grp)_60%,black)]",
+                  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--grp)] focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+                  (isOpen || containsActive) && "border-[var(--grp)]",
                 )}
               >
-                <span>{group.label}</span>
-                <ChevronDown
+                <span
                   aria-hidden="true"
-                  className={cn("h-3.5 w-3.5 shrink-0 transition-transform duration-200", isOpen && "rotate-180")}
+                  className="pointer-events-none absolute inset-y-0 left-0 -z-10 w-1/3 -translate-x-full skew-x-[-20deg] bg-gradient-to-r from-transparent via-white/35 to-transparent transition-transform duration-700 ease-out group-hover/grp:translate-x-[400%]"
                 />
+                <span className="flex items-center gap-2">
+                  <span
+                    aria-hidden="true"
+                    className={cn(
+                      "h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--grp)] shadow-[0_0_8px_var(--grp)] transition-transform duration-300",
+                      isOpen ? "scale-100 motion-safe:animate-pulse" : "scale-75 opacity-60",
+                    )}
+                  />
+                  {group.label}
+                </span>
+                <span
+                  aria-hidden="true"
+                  className={cn(
+                    "flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-white transition-transform duration-300 ease-out",
+                    "bg-gradient-to-b from-[color-mix(in_srgb,var(--grp)_55%,white)] to-[var(--grp)] shadow-[inset_0_1px_0_rgba(255,255,255,0.7),0_2px_0_color-mix(in_srgb,var(--grp)_55%,black)]",
+                    "group-hover/grp:scale-110",
+                    isOpen && "rotate-180",
+                  )}
+                >
+                  <ChevronDown className="h-3 w-3" />
+                </span>
               </button>
             ) : (
               <p className="sr-only">{group.label}</p>

@@ -95,9 +95,7 @@ export default function HomePage() {
             </Reveal>
           </div>
 
-          <Reveal delay={0.2}>
-            <HomeIntro />
-          </Reveal>
+          <HomeIntro />
         </div>
         </div>
       </section>
