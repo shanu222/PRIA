@@ -395,34 +395,15 @@ export const pages: PageMeta[] = [
     icon: "TrendingUp",
   },
   {
-    id: "observations",
-    href: "/observations",
-    title: "Observations",
-    navLabel: "Observations",
+    id: "situation",
+    href: "/situation",
+    title: "Situation Analysis",
+    navLabel: "Situation Analysis",
     group: "national-context",
     eyebrow: "National Context",
-    description: "Key observations on the state of growth and planning.",
-    icon: "Eye",
-  },
-  {
-    id: "challenges",
-    href: "/challenges",
-    title: "Challenges",
-    navLabel: "Challenges",
-    group: "national-context",
-    eyebrow: "National Context",
-    description: "The pressures shaping infrastructure needs in the coming years.",
-    icon: "TriangleAlert",
-  },
-  {
-    id: "hazards",
-    href: "/hazards",
-    title: "Hazards & Disasters",
-    navLabel: "Hazards & Disasters",
-    group: "national-context",
-    eyebrow: "National Context",
-    description: "Recorded disasters, hazard exposure and housing vulnerability across Pakistan.",
-    icon: "Activity",
+    description:
+      "How Pakistan has grown, the pressures ahead to 2047, the disasters on record and the capacity gaps PRIA has to close.",
+    icon: "ScanSearch",
   },
   {
     id: "research",
@@ -434,16 +415,6 @@ export const pages: PageMeta[] = [
     description:
       "The full map of Pakistan. Choose a city to read problems and remedies from the cited papers, and two indicated new-town sites off the hazard line.",
     icon: "BookOpen",
-  },
-  {
-    id: "resources",
-    href: "/resources",
-    title: "Resource Observations",
-    navLabel: "Resource Observations",
-    group: "national-context",
-    eyebrow: "National Context",
-    description: "Gaps in capacity, standards, materials and controls.",
-    icon: "Inbox",
   },
   {
     id: "needs",
@@ -583,7 +554,7 @@ export const home = {
   ] satisfies Stat[],
   glanceLinks: [
     { pageId: "landscape" },
-    { pageId: "challenges" },
+    { pageId: "situation" },
     { pageId: "needs" },
     { pageId: "scope" },
     { pageId: "stakeholders" },
@@ -698,20 +669,22 @@ export const landscape = {
 
 export const observations = {
   items: [
-    { id: "fragmented-growth", code: "1", title: "Fragmented growth", icon: "Puzzle" },
-    { id: "over-saturated", code: "2", title: "Over-saturated few urbans", icon: "Building2" },
-    { id: "reducing-land", code: "3", title: "Reducing land", icon: "Shrink" },
-    { id: "encroachments", code: "4", title: "Encroachments", icon: "Fence" },
-    { id: "no-spatial-planning", code: "5", title: "No formal spatial planning", icon: "MapPinOff" },
+    { id: "fragmented-growth", code: "1", title: "Fragmented, unplanned growth", icon: "Puzzle" },
+    { id: "over-saturated", code: "2", title: "A few over-saturated cities", icon: "Building2" },
+    {
+      id: "shrinking-land",
+      code: "3",
+      title: "Shrinking land for housing and agriculture",
+      icon: "Shrink",
+    },
+    {
+      id: "encroachments",
+      code: "4",
+      title: "Encroachment on land and natural flow paths, with weak enforcement",
+      icon: "Fence",
+    },
+    { id: "no-spatial-planning", code: "5", title: "No formal spatial planning framework", icon: "MapPinOff" },
   ] satisfies InfoItem[],
-  trajectory: {
-    id: "population-trajectory",
-    code: "6",
-    title: "Population trajectory: next 20 years",
-    icon: "TrendingUp",
-    from: { year: 2026, label: "Today" },
-    to: { year: 2047, label: "Pakistan 100 years old" },
-  },
 };
 
 /* -------------------------------------------------------------------------- */
@@ -780,28 +753,20 @@ const projectedColumns: TableColumn[] = [
 ];
 
 export const challenges = {
-  growingNeeds: {
-    id: "growing-needs",
-    title: "Growing needs",
-    icon: "HousePlus",
-    stat: { value: 31, suffix: " Mn", label: "houses to be built in the coming years" },
-  },
   items: [
-    { id: "shrinking-land", title: "Shrinking available land", icon: "Shrink" },
     {
       id: "water-food",
-      title: "Increasing water stress & acute food security",
+      title: "Rising water stress and food insecurity",
       icon: "Droplets",
     },
-    { id: "unemployment", title: "Unemployment-related indifference", icon: "UserX" },
     {
-      id: "strategic-capacity",
-      title: "Lack of strategic infrastructure development capacity",
-      icon: "Construction",
+      id: "unemployment",
+      title: "Unemployment and low incomes limiting investment in safer housing",
+      icon: "UserX",
     },
     {
       id: "tourism-zones",
-      title: "High-priced tourism zones lacking any planned growth & development",
+      title: "High-value tourism zones growing without planned development",
       icon: "TreePalm",
     },
   ] satisfies InfoItem[],
@@ -825,28 +790,34 @@ export const challenges = {
 /* -------------------------------------------------------------------------- */
 
 export const resourceObservations: InfoItem[] = [
-  { id: "design-capacities", title: "Mediocre design capacities", icon: "PencilRuler" },
-  { id: "standard-of-works", title: "Poor standard of works (no highly skilled HR)", icon: "HardHat" },
+  {
+    id: "design-capacity",
+    title: "Limited design and development capacity, including for strategic infrastructure",
+    icon: "PencilRuler",
+  },
+  {
+    id: "standard-of-works",
+    title: "Uneven workmanship and a shortage of highly skilled workers",
+    icon: "HardHat",
+  },
   {
     id: "no-training",
     title: "No formal institutional training for builders, contractors and artisans",
     icon: "GraduationCap",
   },
   {
-    id: "corruption-materials",
-    title: "Corruption and lack of affordable resilient materials",
+    id: "materials-procurement",
+    title: "Scarce affordable resilient materials and weak procurement transparency",
     icon: "Scale",
   },
-  { id: "quality-control", title: "Poor quality control & laws monitoring system", icon: "ClipboardX" },
-  { id: "best-practices", title: "Violation of best practices", icon: "Ban" },
   {
-    id: "encroachment-controls",
-    title: "No encroachment controls by building control authorities",
-    icon: "ShieldOff",
+    id: "quality-control",
+    title: "Weak quality control and enforcement of building codes and best practices",
+    icon: "ClipboardX",
   },
   {
-    id: "global-marvels",
-    title: "Hardly any infrastructure equivalent to global marvels",
+    id: "benchmarking",
+    title: "Few projects designed and benchmarked to international standards",
     icon: "Landmark",
   },
 ];

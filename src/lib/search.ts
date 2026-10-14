@@ -69,7 +69,7 @@ export function buildSearchIndex(): SearchGroup[] {
     { ...anchor("landscape", "residential-split"), id: "sec-split", label: "Residential split: Urban / Rural", icon: "House", keywords: ["urban", "rural", "census", "housing units"] },
     { ...anchor("landscape", "province-map"), id: "sec-map", label: "Pakistan map: provinces & housing", icon: "Map", keywords: ["map", "province", "census", "pacca", "kacha", "density"] },
     { ...anchor("landscape", housingTable.id), id: "sec-housing", label: housingTable.title, icon: "House", keywords: ["census", "housing", "pacca", "kacha", "province", "table"] },
-    { ...anchor("challenges", challenges.projectedTable.id), id: "sec-projected", label: challenges.projectedTable.title, icon: "Map", keywords: ["province", "region", "2047", "table"] },
+    { ...anchor("situation", challenges.projectedTable.id), id: "sec-projected", label: challenges.projectedTable.title, icon: "Map", keywords: ["province", "region", "2047", "table"] },
     { ...anchor("outlook", "population"), id: "sec-pop-2047", label: "Population projection 2026–2047", icon: "TrendingUp", keywords: ["population", "growth", "GHSL", "2047", "projection"] },
     { ...anchor("outlook", "provinces"), id: "sec-prov-2047", label: "Provincial outlook map 2047", icon: "Map", keywords: ["province", "buildings", "built-up", "2047", "map"] },
     { ...anchor("outlook", "housing"), id: "sec-housing-2047", label: "Buildings & residential units required", icon: "Building2", keywords: ["housing", "units", "buildings", "backlog", "scenario"] },
@@ -96,32 +96,39 @@ export function buildSearchIndex(): SearchGroup[] {
 
   const contentEntries: SearchEntry[] = [
     ...disasterTimeline.map((d) => ({
-      ...anchor("hazards", d.id),
+      ...anchor("situation", d.id),
       id: `hz-${d.id}`,
       label: `${d.year}: ${d.title}`,
       icon: d.icon,
       keywords: ["disaster", "hazard", String(d.year)],
     })),
-    ...[...observations.items, observations.trajectory].map((o) => ({
-      ...anchor("observations", o.id),
+    ...observations.items.map((o) => ({
+      ...anchor("situation", o.id),
       id: `obs-${o.id}`,
       label: o.title,
       icon: o.icon,
       keywords: ["observation"],
     })),
-    ...[challenges.growingNeeds, ...challenges.items].map((c) => ({
-      ...anchor("challenges", c.id),
+    {
+      ...anchor("situation", "horizon-2047"),
+      id: "chl-horizon",
+      label: "Population, buildings and homes required to 2047",
+      icon: "TrendingUp",
+      keywords: ["challenge", "growth", "housing", "2047"],
+    },
+    ...challenges.items.map((c) => ({
+      ...anchor("situation", c.id),
       id: `chl-${c.id}`,
       label: c.title,
       icon: c.icon,
       keywords: ["challenge"],
     })),
     ...resourceObservations.map((r) => ({
-      ...anchor("resources", r.id),
+      ...anchor("situation", r.id),
       id: `res-${r.id}`,
       label: r.title,
       icon: r.icon,
-      keywords: ["resource"],
+      keywords: ["resource", "capacity"],
     })),
     ...needs.map((n) => ({
       ...anchor("needs", n.id),

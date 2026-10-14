@@ -190,7 +190,7 @@ export default function HomePage() {
           description="Recorded losses that show what PRIA is designed to prevent."
           action={
             <Button asChild variant="outline">
-              <Link href="/hazards">
+              <Link href="/situation#hazards">
                 Hazards & disasters
                 <ArrowRight />
               </Link>
@@ -203,7 +203,7 @@ export default function HomePage() {
             return (
               <StaggerItem key={event.id}>
                 <Link
-                  href={`/hazards#${event.id}`}
+                  href={`/situation#${event.id}`}
                   className="card-pro card-pro-lift group flex h-full flex-col rounded-xl bg-card p-5"
                 >
                   <div className="flex items-center justify-between">

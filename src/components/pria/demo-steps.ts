@@ -180,43 +180,34 @@ const STATIC: Record<string, DemoStep[]> = {
         "These are the districts expected to grow the most. They are where the atlas has to be specific. A national average will not protect them.",
     },
   ],
-  "/observations": [
+  "/situation": [
     {
       id: "intro",
-      title: "What the growth has done",
-      gist: "The pattern of building, before the list of pressures.",
+      title: "The situation, in one place",
+      gist: "Growth, pressure, hazard and capacity, read together.",
       script:
-        "This page is the diagnosis. It names how growth has actually happened, so the challenges and the needs that follow are not abstract.",
+        "This page is the diagnosis. It sets out how Pakistan has grown, what the next two decades will demand, the disasters already on record, and the gaps in how the country builds. The needs and the scope that follow answer this page.",
     },
     {
-      id: "cards",
+      id: "observations",
       title: "Five patterns",
       gist: "Scattered growth, a few overloaded cities, and no spatial plan.",
       script:
-        "Taken together, these are one failure. Growth has been fragmented. A few cities are over-saturated. Land is shrinking. Encroachment fills the gaps. And there is no formal spatial plan holding the pieces together.",
+        "Taken together, these are one failure. Growth has been fragmented. A few cities are over-saturated. Land for housing and farming is shrinking. Encroachment takes the gaps, including natural flow paths. And there is no formal spatial plan holding the pieces together.",
     },
     {
-      id: "trajectory",
+      id: "horizon",
       title: "The years ahead",
-      gist: "From today to the hundredth year of Pakistan.",
+      gist: "About 255 million people in 2026, about 386 million by 2047.",
       script:
-        "The sixth observation is time. From 2026 to 2047 is the window in which those five patterns either harden, or get redirected. Vision 2047 is that window.",
-    },
-  ],
-  "/challenges": [
-    {
-      id: "intro",
-      title: "What has to be faced",
-      gist: "The pressures that decide what gets built next.",
-      script:
-        "Observations described the pattern. Challenges name the pressure on the next twenty years. Housing need, land, water, food, work, and places that are growing with no plan.",
+        "From 2026 to 2047 is the window in which those patterns either harden or get redirected. The population series reaches about 386 million, the building stock nearly doubles, and about 20 million more homes are required than today.",
     },
     {
       id: "pressures",
       title: "The pressures",
-      gist: "About 31 million houses, on land that is already tightening.",
+      gist: "Water, livelihoods, and tourism growth without a plan.",
       script:
-        "Start with the houses still to be built, about 31 million. Then see what makes that number hard. Land is shrinking, water and food are under stress, capacity is thin, and high-priced tourism zones are growing without a plan.",
+        "Three pressures make that growth harder to place safely. Water stress and food insecurity, unemployment and low incomes that leave little to spend on a safer house, and high-value tourism zones growing without planned development.",
     },
     {
       id: "outlook",
@@ -224,15 +215,6 @@ const STATIC: Record<string, DemoStep[]> = {
       gist: "The same challenge, weighed differently in each province.",
       script:
         "A national challenge is not felt the same way in every province. This outlook sets the 2047 population, buildings and built-up land against the local pressure, so the response can be local too.",
-    },
-  ],
-  "/hazards": [
-    {
-      id: "intro",
-      title: "The dangers already on record",
-      gist: "Why the atlas refuses a single building type for the whole country.",
-      script:
-        "This is the evidence behind every recommendation. Not a generic risk list. The disasters Pakistan has recorded, and the housing those disasters found unprepared.",
     },
     {
       id: "timeline",
@@ -254,6 +236,13 @@ const STATIC: Record<string, DemoStep[]> = {
       gist: "Pacca and kacha stock tell you where the next loss will concentrate.",
       script:
         "Hazard is only half the loss. The other half is the quality of the house that meets it. The landscape map compares pacca and kacha housing, density and urban share, so vulnerability is visible by province.",
+    },
+    {
+      id: "gaps",
+      title: "Where the chain is weak",
+      gist: "From the drawing board to the inspector on site.",
+      script:
+        "The last question is whether the country can build well. Read these as one chain. Limited design capacity, uneven workmanship, little formal training, scarce affordable resilient materials, and weak quality control. A model house does not survive that chain on its own.",
     },
   ],
   "/research": [
@@ -284,22 +273,6 @@ const STATIC: Record<string, DemoStep[]> = {
       title: "The closed list",
       gist: "If it is not in this library, it is not on the page.",
       script: `The bank holds ${evidenceSources.length} sources. That list is the boundary. Nothing above it was added to make a city look more studied than it is.`,
-    },
-  ],
-  "/resources": [
-    {
-      id: "intro",
-      title: "The capacity to build well",
-      gist: "A sound recommendation fails if the country cannot carry it out.",
-      script:
-        "The earlier pages ask what to build. This page asks whether we can build it well. Design skill, workmanship, training, materials, and the controls that keep standards honest.",
-    },
-    {
-      id: "gaps",
-      title: "Where the chain is weak",
-      gist: "From the drawing board to the inspector on site.",
-      script:
-        "Read these as one chain. Weak design, uneven work, little formal training, scarce affordable resilient materials, thin quality control, and encroachment that nobody stops. A model house does not survive that chain on its own.",
     },
   ],
   "/needs": [

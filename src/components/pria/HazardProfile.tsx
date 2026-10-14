@@ -9,13 +9,18 @@ import { cn } from "@/lib/utils";
 export function HazardProfile({
   segment,
   withLink = false,
+  omitValues,
   className,
 }: {
   segment: Segment;
   withLink?: boolean;
+  /** Fact values already shown elsewhere on the page. */
+  omitValues?: ReadonlySet<string>;
   className?: string;
 }) {
   const profile = segmentProfiles[segment.id];
+  const shown = omitValues ? [...omitValues] : [];
+  const facts = profile.facts.filter((f) => !shown.some((v) => f.value === v || f.label.includes(v)));
   return (
     <article
       className={cn(
@@ -57,7 +62,7 @@ export function HazardProfile({
       </ul>
 
       <dl className="mt-5 grid flex-1 gap-3 sm:grid-cols-2">
-        {profile.facts.map((f) => (
+        {facts.map((f) => (
           <div
             key={f.label}
             className="rounded-xl border-2 border-[color-mix(in_srgb,var(--seg)_20%,transparent)] bg-[color-mix(in_srgb,var(--seg)_5%,hsl(var(--card)))] p-4 transition-colors hover:border-[var(--seg)]"

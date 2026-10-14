@@ -135,7 +135,7 @@ function sceneFor(pathname: string): Scene {
   if (pathname.startsWith("/drim")) return { root: 98, intervals: [0, 5, 9, 12], pace: 2100, air: 700 };
   if (pathname.startsWith("/segments")) return { root: 110, intervals: [0, 4, 7, 11, 12], pace: 1900, air: 780 };
   if (pathname.startsWith("/research")) return { root: 82.4, intervals: [0, 7, 10, 14], pace: 3000, air: 600 };
-  if (pathname.startsWith("/hazards") || pathname.startsWith("/challenges") || pathname.startsWith("/observations")) {
+  if (pathname.startsWith("/situation")) {
     return { root: 73.4, intervals: [0, 3, 7, 10], pace: 2800, air: 540 };
   }
   if (pathname.startsWith("/needs") || pathname.startsWith("/scope") || pathname.startsWith("/stakeholders")) {
