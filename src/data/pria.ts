@@ -682,7 +682,7 @@ export const observations = {
       code: "2",
       title: "A few over-saturated cities",
       icon: "Building2",
-      image: "/observations/over-saturated.jpg",
+      image: "/split/urban.jpg",
     },
     {
       id: "shrinking-land",
