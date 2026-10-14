@@ -4,7 +4,7 @@ import * as React from "react";
 import { MapPin } from "lucide-react";
 import { getProvinceOutlook, outlookSources, provinceOutlook, type ProvinceOutlook } from "@/data/outlook";
 import { cn } from "@/lib/utils";
-import { MapSourceNote, PakistanMap } from "./PakistanMap";
+import { MapSourceNote, PakistanMap, SHADE_LEGEND, provinceColor } from "./PakistanMap";
 
 type Metric = {
   id: string;
@@ -74,7 +74,8 @@ export function ProvinceOutlookMap() {
   const values = provinceOutlook.map((p) => scale(metric.value(p)));
   const min = Math.min(...values);
   const max = Math.max(...values);
-  const shade = (v: number) => 0.18 + 0.82 * ((scale(v) - min) / (max - min || 1));
+  const shade01 = (v: number) => (scale(v) - min) / (max - min || 1);
+  const shade = (v: number) => 0.18 + 0.82 * shade01(v);
 
   const focus = getProvinceOutlook(hovered ?? selected)!;
   const ranked = [...provinceOutlook].sort((a, b) => metric.value(b) - metric.value(a));
@@ -113,17 +114,15 @@ export function ProvinceOutlookMap() {
           }}
           fills={(id) => {
             const o = getProvinceOutlook(id);
-            return o ? { fill: metric.color, opacity: shade(metric.value(o)) } : { fill: "hsl(var(--muted-foreground))", opacity: 0.14 };
+            return o
+              ? { fill: provinceColor(id).base, opacity: 0.3 + 0.7 * shade01(metric.value(o)) }
+              : { fill: "hsl(var(--muted-foreground))", opacity: 0.14 };
           }}
         />
         <div className="mt-4 flex items-center gap-3 text-xs text-muted-foreground">
-          <span>Lower</span>
-          <span
-            aria-hidden="true"
-            className="h-2 flex-1 rounded-full"
-            style={{ background: `linear-gradient(90deg, color-mix(in srgb, ${metric.color} 18%, transparent), ${metric.color})` }}
-          />
-          <span>Higher</span>
+          <span>Lighter = lower</span>
+          <span aria-hidden="true" className="h-2 flex-1 rounded-full" style={{ background: SHADE_LEGEND }} />
+          <span>Deeper = higher</span>
         </div>
         <MapSourceNote className="mt-3" />
       </div>

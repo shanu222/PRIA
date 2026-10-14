@@ -4,7 +4,7 @@ import * as React from "react";
 import { MapPin } from "lucide-react";
 import { censusSource, getProvince, provinces, type ProvinceCensus } from "@/data/census";
 import { cn } from "@/lib/utils";
-import { MapSourceNote, PakistanMap, ProvinceFacts } from "./PakistanMap";
+import { MapSourceNote, PakistanMap, ProvinceFacts, SHADE_LEGEND, provinceColor } from "./PakistanMap";
 
 type Metric = {
   id: string;
@@ -33,7 +33,8 @@ export function ProvinceCensusMap() {
   const scale = (v: number) => (metric.log ? Math.log10(v) : v);
   const min = Math.min(...values.map(scale));
   const max = Math.max(...values.map(scale));
-  const shade = (v: number) => 0.18 + 0.82 * ((scale(v) - min) / (max - min || 1));
+  const shade01 = (v: number) => (scale(v) - min) / (max - min || 1);
+  const shade = (v: number) => 0.18 + 0.82 * shade01(v);
 
   const focusId = hovered ?? selected;
   const focus = getProvince(focusId)!;
@@ -77,17 +78,13 @@ export function ProvinceCensusMap() {
             const v = metric.value(getProvince(id)!);
             return v === undefined
               ? { fill: "hsl(var(--muted-foreground))", opacity: 0.14 }
-              : { fill: metric.color, opacity: shade(v) };
+              : { fill: provinceColor(id).base, opacity: 0.3 + 0.7 * shade01(v) };
           }}
         />
         <div className="mt-4 flex items-center gap-3 text-xs text-muted-foreground">
-          <span>Lower</span>
-          <span
-            aria-hidden="true"
-            className="h-2 flex-1 rounded-full"
-            style={{ background: `linear-gradient(90deg, color-mix(in srgb, ${metric.color} 18%, transparent), ${metric.color})` }}
-          />
-          <span>Higher</span>
+          <span>Lighter = lower</span>
+          <span aria-hidden="true" className="h-2 flex-1 rounded-full" style={{ background: SHADE_LEGEND }} />
+          <span>Deeper = higher</span>
           <span className="flex items-center gap-1.5">
             <span aria-hidden="true" className="h-2.5 w-2.5 rounded-sm bg-muted-foreground/20" /> No PBS housing data
           </span>

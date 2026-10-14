@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { segments, type SegmentId } from "@/data/pria";
 import { getProvince, segmentProvinces } from "@/data/census";
 import { cn } from "@/lib/utils";
-import { MapSourceNote, PakistanMap } from "./PakistanMap";
+import { MapSourceNote, PakistanMap, provinceColor } from "./PakistanMap";
 
 /** Marker position of each segment, in map coordinates. */
 const MARKERS: Record<SegmentId, [number, number]> = {
@@ -53,11 +53,10 @@ export function PakistanSegmentMap({
           if (activeSegment) {
             const inSegment = segmentProvinces[activeSegment.id].includes(id as never);
             return inSegment
-              ? { fill: activeSegment.color, opacity: 0.78 }
+              ? { fill: activeSegment.color, opacity: 0.82, hoverFill: activeSegment.colorStrong }
               : { fill: "hsl(var(--muted-foreground))", opacity: 0.12 };
           }
-          if (province === id) return { fill: "hsl(var(--primary))", opacity: 0.55 };
-          return { fill: "hsl(var(--primary))", opacity: 0.16 };
+          return { fill: provinceColor(id).base, opacity: 0.72 };
         }}
         labelFor={(p) =>
           `${p.name}: ${segments

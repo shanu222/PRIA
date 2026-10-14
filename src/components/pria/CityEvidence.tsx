@@ -21,7 +21,7 @@ import { indicatedTowns } from "@/data/new-towns";
 import { projectLonLat } from "@/data/pakistan-geo";
 import { getSegment } from "@/data/pria";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { PakistanMap } from "./PakistanMap";
+import { PakistanMap, provinceColor } from "./PakistanMap";
 
 const FEATURED = ["karachi", "lahore", "peshawar", "quetta", "islamabad", "gupis"];
 
@@ -185,7 +185,7 @@ export function CityEvidence() {
       <div data-demo="map" className="overflow-hidden rounded-2xl border bg-card p-3 shadow-soft sm:p-4">
         <PakistanMap
           ariaLabel="Map of Pakistan. Select a city to read its evidence."
-          fills={() => ({ fill: "hsl(var(--primary))", opacity: 0.16, strokeWidth: 1.5 })}
+          fills={(id) => ({ fill: provinceColor(id).base, opacity: 0.38, strokeWidth: 1.5 })}
           activeId={selected?.province}
           onSelect={(provinceId) => {
             const city = getEvidenceCity(PRIMARY_CITY[provinceId as ProvinceId] ?? "");

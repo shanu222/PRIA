@@ -18,7 +18,7 @@ import { segments, type SegmentId } from "@/data/pria";
 import { Icon } from "@/lib/icons";
 import { cn } from "@/lib/utils";
 import { DrimCard } from "./DrimCard";
-import { MapSourceNote, PakistanMap } from "./PakistanMap";
+import { MapSourceNote, PakistanMap, SHADE_LEGEND, provinceColor } from "./PakistanMap";
 
 type Filters = {
   province: ProvinceId | null;
@@ -114,21 +114,16 @@ export function DrimExplorer() {
             onSelect={(id) => setFilter("province", id as ProvinceId)}
             labelFor={(p) => `${p.name}: ${counts[p.id]} suitable models`}
             fills={(id) => {
-              const selected = filters.province === id;
-              return {
-                fill: selected ? "#B45309" : MAP_COLOR,
-                opacity: selected ? 0.95 : 0.15 + 0.7 * (counts[id] / maxCount),
-              };
+              const color = provinceColor(id);
+              return filters.province === id
+                ? { fill: color.hover, opacity: 1 }
+                : { fill: color.base, opacity: 0.3 + 0.65 * (counts[id] / maxCount) };
             }}
           />
           <div className="mt-3 flex items-center gap-3 text-xs text-muted-foreground">
-            <span>Fewer</span>
-            <span
-              aria-hidden="true"
-              className="h-2 flex-1 rounded-full"
-              style={{ background: `linear-gradient(90deg, color-mix(in srgb, ${MAP_COLOR} 15%, transparent), ${MAP_COLOR})` }}
-            />
-            <span>More models</span>
+            <span>Lighter = fewer</span>
+            <span aria-hidden="true" className="h-2 flex-1 rounded-full" style={{ background: SHADE_LEGEND }} />
+            <span>Deeper = more models</span>
           </div>
           <MapSourceNote className="mt-3" />
         </div>

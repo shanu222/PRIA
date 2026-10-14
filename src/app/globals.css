@@ -41,6 +41,7 @@
 
     --radius: 0.875rem;
     --topo-stroke: 155 40% 30%;
+    --map-outline: 160 84% 18%;
   }
 
   .dark {
@@ -77,6 +78,7 @@
     --provisional-foreground: 200 95% 74%;
 
     --topo-stroke: 151 40% 55%;
+    --map-outline: 152 70% 55%;
   }
 }
 
@@ -115,30 +117,97 @@
   [data-tones] > :nth-child(6n + 5) { --tone: #be123c; --tone-2: #db2777; }
   [data-tones] > :nth-child(6n + 6) { --tone: #6d28d9; --tone-2: #0e7490; }
 
+  /* Two-colour gradient outline (thicker on top) over a tinted card face; it flows on hover. */
   .card-pro {
     position: relative;
-    border-width: 2px;
-    border-color: color-mix(in srgb, var(--tone, #047857) 20%, hsl(var(--border)));
-    border-top: 4px solid var(--tone, #047857);
-    background-image: linear-gradient(
-      165deg,
-      color-mix(in srgb, var(--tone, #047857) 7%, hsl(var(--card))) 0%,
-      hsl(var(--card)) 42%
-    );
+    border: 2px solid transparent;
+    border-top-width: 4px;
+    background:
+      linear-gradient(
+          165deg,
+          color-mix(in srgb, var(--tone, #047857) 9%, hsl(var(--card))) 0%,
+          color-mix(in srgb, var(--tone-2, #0d9488) 3%, hsl(var(--card))) 45%,
+          hsl(var(--card)) 70%
+        )
+        padding-box,
+      linear-gradient(
+          120deg,
+          color-mix(in srgb, var(--tone, #047857) 55%, hsl(var(--card))),
+          color-mix(in srgb, var(--tone-2, #0d9488) 45%, hsl(var(--card))),
+          color-mix(in srgb, var(--tone, #047857) 55%, hsl(var(--card)))
+        )
+        border-box;
+    background-size:
+      100% 100%,
+      200% 200%;
     box-shadow:
       0 1px 2px rgb(15 23 42 / 0.04),
-      0 6px 16px -6px color-mix(in srgb, var(--tone, #047857) 18%, transparent);
+      0 6px 16px -6px color-mix(in srgb, var(--tone, #047857) 22%, transparent);
     transition:
       transform 300ms cubic-bezier(0.16, 1, 0.3, 1),
-      border-color 200ms,
       box-shadow 300ms;
   }
   .card-pro:hover,
   .card-pro:focus-visible {
-    border-color: var(--tone, #047857);
+    background:
+      linear-gradient(
+          165deg,
+          color-mix(in srgb, var(--tone, #047857) 12%, hsl(var(--card))) 0%,
+          color-mix(in srgb, var(--tone-2, #0d9488) 5%, hsl(var(--card))) 45%,
+          hsl(var(--card)) 70%
+        )
+        padding-box,
+      linear-gradient(120deg, var(--tone, #047857), var(--tone-2, #0d9488), var(--tone, #047857)) border-box;
+    background-size:
+      100% 100%,
+      200% 200%;
+    animation: card-outline-flow 3s linear infinite;
     box-shadow:
       0 2px 4px rgb(15 23 42 / 0.05),
       0 22px 44px -18px color-mix(in srgb, var(--tone, #047857) 55%, transparent);
+  }
+  @keyframes card-outline-flow {
+    from {
+      background-position:
+        0 0,
+        0% 50%;
+    }
+    to {
+      background-position:
+        0 0,
+        200% 50%;
+    }
+  }
+
+  /* Map: the outer boundary draws in, provinces fade in one after another. */
+  .pk-outline {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    animation: pk-draw 1.8s cubic-bezier(0.65, 0, 0.35, 1) forwards;
+  }
+  .pk-province {
+    animation: pk-fade 600ms ease-out both;
+  }
+  @keyframes pk-draw {
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+  @keyframes pk-fade {
+    from {
+      opacity: 0;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .pk-outline {
+      animation: none;
+      stroke-dashoffset: 0;
+    }
+    .pk-province,
+    .card-pro:hover,
+    .card-pro:focus-visible {
+      animation: none;
+    }
   }
   .card-pro-lift:hover {
     transform: translateY(-4px);
@@ -164,13 +233,25 @@
     background: linear-gradient(90deg, var(--tone, #047857), var(--tone-2, #0d9488));
   }
 
-  .dark .card-pro {
-    border-color: color-mix(in srgb, var(--tone, #047857) 30%, hsl(var(--border)));
-    background-image: linear-gradient(
-      165deg,
-      color-mix(in srgb, var(--tone, #047857) 14%, hsl(var(--card))) 0%,
-      hsl(var(--card)) 45%
-    );
+  .dark .card-pro:not(:hover):not(:focus-visible) {
+    background:
+      linear-gradient(
+          165deg,
+          color-mix(in srgb, var(--tone, #047857) 16%, hsl(var(--card))) 0%,
+          color-mix(in srgb, var(--tone-2, #0d9488) 6%, hsl(var(--card))) 45%,
+          hsl(var(--card)) 70%
+        )
+        padding-box,
+      linear-gradient(
+          120deg,
+          color-mix(in srgb, var(--tone, #047857) 55%, hsl(var(--card))),
+          color-mix(in srgb, var(--tone-2, #0d9488) 45%, hsl(var(--card))),
+          color-mix(in srgb, var(--tone, #047857) 55%, hsl(var(--card)))
+        )
+        border-box;
+    background-size:
+      100% 100%,
+      200% 200%;
   }
   .dark .tone-icon,
   .dark .tone-text {

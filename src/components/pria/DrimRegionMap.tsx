@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import type { ProvinceId } from "@/data/census";
-import { PakistanMap } from "./PakistanMap";
+import { PakistanMap, provinceColor } from "./PakistanMap";
 
 /** Highlights the provinces a DRIM model is suited to. */
 export function DrimRegionMap({ provinces, title }: { provinces: ProvinceId[]; title: string }) {
@@ -16,8 +16,8 @@ export function DrimRegionMap({ provinces, title }: { provinces: ProvinceId[]; t
       labelFor={(p) => `${p.name}: ${suited.has(p.id) ? "suitable" : "not listed"}`}
       fills={(id) =>
         suited.has(id)
-          ? { fill: "#B45309", opacity: hovered === id ? 1 : 0.85 }
-          : { fill: "hsl(var(--muted-foreground))", opacity: 0.12 }
+          ? { fill: provinceColor(id).base, opacity: 0.9 }
+          : { fill: "hsl(var(--muted-foreground))", opacity: 0.12, hoverFill: "hsl(var(--muted-foreground))" }
       }
     />
   );
