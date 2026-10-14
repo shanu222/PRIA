@@ -369,6 +369,12 @@
     background: linear-gradient(90deg, var(--tone, #047857), var(--tone-2, #0d9488));
   }
 
+  .dark .card-pro {
+    box-shadow:
+      0 0 0 1px color-mix(in srgb, var(--tone, #34d399) 22%, transparent),
+      0 0 28px -14px color-mix(in srgb, var(--tone, #34d399) 70%, transparent),
+      inset 0 1px 0 rgb(255 255 255 / 0.05);
+  }
   .dark .card-pro:not(:hover):not(:focus-visible) {
     background:
       linear-gradient(

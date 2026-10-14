@@ -8,8 +8,6 @@ import { Reveal, Stagger, StaggerItem } from "@/components/pria/Motion";
 import { ProvinceCensusMap } from "@/components/pria/ProvinceCensusMap";
 import { ProvinceTable } from "@/components/pria/ProvinceTable";
 import { ResidentialDonut } from "@/components/pria/ResidentialDonut";
-import { StatTile } from "@/components/pria/StatTile";
-
 const page = getPage("landscape");
 export const metadata: Metadata = { title: page.title, description: page.description };
 
@@ -25,7 +23,7 @@ export default async function LandscapePage() {
         icon={page.icon}
         aside={
           <div className="w-full min-w-[240px] lg:w-64">
-            <StatTile stat={landscape.population} emphasis />
+            <GlowStatTile stat={landscape.population} color="emerald" icon="Users" progress={35} />
           </div>
         }
       />
@@ -83,7 +81,7 @@ export default async function LandscapePage() {
           description="Share of the 38.29 million housing units in urban and rural areas, Census 2023."
         />
         <Reveal>
-          <div className="card-pro rounded-2xl bg-card p-6 sm:p-8">
+          <div className="rounded-2xl border border-emerald-400/35 bg-[linear-gradient(160deg,#04231d,#071417)] p-5 shadow-[0_0_32px_-14px_#34d399] sm:p-7">
             <ResidentialDonut data={landscape.residentialSplit} />
           </div>
         </Reveal>

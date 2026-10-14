@@ -15,7 +15,7 @@ import { DataTable } from "@/components/pria/DataTable";
 import { Reveal, Stagger, StaggerItem } from "@/components/pria/Motion";
 import { BuildingsHousingChart, CoverageChart, DistrictChart, PopulationChart } from "@/components/pria/OutlookCharts";
 import { ProvinceOutlookMap } from "@/components/pria/ProvinceOutlookMap";
-import { StatTile } from "@/components/pria/StatTile";
+import { GLOW_ORDER, GlowStatTile } from "@/components/pria/GlowCard";
 
 const page = getPage("outlook");
 export const metadata: Metadata = { title: page.title, description: page.description };
@@ -82,7 +82,7 @@ export default function OutlookPage() {
         <Stagger className="grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-5">
           {headline.map((s, i) => (
             <StaggerItem key={s.id} className={i === headline.length - 1 ? "col-span-2 md:col-span-1" : undefined}>
-              <StatTile stat={s} emphasis={i === 0} />
+              <GlowStatTile stat={s} color={GLOW_ORDER[i % GLOW_ORDER.length]} progress={28 + i * 12} />
             </StaggerItem>
           ))}
         </Stagger>
