@@ -3,7 +3,7 @@ import { getPage, landscape } from "@/data/pria";
 import { getPriaContent } from "@/data/content";
 import { censusSource, housingTable } from "@/data/census";
 import { PageHeader, SectionHeader } from "@/components/layout/PageHeader";
-import { InsightCard } from "@/components/pria/InsightCard";
+import { GLOW_ORDER, GlowStatTile, GlowTypeCard } from "@/components/pria/GlowCard";
 import { Reveal, Stagger, StaggerItem } from "@/components/pria/Motion";
 import { ProvinceCensusMap } from "@/components/pria/ProvinceCensusMap";
 import { ProvinceTable } from "@/components/pria/ProvinceTable";
@@ -38,9 +38,9 @@ export default async function LandscapePage() {
           description={`${censusSource.label}.`}
         />
         <Stagger className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-          {landscape.censusStats.map((s) => (
+          {landscape.censusStats.map((s, i) => (
             <StaggerItem key={s.id}>
-              <StatTile stat={s} />
+              <GlowStatTile stat={s} color={GLOW_ORDER[i % GLOW_ORDER.length]} image={`/cards/${s.id}.jpg`} />
             </StaggerItem>
           ))}
         </Stagger>
@@ -49,9 +49,15 @@ export default async function LandscapePage() {
       <section data-demo="types" aria-labelledby="types" className="scroll-mt-24">
         <SectionHeader id="types" eyebrow="Classification" title="Types of Infrastructure" />
         <Stagger className="grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-5">
-          {landscape.infrastructureTypes.map((t) => (
+          {landscape.infrastructureTypes.map((t, i) => (
             <StaggerItem key={t.id}>
-              <InsightCard id={`type-${t.id}`} title={t.title} icon={t.icon} />
+              <GlowTypeCard
+                id={`type-${t.id}`}
+                title={t.title}
+                icon={t.icon}
+                color={GLOW_ORDER[i % GLOW_ORDER.length]}
+                image={`/cards/${t.id}.jpg`}
+              />
             </StaggerItem>
           ))}
         </Stagger>

@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { SectionHeader } from "@/components/layout/PageHeader";
 import { Reveal, Stagger, StaggerItem } from "@/components/pria/Motion";
 import { SegmentExplorer } from "@/components/pria/SegmentExplorer";
-import { StatTile } from "@/components/pria/StatTile";
+import { GLOW_ORDER, GlowStatTile } from "@/components/pria/GlowCard";
 import { TopoPattern } from "@/components/pria/TopoPattern";
 import { LogoEmblem } from "@/components/layout/Logo";
 import { HomeIntro } from "@/components/pria/HomeIntro";
@@ -22,6 +22,14 @@ const GLANCE_PALETTE = [
   { from: "#f43f5e", to: "#be123c", tint: "#fecdd3", text: "#be123c" },
   { from: "#06b6d4", to: "#0e7490", tint: "#a5f3fc", text: "#0e7490" },
 ];
+
+const STAT_VISUALS: Record<string, { icon: string; art: string; progress: number }> = {
+  population: { icon: "Users", art: "TrendingUp", progress: 35 },
+  houses: { icon: "House", art: "Building", progress: 25 },
+  horizon: { icon: "CalendarClock", art: "Target", progress: 40 },
+  segments: { icon: "Map", art: "Mountain", progress: 45 },
+  categories: { icon: "Building2", art: "Landmark", progress: 30 },
+};
 
 const GLANCE_FADE = "linear-gradient(to right, transparent 0%, rgba(0,0,0,0.55) 30%, #000 60%)";
 
@@ -99,7 +107,7 @@ export default function HomePage() {
         <Stagger className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 xl:grid-cols-5">
           {stats.map((stat, i) => (
             <StaggerItem key={stat.id} className={i === stats.length - 1 ? "col-span-2 md:col-span-1" : undefined}>
-              <StatTile stat={stat} emphasis={i < 2} />
+              <GlowStatTile stat={stat} color={GLOW_ORDER[i % GLOW_ORDER.length]} {...STAT_VISUALS[stat.id]} />
             </StaggerItem>
           ))}
         </Stagger>
