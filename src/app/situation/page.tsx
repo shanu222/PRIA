@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, ChevronRight } from "lucide-react";
+import { MAP_VIEWBOX, kashmirShape, provinceShapes } from "@/data/pakistan-geo";
 import { challenges, getPage, observations, resourceObservations, segments, site } from "@/data/pria";
 import { getPriaContent } from "@/data/content";
 import { disasterTimeline } from "@/data/hazards";
@@ -55,6 +56,17 @@ const timelineValues = new Set(disasterTimeline.flatMap((e) => e.facts.map((f) =
 
 const eyebrow = (index: number, text: string) => `${String(index).padStart(2, "0")} · ${text}`;
 
+const PRESSURE_PHOTOS: Record<string, string> = {
+  "water-food": "/segments/desert-arid.jpg",
+  unemployment: "/construction/frame.jpg",
+  "tourism-zones": "/segments/mountain.jpg",
+};
+
+const HORIZON_LOOK = {
+  population: { color: "#34d399", image: "/split/urban.jpg", icon: "Users" },
+  buildings: { color: "#38bdf8", image: "/construction/frame.jpg", icon: "Building2" },
+} as const;
+
 export default async function SituationPage() {
   const { projectedTable } = await getPriaContent();
   return (
@@ -97,76 +109,111 @@ export default async function SituationPage() {
       </section>
 
       <section aria-labelledby="challenges" className="scroll-mt-24">
-        <SectionHeader
-          id="challenges"
-          eyebrow={eyebrow(2, "Challenges")}
-          title="Pressures on the next two decades"
-          description={`What the country has to accommodate between ${FROM} and ${TO}, and the pressures that make it harder.`}
-        />
-        <div className="flex flex-col gap-4">
-          <Reveal>
+        <div className="relative overflow-hidden rounded-3xl border border-cyan-400/30 bg-[#04141c] p-5 text-white shadow-[0_0_36px_-16px_#22d3ee] sm:p-7">
+          <img
+            src="/segments/mountain.jpg"
+            alt=""
+            className="pointer-events-none absolute inset-y-0 right-0 h-[46%] w-[58%] object-cover opacity-80"
+            style={{ maskImage: "linear-gradient(to right, transparent, #000 28%), linear-gradient(to bottom, #000 40%, transparent)", WebkitMaskImage: "linear-gradient(to right, transparent, #000 28%)" }}
+          />
+          <p className="relative text-xs font-bold uppercase tracking-[0.2em] text-cyan-300">{eyebrow(2, "Challenges")}</p>
+          <h2 id="challenges" className="relative mt-2 max-w-3xl text-3xl font-extrabold leading-tight sm:text-4xl">
+            Pressures on the <span className="text-cyan-300" style={{ textShadow: "0 0 18px rgba(34,211,238,0.45)" }}>next two decades</span>
+          </h2>
+          <p className="relative mt-2 max-w-2xl text-sm text-white/70 sm:text-base">
+            What the country has to accommodate between {FROM} and {TO}, and the pressures that make it harder.
+          </p>
+
+          <div className="relative mt-6 flex flex-col gap-4">
             <article
               data-demo="horizon"
               id="horizon-2047"
-              className="relative scroll-mt-24 overflow-hidden rounded-2xl bg-gradient-to-br from-[#063521] to-[#0B5D3B] p-7 text-white shadow-lift sm:p-9"
+              className="scroll-mt-24 overflow-hidden rounded-2xl border border-cyan-400/25 bg-cyan-400/[0.04] p-4 sm:p-5"
             >
-              <TopoPattern className="text-white opacity-[0.14]" />
-              <div className="relative flex flex-col gap-8">
-                <div className="flex flex-wrap items-center justify-between gap-3">
-                  <div className="flex items-center gap-3">
-                    <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-white/15 ring-1 ring-white/25">
-                      <Icon name="TrendingUp" className="h-5 w-5" />
-                    </span>
-                    <h3 className="text-xl font-bold">
-                      {FROM} → {TO}
-                    </h3>
-                  </div>
-                  <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-semibold ring-1 ring-white/20">
-                    {TO - FROM} years · {site.vision}
+              <TopoPattern className="text-cyan-200 opacity-[0.12]" />
+              <div className="relative flex flex-wrap items-center justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <span className="flex h-12 w-12 items-center justify-center rounded-full border border-cyan-300/40 bg-cyan-400/10 text-cyan-200 shadow-[0_0_16px_-4px_#22d3ee]">
+                    <Icon name="TrendingUp" className="h-5 w-5" />
                   </span>
+                  <h3 className="font-heading text-2xl font-bold">
+                    {FROM} → {TO}
+                  </h3>
                 </div>
-                <dl className="grid gap-4 md:grid-cols-3">
-                  {horizon.map((h) => (
-                    <div key={h.id} className="rounded-xl bg-white/[0.07] p-5 ring-1 ring-white/15">
-                      <dt className="text-sm text-white/75">{h.label}</dt>
+                <svg viewBox={`0 0 ${MAP_VIEWBOX.width} ${MAP_VIEWBOX.height}`} aria-hidden className="hidden h-16 w-auto sm:block" style={{ aspectRatio: `${MAP_VIEWBOX.width} / ${MAP_VIEWBOX.height}` }}>
+                  {[...provinceShapes.map((s) => s.d), kashmirShape.d].map((d, i) => (
+                    <path key={i} d={d} fill="#2dd4bf" fillOpacity={0.55} stroke="#99f6e4" strokeWidth={2} />
+                  ))}
+                </svg>
+                <span className="rounded-full border border-cyan-300/40 bg-cyan-400/10 px-3 py-1 text-xs font-semibold text-cyan-100">
+                  {TO - FROM} years · {site.vision}
+                </span>
+              </div>
+              <dl className="relative mt-4 grid gap-3 md:grid-cols-3">
+                {horizon.map((h) => {
+                  const look = HORIZON_LOOK[h.id as keyof typeof HORIZON_LOOK];
+                  return (
+                    <div key={h.id} className="group relative isolate overflow-hidden rounded-xl border p-4" style={{ borderColor: `${look.color}88`, boxShadow: `0 0 18px -10px ${look.color}` }}>
+                      <img src={look.image} alt="" className="absolute inset-y-0 right-0 -z-10 h-full w-[62%] object-cover opacity-70 transition-transform duration-700 group-hover:scale-110" style={{ maskImage: "linear-gradient(to right, transparent, #000 40%)", WebkitMaskImage: "linear-gradient(to right, transparent, #000 40%)" }} />
+                      <span className="absolute inset-0 -z-10 bg-gradient-to-r from-[#06141b] via-[#06141b]/75 to-transparent" />
+                      <dt className="flex items-center gap-2 text-sm font-medium text-white/85">
+                        <span className="flex h-8 w-8 items-center justify-center rounded-full border border-white/20" style={{ color: look.color, boxShadow: `0 0 12px -4px ${look.color}` }}>
+                          <Icon name={look.icon} className="h-4 w-4" />
+                        </span>
+                        {h.label}
+                      </dt>
                       <dd className="mt-2">
-                        <span className="font-heading text-3xl font-extrabold tracking-tight sm:text-4xl">
+                        <span className="font-heading text-3xl font-extrabold tracking-tight" style={{ color: look.color, textShadow: `0 0 16px ${look.color}` }}>
                           <CountUp value={h.to} decimals={h.decimals} suffix=" Mn" />
                         </span>
-                        <span className="mt-1 block text-sm text-white/80">
+                        <span className="mt-1 block text-sm text-white/75">
                           by {TO}, from {h.from.toFixed(h.decimals)} Mn in {FROM}
                         </span>
-                        <span className="mt-3 block text-[10px] font-medium uppercase tracking-wider text-white/60">
-                          {h.source}
-                        </span>
+                        <span className="mt-3 block h-0.5 w-16 rounded-full" style={{ background: look.color }} />
+                        <span className="mt-2 block text-[10px] font-medium uppercase tracking-wider text-white/55">{h.source}</span>
                       </dd>
                     </div>
-                  ))}
-                  <div className="rounded-xl bg-white/[0.07] p-5 ring-1 ring-white/15">
-                    <dt className="text-sm text-white/75">Additional homes required</dt>
-                    <dd className="mt-2">
-                      <span className="font-heading text-3xl font-extrabold tracking-tight sm:text-4xl">
-                        <CountUp value={additionalUnits} decimals={1} suffix=" Mn" />
-                      </span>
-                      <span className="mt-1 block text-sm text-white/80">residential units over {FROM} levels</span>
-                      <span className="mt-3 block text-[10px] font-medium uppercase tracking-wider text-white/60">
-                        Population ÷ 6.5 persons per unit
-                      </span>
-                    </dd>
-                  </div>
-                </dl>
-              </div>
+                  );
+                })}
+                <div className="group relative isolate overflow-hidden rounded-xl border border-amber-300/50 p-4 shadow-[0_0_18px_-10px_#fbbf24]">
+                  <img src="/segments/riverine-plains.jpg" alt="" className="absolute inset-y-0 right-0 -z-10 h-full w-[62%] object-cover opacity-70 transition-transform duration-700 group-hover:scale-110" style={{ maskImage: "linear-gradient(to right, transparent, #000 40%)", WebkitMaskImage: "linear-gradient(to right, transparent, #000 40%)" }} />
+                  <span className="absolute inset-0 -z-10 bg-gradient-to-r from-[#1a1406] via-[#1a1406]/75 to-transparent" />
+                  <dt className="flex items-center gap-2 text-sm font-medium text-white/85">
+                    <span className="flex h-8 w-8 items-center justify-center rounded-full border border-amber-200/30 text-amber-200 shadow-[0_0_12px_-4px_#fbbf24]">
+                      <Icon name="House" className="h-4 w-4" />
+                    </span>
+                    Additional homes required
+                  </dt>
+                  <dd className="mt-2">
+                    <span className="font-heading text-3xl font-extrabold tracking-tight text-amber-200" style={{ textShadow: "0 0 16px #fbbf24" }}>
+                      <CountUp value={additionalUnits} decimals={1} suffix=" Mn" />
+                    </span>
+                    <span className="mt-1 block text-sm text-white/75">residential units over {FROM} levels</span>
+                    <span className="mt-3 block h-0.5 w-16 rounded-full bg-amber-300" />
+                    <span className="mt-2 block text-[10px] font-medium uppercase tracking-wider text-white/55">Population ÷ 6.5 persons per unit</span>
+                  </dd>
+                </div>
+              </dl>
             </article>
-          </Reveal>
-          <div data-demo="pressures">
-            <Stagger className="grid gap-4 sm:grid-cols-3">
-              {challenges.items.map((c) => (
-                <StaggerItem key={c.id}>
-                  <InsightCard id={c.id} title={c.title} icon={c.icon} tone="water" />
-                </StaggerItem>
-              ))}
-            </Stagger>
+            <div data-demo="pressures">
+              <Stagger className="grid gap-3 sm:grid-cols-3">
+                {challenges.items.map((c) => (
+                  <StaggerItem key={c.id}>
+                    <article id={c.id} className="group relative isolate flex h-full scroll-mt-24 items-center gap-3 overflow-hidden rounded-2xl border border-sky-400/35 bg-[#07141c] p-4 transition-transform duration-300 hover:-translate-y-0.5 hover:border-sky-300">
+                      <img src={PRESSURE_PHOTOS[c.id]} alt="" className="absolute inset-0 -z-10 h-full w-full object-cover opacity-45 transition-transform duration-700 group-hover:scale-105" />
+                      <span className="absolute inset-0 -z-10 bg-gradient-to-r from-[#07141c] via-[#07141c]/80 to-[#07141c]/35" />
+                      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-cyan-300/40 bg-cyan-400/15 text-cyan-200 shadow-[0_0_14px_-4px_#22d3ee]">
+                        <Icon name={c.icon} className="h-4 w-4" />
+                      </span>
+                      <h3 className="flex-1 text-sm font-semibold leading-snug">{c.title}</h3>
+                      <ChevronRight className="h-4 w-4 shrink-0 text-white/70 transition-transform group-hover:translate-x-0.5" aria-hidden />
+                    </article>
+                  </StaggerItem>
+                ))}
+              </Stagger>
+            </div>
           </div>
+        </div>
           <div data-demo="outlook" className="mt-6">
             <h3 id={projectedTable.id} className="mb-4 scroll-mt-24 text-lg font-bold">
               {projectedTable.title}
@@ -175,7 +222,6 @@ export default async function SituationPage() {
               <ProvinceTable table={projectedTable} />
             </Reveal>
           </div>
-        </div>
       </section>
 
       <section aria-labelledby="hazards" className="scroll-mt-24">
