@@ -80,6 +80,7 @@ export type InfoItem = {
   code?: string;
   title: string;
   icon: IconName;
+  image?: string;
 };
 
 export type NavGroupId = "overview" | "national-context" | "research" | "framework" | "segments" | "solutions" | "summary";
@@ -669,21 +670,41 @@ export const landscape = {
 
 export const observations = {
   items: [
-    { id: "fragmented-growth", code: "1", title: "Fragmented, unplanned growth", icon: "Puzzle" },
-    { id: "over-saturated", code: "2", title: "A few over-saturated cities", icon: "Building2" },
+    {
+      id: "fragmented-growth",
+      code: "1",
+      title: "Fragmented, unplanned growth",
+      icon: "Puzzle",
+      image: "/observations/fragmented-growth.jpg",
+    },
+    {
+      id: "over-saturated",
+      code: "2",
+      title: "A few over-saturated cities",
+      icon: "Building2",
+      image: "/observations/over-saturated.jpg",
+    },
     {
       id: "shrinking-land",
       code: "3",
       title: "Shrinking land for housing and agriculture",
       icon: "Shrink",
+      image: "/observations/shrinking-land.jpg",
     },
     {
       id: "encroachments",
       code: "4",
       title: "Encroachment on land and natural flow paths, with weak enforcement",
       icon: "Fence",
+      image: "/observations/encroachments.jpg",
     },
-    { id: "no-spatial-planning", code: "5", title: "No formal spatial planning framework", icon: "MapPinOff" },
+    {
+      id: "no-spatial-planning",
+      code: "5",
+      title: "No formal spatial planning framework",
+      icon: "MapPinOff",
+      image: "/observations/no-spatial-planning.jpg",
+    },
   ] satisfies InfoItem[],
 };
 

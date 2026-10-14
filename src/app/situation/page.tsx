@@ -90,7 +90,7 @@ export default async function SituationPage() {
         <Stagger className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
           {observations.items.map((o) => (
             <StaggerItem key={o.id}>
-              <InsightCard id={o.id} code={o.code} title={o.title} icon={o.icon} />
+              <InsightCard id={o.id} code={o.code} title={o.title} icon={o.icon} image={o.image} />
             </StaggerItem>
           ))}
         </Stagger>
