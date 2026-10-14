@@ -80,7 +80,20 @@ export function ScopeTimeline() {
                 <span className="relative z-10 flex h-11 w-11 shrink-0 items-center justify-center rounded-full border-2 border-primary/30 bg-card font-heading text-sm font-bold uppercase text-primary shadow-soft dark:text-accent-foreground sm:h-14 sm:w-14 sm:text-base">
                   {item.code}
                 </span>
-                <div className="card-pro card-pro-lift group flex flex-1 items-start gap-4 rounded-xl bg-card p-5">
+                <div className="card-pro card-pro-lift group relative flex flex-1 items-start gap-4 overflow-hidden rounded-xl bg-card p-5">
+                  <img
+                    src={
+                      {
+                        planning: "/glance/scope.jpg",
+                        methods: "/construction/timber.jpg",
+                        institutions: "/glance/stakeholders.jpg",
+                        finance: "/glance/needs.jpg",
+                      }[item.group]
+                    }
+                    alt=""
+                    className="pointer-events-none absolute inset-y-0 right-0 h-full w-2/5 object-cover opacity-25"
+                    style={{ maskImage: "linear-gradient(to right, transparent, #000 40%)", WebkitMaskImage: "linear-gradient(to right, transparent, #000 40%)" }}
+                  />
                   <span className="hidden h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary-tint text-primary dark:text-accent-foreground sm:flex">
                     <Icon name={item.icon} className="h-5 w-5" />
                   </span>

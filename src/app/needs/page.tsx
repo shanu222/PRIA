@@ -12,6 +12,14 @@ export const metadata: Metadata = { title: page.title, description: page.descrip
 
 const waterNeeds = new Set(["water-recycling", "water-storage"]);
 
+const NEED_PHOTOS: Record<string, string> = {
+  "climate-exposure": "/segments/coastal.jpg",
+  "social-imperatives": "/split/urban.jpg",
+  "vertical-solutions": "/banners/outlook.jpg",
+  "water-recycling": "/segments/riverine-plains.jpg",
+  "water-storage": "/segments/mountain.jpg",
+};
+
 export default function NeedsPage() {
   return (
     <div className="mx-auto flex max-w-7xl flex-col gap-10">
@@ -31,6 +39,14 @@ export default function NeedsPage() {
                 )}
                 style={water ? ({ "--tone": "#0e7490", "--tone-2": "#2563eb" } as React.CSSProperties) : undefined}
               >
+                {NEED_PHOTOS[n.id] && (
+                  <img
+                    src={NEED_PHOTOS[n.id]}
+                    alt=""
+                    className="pointer-events-none absolute inset-y-0 right-0 h-full w-[46%] object-cover opacity-35 transition-transform duration-700 group-hover:scale-105"
+                    style={{ maskImage: "linear-gradient(to right, transparent, #000 45%)", WebkitMaskImage: "linear-gradient(to right, transparent, #000 45%)" }}
+                  />
+                )}
                 <TopoPattern
                   className={cn(
                     "opacity-0 transition-opacity duration-500 group-hover:opacity-[0.1]",

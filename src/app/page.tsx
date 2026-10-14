@@ -240,12 +240,26 @@ export default function HomePage() {
         <Stagger className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
           {disasterTimeline.map((event) => {
             const lead = event.facts[0];
+            const photo =
+              event.id === "earthquake-2005"
+                ? "/segments/mountain.jpg"
+                : event.id === "heatwave-2015"
+                  ? "/segments/desert-arid.jpg"
+                  : event.id === "biparjoy-2023"
+                    ? "/segments/coastal.jpg"
+                    : "/segments/riverine-plains.jpg";
             return (
               <StaggerItem key={event.id}>
                 <Link
                   href={`/situation#${event.id}`}
-                  className="card-pro card-pro-lift group flex h-full flex-col rounded-xl bg-card p-5"
+                  className="card-pro card-pro-lift group relative flex h-full flex-col overflow-hidden rounded-xl bg-card p-5"
                 >
+                  <img
+                    src={photo}
+                    alt=""
+                    className="pointer-events-none absolute inset-y-0 right-0 h-full w-1/2 object-cover opacity-30 transition-transform duration-700 group-hover:scale-105"
+                    style={{ maskImage: "linear-gradient(to right, transparent, #000 40%)", WebkitMaskImage: "linear-gradient(to right, transparent, #000 40%)" }}
+                  />
                   <div className="flex items-center justify-between">
                     <span className="tone-text font-heading text-2xl font-extrabold">{event.year}</span>
                     <span className="tone-icon flex h-9 w-9 items-center justify-center rounded-lg">

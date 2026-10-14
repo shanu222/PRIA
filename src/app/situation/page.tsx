@@ -323,7 +323,23 @@ export default async function SituationPage() {
         <Stagger className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {resourceObservations.map((r, i) => (
             <StaggerItem key={r.id}>
-              <InsightCard id={r.id} code={String(i + 1)} title={r.title} icon={r.icon} tone="warning" />
+              <InsightCard
+                id={r.id}
+                code={String(i + 1)}
+                title={r.title}
+                icon={r.icon}
+                tone="warning"
+                image={
+                  {
+                    "design-capacity": "/glance/scope.jpg",
+                    "standard-of-works": "/construction/masonry.jpg",
+                    "no-training": "/glance/stakeholders.jpg",
+                    "materials-procurement": "/construction/earth.jpg",
+                    "quality-control": "/construction/frame.jpg",
+                    benchmarking: "/glance/ndma-role.jpg",
+                  }[r.id]
+                }
+              />
             </StaggerItem>
           ))}
         </Stagger>

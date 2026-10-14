@@ -10,18 +10,25 @@ import { Button } from "@/components/ui/button";
 import { markDemoCarry, stepsForPath, type DemoStep } from "./demo-steps";
 import { INTRO_POSTER, INTRO_SRC } from "./HomeIntro";
 
+let lockedVoice: SpeechSynthesisVoice | null = null;
+
+/** One narrator for the whole tour, the warmest natural English voice on the machine. */
 function pickVoice(voices: SpeechSynthesisVoice[]) {
+  if (lockedVoice && voices.includes(lockedVoice)) return lockedVoice;
   const scored = voices
     .filter((voice) => voice.lang.toLowerCase().startsWith("en"))
     .map((voice) => {
       const name = voice.name.toLowerCase();
       let score = voice.localService ? 8 : 0;
-      if (name.includes("natural") || name.includes("premium") || name.includes("enhanced")) score += 4;
-      if (voice.lang.toLowerCase().startsWith("en-gb")) score += 2;
+      if (name.includes("natural") || name.includes("neural") || name.includes("premium") || name.includes("enhanced")) score += 8;
+      if (/ryan|guy|davis|andrew|brian|daniel|george|sonia|libby|jenny/.test(name)) score += 6;
+      if (voice.lang.toLowerCase().startsWith("en-gb")) score += 3;
+      if (/espeak|compact|zarvox|whisper/.test(name)) score -= 8;
       return { voice, score };
     })
     .sort((a, b) => b.score - a.score);
-  return scored[0]?.voice;
+  lockedVoice = scored[0]?.voice ?? null;
+  return lockedVoice ?? undefined;
 }
 
 function chunksOf(text: string) {
@@ -129,20 +136,22 @@ function copyCanvases(source: HTMLElement, clone: HTMLElement) {
 
 type Scene = { root: number; intervals: number[]; pace: number; air: number };
 
-/** Low, warm beds. Nothing above the speaking range, so the score stays in the room. */
+/** A different bed for every page, kept under the speaking voice. */
 function sceneFor(pathname: string): Scene {
-  if (pathname.startsWith("/summary")) return { root: 65.4, intervals: [0, 7, 12, 16], pace: 3200, air: 520 };
-  if (pathname.startsWith("/drim")) return { root: 98, intervals: [0, 5, 9, 12], pace: 2100, air: 700 };
-  if (pathname.startsWith("/segments")) return { root: 110, intervals: [0, 4, 7, 11, 12], pace: 1900, air: 780 };
-  if (pathname.startsWith("/research")) return { root: 82.4, intervals: [0, 7, 10, 14], pace: 3000, air: 600 };
-  if (pathname.startsWith("/situation")) {
-    return { root: 73.4, intervals: [0, 3, 7, 10], pace: 2800, air: 540 };
+  if (pathname.startsWith("/summary")) return { root: 123.5, intervals: [0, 7, 12, 16], pace: 2600, air: 640 };
+  if (pathname.startsWith("/drim")) return { root: 233, intervals: [0, 4, 7, 11], pace: 1280, air: 1600 };
+  if (pathname.startsWith("/segments")) return { root: 196, intervals: [0, 3, 7, 10, 14], pace: 1500, air: 1200 };
+  if (pathname.startsWith("/research") || pathname.startsWith("/cities")) {
+    return { root: 146.8, intervals: [0, 5, 9, 12], pace: 2100, air: 780 };
   }
-  if (pathname.startsWith("/needs") || pathname.startsWith("/scope") || pathname.startsWith("/stakeholders")) {
-    return { root: 92.5, intervals: [0, 5, 12, 17], pace: 2300, air: 720 };
-  }
-  if (pathname === "/") return { root: 98, intervals: [0, 7, 12, 16], pace: 2400, air: 760 };
-  return { root: 87.3, intervals: [0, 5, 12, 17], pace: 2500, air: 660 };
+  if (pathname.startsWith("/situation")) return { root: 138.6, intervals: [0, 3, 6, 10], pace: 1900, air: 700 };
+  if (pathname.startsWith("/stakeholders")) return { root: 164.8, intervals: [0, 5, 8, 12], pace: 1700, air: 900 };
+  if (pathname.startsWith("/scope")) return { root: 185, intervals: [0, 4, 9, 12], pace: 1450, air: 1100 };
+  if (pathname.startsWith("/needs")) return { root: 155.6, intervals: [0, 2, 7, 9], pace: 1650, air: 820 };
+  if (pathname.startsWith("/outlook")) return { root: 220, intervals: [0, 5, 7, 12], pace: 1350, air: 1500 };
+  if (pathname.startsWith("/landscape")) return { root: 174.6, intervals: [0, 3, 8, 12], pace: 1800, air: 980 };
+  if (pathname === "/") return { root: 207.7, intervals: [0, 4, 7, 11], pace: 1550, air: 1400 };
+  return { root: 160, intervals: [0, 5, 10, 15], pace: 1750, air: 860 };
 }
 
 type Score = {
@@ -245,7 +254,7 @@ function createScore(): Score {
     panner.pan.value = cursor % 2 === 0 ? -0.4 : 0.4;
     const time = ctx.currentTime;
     gain.gain.setValueAtTime(0.0001, time);
-    gain.gain.exponentialRampToValueAtTime(0.035, time + 0.22);
+    gain.gain.exponentialRampToValueAtTime(0.055, time + 0.22);
     gain.gain.exponentialRampToValueAtTime(0.0001, time + 2.6);
     osc.connect(gain);
     gain.connect(panner);
@@ -385,8 +394,8 @@ function speakChunks(
         utterance.lang = "en-GB";
       }
       utterance.volume = appliedVolume;
-      utterance.rate = appliedRate;
-      utterance.pitch = 1;
+      utterance.rate = Math.min(1.15, appliedRate * 0.94);
+      utterance.pitch = 0.96;
       utterance.onboundary = (event) => {
         if (mine !== token) return;
         if (typeof event.charIndex === "number") heard = event.charIndex;
@@ -396,7 +405,11 @@ function speakChunks(
         token += 1;
         window.setTimeout(next, 40);
       };
-      utterance.onend = advance;
+      utterance.onend = () => {
+        if (settled || mine !== token) return;
+        token += 1;
+        window.setTimeout(next, 260);
+      };
       utterance.onerror = advance;
       const expected = Math.max(1600, (line.split(/\s+/).length / (2.2 * appliedRate)) * 1000 + 900);
       const guard = () => {

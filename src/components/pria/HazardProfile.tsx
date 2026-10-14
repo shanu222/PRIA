@@ -24,10 +24,16 @@ export function HazardProfile({
   return (
     <article
       className={cn(
-        "card-pro card-pro-lift group flex h-full flex-col rounded-2xl bg-card p-6",
+        "card-pro card-pro-lift group relative flex h-full flex-col overflow-hidden rounded-2xl bg-card p-6",
         className,
       )}
     >
+      <img
+        src={`/segments/${segment.slug}.jpg`}
+        alt=""
+        className="pointer-events-none absolute inset-y-0 right-0 h-full w-[42%] object-cover opacity-25 transition-transform duration-700 group-hover:scale-105"
+        style={{ maskImage: "linear-gradient(to right, transparent, #000 42%)", WebkitMaskImage: "linear-gradient(to right, transparent, #000 42%)" }}
+      />
       <div className="flex items-start justify-between gap-4">
         <div className="flex items-center gap-3">
           <span className="flex h-11 w-11 items-center justify-center rounded-xl text-white" style={{ background: segment.colorStrong }}>
