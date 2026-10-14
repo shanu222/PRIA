@@ -110,6 +110,10 @@ const config: Config = {
           "0%, 100%": { opacity: "0.8" },
           "50%": { opacity: "1" },
         },
+        "bar-in": {
+          from: { transform: "scaleX(0)" },
+          to: { transform: "scaleX(1)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -118,6 +122,7 @@ const config: Config = {
         "swivel-spin": "swivel-spin 1.1s cubic-bezier(0.16, 1, 0.3, 1)",
         "glow-pulse": "glow-pulse 4s ease-in-out infinite",
         "soft-pulse": "soft-pulse 3.5s ease-in-out infinite",
+        "bar-in": "bar-in 1.1s cubic-bezier(0.16, 1, 0.3, 1) both",
       },
     },
   },

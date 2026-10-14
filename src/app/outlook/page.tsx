@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Building2, Building, House, Info, TrendingUp, Users } from "lucide-react";
+import { AlertTriangle, Building2, Building, Cog, House, Info, Layers, TrendingUp, Users } from "lucide-react";
 import { getPage, type Stat } from "@/data/pria";
 import {
   buildCapacityScenario as scenario,
@@ -70,24 +70,34 @@ function Fact({
   value,
   label,
   note,
+  image,
   color = "emerald",
 }: {
   icon: typeof Users;
   value: string;
   label: string;
   note?: string;
+  image?: string;
   color?: keyof typeof FACT_COLORS;
 }) {
   const c = FACT_COLORS[color];
   return (
     <li
-      className="group flex h-full items-start gap-3 rounded-2xl border p-4 text-white transition-transform duration-300 hover:-translate-y-0.5"
+      className="group relative isolate flex h-full items-start gap-3 overflow-hidden rounded-2xl border p-4 text-white transition-transform duration-300 hover:-translate-y-0.5 before:pointer-events-none before:absolute before:inset-y-0 before:-left-1/2 before:w-1/2 before:-skew-x-12 before:bg-gradient-to-r before:from-transparent before:via-white/20 before:to-transparent before:transition-transform before:duration-700 hover:before:translate-x-[280%]"
       style={{
         borderColor: `color-mix(in srgb, ${c} 55%, transparent)`,
         background: `radial-gradient(120% 80% at 100% 0%, color-mix(in srgb, ${c} 22%, transparent), transparent 55%), linear-gradient(160deg, color-mix(in srgb, ${c} 16%, #071417), #071417)`,
         boxShadow: `0 0 22px -12px ${c}, inset 0 1px 0 rgba(255,255,255,0.08)`,
       }}
     >
+      {image && (
+        <img
+          src={image}
+          alt=""
+          className="absolute inset-y-0 right-0 -z-10 h-full w-[58%] object-cover opacity-70 transition-transform duration-700 group-hover:scale-110"
+          style={{ maskImage: "linear-gradient(to right, transparent, #000 42%)", WebkitMaskImage: "linear-gradient(to right, transparent, #000 42%)" }}
+        />
+      )}
       <span
         className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl"
         style={{ color: c, background: `color-mix(in srgb, ${c} 16%, transparent)`, boxShadow: `0 0 14px -4px ${c}` }}
@@ -270,38 +280,64 @@ export default function OutlookPage() {
             />
           </Reveal>
         </div>
-        <ul data-tones="" className="mt-6 grid gap-3 sm:grid-cols-3">
-          <Fact color="emerald" icon={Building2} value={`+${h.buildingGrowth}% / yr`} label="Average building growth rate" />
-          <Fact color="sky" icon={House} value="+20.37 Mn" label="Additional units needed by 2047 (vs 2026)" />
-          <Fact color="violet" icon={Users} value="≈ 6.5 persons" label="Residential units required per unit" />
+        <ul className="mt-6 grid gap-3 sm:grid-cols-3">
+          <Fact color="emerald" icon={Building2} image="/construction/masonry.jpg" value={`${h.buildingsInclAjkGb2026} → ${h.buildingsInclAjkGb2047} Mn`} label="Buildings incl. AJK & GB, 2026 – 2047" />
+          <Fact color="sky" icon={House} image="/construction/elevated.jpg" value="≈ 0.97 Mn / yr" label="Average additional residential units needed, 2026–2047" />
+          <Fact color="violet" icon={Building} image="/construction/frame.jpg" value="2.16 Mn" label="Buildings added in 2047 alone" />
         </ul>
 
         <Reveal className="mt-6">
-          <div className="rounded-2xl border-2 border-dashed border-amber-500/60 bg-gradient-to-br from-amber-50 to-card p-5 dark:from-amber-500/10 sm:p-6">
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <h3 className="text-lg font-bold">Build-capacity scenario</h3>
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-500/50 bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-900 dark:bg-amber-500/15 dark:text-amber-200">
+          <div className="relative isolate overflow-hidden rounded-2xl border-2 border-dashed border-amber-400/70 bg-[#1a1206] p-5 text-white shadow-[0_0_32px_-16px_#f59e0b] sm:p-6">
+            <img
+              src="/construction/frame.jpg"
+              alt=""
+              className="pointer-events-none absolute inset-y-0 right-0 -z-10 h-full w-[42%] object-cover opacity-60"
+              style={{ maskImage: "linear-gradient(to right, transparent, #000 35%)", WebkitMaskImage: "linear-gradient(to right, transparent, #000 35%)" }}
+            />
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <h3 className="flex items-center gap-2 text-lg font-bold text-amber-200">
+                <Cog className="h-5 w-5 motion-safe:animate-[spin_8s_linear_infinite]" aria-hidden />
+                Build-capacity scenario
+              </h3>
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-400/50 bg-amber-400/15 px-3 py-1 text-xs font-semibold text-amber-100">
                 <Info className="h-3.5 w-3.5" aria-hidden />
                 Planning assumption, not portal data
               </span>
             </div>
-            <p className="mt-2 max-w-3xl text-sm text-muted-foreground">
+            <p className="mt-2 max-w-3xl text-sm text-white/75">
               If about {fmt(scenario.neededPerYear)} units are needed every year but only {fmt(scenario.builtPerYear)} are built, the{" "}
               {fmt(scenario.shortfallPerYear)}-unit annual gap compounds over the {scenario.years} years to 2047.
             </p>
             <dl className="mt-5 grid gap-3 sm:grid-cols-3">
-              {[
-                ["Cumulative need", fmt(scenario.cumulativeNeed), "#047857", "#0d9488"],
-                ["Cumulative delivery", fmt(scenario.cumulativeDelivery), "#0e7490", "#2563eb"],
-                ["Backlog by 2047", fmt(scenario.cumulativeShortfall), "#b45309", "#dc2626"],
-              ].map(([k, v, tone, tone2]) => (
+              {(
+                [
+                  ["Cumulative need", scenario.cumulativeNeed, Layers, "#34d399", 100],
+                  ["Cumulative delivery", scenario.cumulativeDelivery, House, "#38bdf8", 60],
+                  ["Backlog by 2047", scenario.cumulativeShortfall, AlertTriangle, "#fb7185", 40],
+                ] as const
+              ).map(([k, v, I, c, bar]) => (
                 <div
                   key={k}
-                  className="card-pro card-pro-lift rounded-xl bg-card p-4"
-                  style={{ "--tone": tone, "--tone-2": tone2 } as React.CSSProperties}
+                  className="rounded-xl border p-4"
+                  style={{
+                    borderColor: `color-mix(in srgb, ${c} 55%, transparent)`,
+                    background: `color-mix(in srgb, ${c} 12%, rgba(7,20,23,0.85))`,
+                    boxShadow: `0 0 18px -10px ${c}`,
+                  }}
                 >
-                  <dt className="tone-text text-xs font-semibold uppercase tracking-wider">{k}</dt>
-                  <dd className="tone-gradient-text mt-1 font-heading text-2xl font-bold">{v} units</dd>
+                  <dt className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider" style={{ color: c }}>
+                    <I className="h-4 w-4" aria-hidden />
+                    {k}
+                  </dt>
+                  <dd className="mt-1 font-heading text-2xl font-bold" style={{ color: c }}>
+                    {fmt(v)} units
+                  </dd>
+                  <span className="mt-3 block h-1.5 overflow-hidden rounded-full bg-white/10">
+                    <span
+                      className="block h-full origin-left rounded-full motion-safe:animate-bar-in"
+                      style={{ width: `${bar}%`, background: c, boxShadow: `0 0 10px ${c}` }}
+                    />
+                  </span>
                 </div>
               ))}
             </dl>
@@ -310,56 +346,53 @@ export default function OutlookPage() {
       </section>
 
       <section data-demo="urban" aria-labelledby="urban">
-        <SectionHeader
+        <Band
           id="urban"
           eyebrow="Urbanisation"
           title="Urban population growing twice as fast as rural"
+          highlight="twice as fast"
+          accent="#38bdf8"
+          image="/split/urban.jpg"
           description="Urban and rural population including Azad Kashmir; Gilgit-Baltistan has no split after 2017."
         />
         <Stagger className="grid gap-4 md:grid-cols-3">
-          {[
-            { year: "2017", d: ur.y2017 },
-            { year: "2023", d: ur.y2023 },
-          ].map(({ year, d }) => (
-            <StaggerItem key={year}>
-              <Panel className="h-full">
-                <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{year}</p>
-                <p className="mt-1 font-heading text-3xl font-bold">{d.urbanShare}% urban</p>
-                <div className="mt-4 flex h-3 overflow-hidden rounded-full bg-muted" aria-hidden="true">
-                  <span className="bg-[#0E7490]" style={{ width: `${d.urbanShare}%` }} />
-                  <span className="flex-1 bg-[#0B5D3B]" />
+          {(
+            [
+              { year: "2017", share: ur.y2017.urbanShare, rows: [["Urban", `${ur.y2017.urban} Mn`], ["Rural", `${ur.y2017.rural} Mn`], ["Total (incl. AJK)", `${ur.y2017.total} Mn`]] },
+              { year: "2023", share: ur.y2023.urbanShare, rows: [["Urban", `${ur.y2023.urban} Mn`], ["Rural", `${ur.y2023.rural} Mn`], ["Total (incl. AJK)", `${ur.y2023.total} Mn`]] },
+              { year: "2047 projection", share: ur.urbanShare2047, rows: [["Urban", `≈${ur.urban2047} Mn`], ["Rural", `≈${ur.rural2047} Mn`], ["Growth 2017–23", `${ur.urbanCagr}% vs ${ur.ruralCagr}%`]] },
+            ] as const
+          ).map((card) => (
+            <StaggerItem key={card.year}>
+              <article className="group relative h-full overflow-hidden rounded-2xl border border-sky-400/40 bg-[#04121c] p-5 text-white shadow-[0_0_24px_-14px_#38bdf8] transition-transform duration-300 hover:-translate-y-1">
+                <img
+                  src="/split/urban.jpg"
+                  alt=""
+                  className="absolute inset-0 -z-10 h-full w-full object-cover opacity-25 transition-transform duration-700 group-hover:scale-105"
+                />
+                <div className="absolute inset-0 -z-10 bg-gradient-to-t from-[#04121c] via-[#04121c]/80 to-[#04121c]/40" />
+                <p className="text-xs font-bold uppercase tracking-wider text-sky-300">{card.year}</p>
+                <p className="mt-1 font-heading text-3xl font-bold">{card.share}% urban</p>
+                <div className="mt-4 h-2.5 overflow-hidden rounded-full bg-white/10" aria-hidden="true">
+                  <span
+                    className="block h-full origin-left rounded-full bg-gradient-to-r from-sky-400 to-emerald-400 shadow-[0_0_12px_#38bdf8] motion-safe:animate-bar-in"
+                    style={{ width: `${card.share}%` }}
+                  />
                 </div>
-                <dl className="mt-4 grid grid-cols-2 gap-2 text-sm">
-                  <dt className="text-muted-foreground">Urban</dt>
-                  <dd className="text-right font-semibold">{d.urban} Mn</dd>
-                  <dt className="text-muted-foreground">Rural</dt>
-                  <dd className="text-right font-semibold">{d.rural} Mn</dd>
-                  <dt className="text-muted-foreground">Total (incl. AJK)</dt>
-                  <dd className="text-right font-semibold">{d.total} Mn</dd>
+                <dl className="mt-4 flex flex-col gap-1.5 text-sm">
+                  {card.rows.map(([k, v], i) => (
+                    <div key={k} className="flex items-center justify-between gap-3">
+                      <dt className="flex items-center gap-2 text-white/70">
+                        <span className={i === 0 ? "h-2 w-2 rounded-full bg-sky-400" : i === 1 ? "h-2 w-2 rounded-full bg-emerald-400" : "h-2 w-2 rounded-full bg-white/50"} />
+                        {k}
+                      </dt>
+                      <dd className="font-semibold tabular-nums">{v}</dd>
+                    </div>
+                  ))}
                 </dl>
-              </Panel>
+              </article>
             </StaggerItem>
           ))}
-          <StaggerItem>
-            <Panel tone="indigo" className="h-full">
-              <p className="text-xs font-semibold uppercase tracking-wider text-primary dark:text-accent-foreground">2047 projection</p>
-              <p className="mt-1 font-heading text-3xl font-bold">{ur.urbanShare2047}% urban</p>
-              <div className="mt-4 flex h-3 overflow-hidden rounded-full bg-muted" aria-hidden="true">
-                <span className="bg-[#0E7490]" style={{ width: `${ur.urbanShare2047}%` }} />
-                <span className="flex-1 bg-[#0B5D3B]" />
-              </div>
-              <dl className="mt-4 grid grid-cols-2 gap-2 text-sm">
-                <dt className="text-muted-foreground">Urban</dt>
-                <dd className="text-right font-semibold">≈ {ur.urban2047} Mn</dd>
-                <dt className="text-muted-foreground">Rural</dt>
-                <dd className="text-right font-semibold">≈ {ur.rural2047} Mn</dd>
-                <dt className="text-muted-foreground">Growth 2017→23</dt>
-                <dd className="text-right font-semibold">
-                  {ur.urbanCagr}% vs {ur.ruralCagr}%
-                </dd>
-              </dl>
-            </Panel>
-          </StaggerItem>
         </Stagger>
         <Source>
           {src.urbanRural}; {src.reference}
