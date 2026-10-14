@@ -10,6 +10,9 @@ import { Button } from "@/components/ui/button";
 import { markDemoCarry, stepsForPath, type DemoStep } from "./demo-steps";
 import { INTRO_POSTER, INTRO_SRC } from "./HomeIntro";
 
+const DEMO_BTN =
+  "!rounded-full !border-2 !border-teal-300/80 !bg-[#071c1a] !text-white shadow-[0_0_18px_-8px_#2dd4bf] hover:!bg-[#0f3d36] hover:!text-white";
+
 let lockedVoice: SpeechSynthesisVoice | null = null;
 
 /** One narrator for the whole tour, the warmest natural English voice on the machine. */
@@ -644,22 +647,10 @@ function IntroFilm({
       <div className="absolute inset-x-0 top-0 flex items-center justify-between gap-3 bg-gradient-to-b from-black/70 to-transparent p-4">
         <p className="text-xs font-semibold uppercase tracking-[0.16em] text-white/85">PRIA introduction</p>
         <div className="flex items-center gap-2">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={onPause}
-            className="border-[#042f2e]/20 bg-white text-[#042f2e] dark:border-[#042f2e]/20 dark:bg-white dark:text-[#042f2e]"
-            style={{ color: "#042f2e", backgroundColor: "#ffffff" }}
-          >
+          <Button type="button" variant="ghost" onClick={onPause} className={DEMO_BTN}>
             {paused ? <Play /> : <Pause />} {paused ? "Resume" : "Pause"}
           </Button>
-          <Button
-            type="button"
-            variant="outline"
-            onClick={onDone}
-            className="border-[#042f2e]/20 bg-white text-[#042f2e] dark:border-[#042f2e]/20 dark:bg-white dark:text-[#042f2e]"
-            style={{ color: "#042f2e", backgroundColor: "#ffffff" }}
-          >
+          <Button type="button" variant="ghost" onClick={onDone} className={DEMO_BTN}>
             Continue
           </Button>
         </div>
@@ -927,24 +918,10 @@ export function PageDemo() {
                 <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-emerald-950/10 pt-3">
                   <VoiceControls rate={rate} volume={volume} onRate={setRate} onVolume={setVolume} onLight />
                   <div className="flex items-center gap-2">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={togglePause}
-                      className="rounded-full border-[#042f2e]/15 bg-[#f3faf6] text-[#042f2e] dark:border-[#042f2e]/20 dark:bg-[#f3faf6] dark:text-[#042f2e]"
-                      style={{ color: "#042f2e", backgroundColor: "#f3faf6" }}
-                    >
+                    <Button type="button" variant="ghost" size="sm" onClick={togglePause} className={DEMO_BTN}>
                       {paused ? <Play /> : <Pause />} {paused ? "Resume" : "Pause"}
                     </Button>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={finish}
-                      className="rounded-full border-[#042f2e]/15 bg-[#f3faf6] text-[#042f2e] dark:border-[#042f2e]/20 dark:bg-[#f3faf6] dark:text-[#042f2e]"
-                      style={{ color: "#042f2e", backgroundColor: "#f3faf6" }}
-                    >
+                    <Button type="button" variant="ghost" size="sm" onClick={finish} className={DEMO_BTN}>
                       <Square /> Stop
                     </Button>
                   </div>

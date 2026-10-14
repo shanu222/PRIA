@@ -11,7 +11,7 @@ const buttonVariants = cva(
         default:
           "btn-sheen border border-[#065f46] bg-primary bg-gradient-to-r from-[#047857] via-[#0f766e] to-[#1d4ed8] bg-[length:200%_100%] bg-left text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.25),0_6px_18px_-8px_rgba(4,120,87,0.7)] hover:-translate-y-px hover:bg-right hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.3),0_14px_28px_-10px_rgba(29,78,216,0.6)] active:translate-y-0 [transition-property:background-position,transform,box-shadow] duration-500",
         outline:
-          "btn-sheen btn-gradient-outline text-[#065f46] shadow-sm [--btn-a:#059669] [--btn-b:#0891b2] hover:-translate-y-px dark:text-emerald-200",
+          "btn-sheen btn-gradient-outline text-[#065f46] shadow-sm [--btn-a:#059669] [--btn-b:#0891b2] hover:-translate-y-px dark:text-emerald-100",
         secondary:
           "btn-sheen btn-gradient-outline text-[#3730a3] [--btn-a:#4f46e5] [--btn-b:#a21caf] hover:-translate-y-px dark:text-indigo-200",
         ghost: "text-foreground hover:bg-muted active:bg-muted/80",

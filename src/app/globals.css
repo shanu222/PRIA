@@ -426,7 +426,7 @@
     color: var(--seg-strong);
   }
   .dark .seg-text {
-    color: var(--seg);
+    color: color-mix(in srgb, var(--seg) 62%, white);
   }
   .bg-grid-fade {
     mask-image: radial-gradient(ellipse at center, black 40%, transparent 75%);
