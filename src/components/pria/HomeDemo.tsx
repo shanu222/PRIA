@@ -519,14 +519,16 @@ function VoiceControls({
   onRate,
   onVolume,
   onDark = false,
+  onLight = false,
 }: {
   rate: number;
   volume: number;
   onRate: (value: number) => void;
   onVolume: (value: number) => void;
   onDark?: boolean;
+  onLight?: boolean;
 }) {
-  const label = onDark ? "text-white/80" : "text-muted-foreground";
+  const label = onDark ? "text-white/90" : onLight ? "text-[#134e4a]" : "text-muted-foreground";
   return (
     <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
       <label className={`flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wide ${label}`}>
@@ -612,10 +614,22 @@ function IntroFilm({
       <div className="absolute inset-x-0 top-0 flex items-center justify-between gap-3 bg-gradient-to-b from-black/70 to-transparent p-4">
         <p className="text-xs font-semibold uppercase tracking-[0.16em] text-white/85">PRIA introduction</p>
         <div className="flex items-center gap-2">
-          <Button type="button" variant="outline" onClick={onPause} className="border-white/30 bg-white text-[#042f2e]">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onPause}
+            className="border-[#042f2e]/20 bg-white text-[#042f2e] dark:border-[#042f2e]/20 dark:bg-white dark:text-[#042f2e]"
+            style={{ color: "#042f2e", backgroundColor: "#ffffff" }}
+          >
             {paused ? <Play /> : <Pause />} {paused ? "Resume" : "Pause"}
           </Button>
-          <Button type="button" variant="outline" onClick={onDone} className="border-white/30 bg-white text-[#042f2e]">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onDone}
+            className="border-[#042f2e]/20 bg-white text-[#042f2e] dark:border-[#042f2e]/20 dark:bg-white dark:text-[#042f2e]"
+            style={{ color: "#042f2e", backgroundColor: "#ffffff" }}
+          >
             Continue
           </Button>
         </div>
@@ -863,10 +877,10 @@ export function PageDemo() {
           <div className="fixed inset-0 z-50 flex items-end justify-center bg-[#042f2e]/72 p-3 backdrop-blur-[2px] sm:items-center sm:p-6">
             <div className="flex w-full max-w-5xl flex-col gap-3">
               {active ? <ZoomShot sourceId={active.id} tick={step ?? 0} /> : null}
-              <div className="rounded-2xl bg-white px-5 py-4 text-[#042f2e] shadow-lift">
+              <div className="rounded-2xl bg-white px-5 py-4 text-[#042f2e] shadow-lift dark:bg-white dark:text-[#042f2e]">
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-emerald-800">Curator’s note</p>
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-emerald-900/70">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#065f46]">Curator’s note</p>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#134e4a]">
                     {tourMark?.mode === "all"
                       ? `Full portal · ${pageLabel(pathname)} · ${(tourMark.index ?? 0) + 1} of ${tourMark.total}`
                       : "This page"}
@@ -876,23 +890,24 @@ export function PageDemo() {
                 {active ? (
                   <>
                     <p className="mt-2 font-heading text-lg font-semibold leading-snug">{active.title}</p>
-                    <p className="mt-1 text-base leading-relaxed text-[#134e4a]">{active.gist}</p>
+                    <p className="mt-1 text-base leading-relaxed text-[#134e4a] dark:text-[#134e4a]">{active.gist}</p>
                   </>
                 ) : (
                   <>
                     <p className="mt-2 font-heading text-lg font-semibold leading-snug">Opening the next page</p>
-                    <p className="mt-1 text-base leading-relaxed text-[#134e4a]">The explanation continues there.</p>
+                    <p className="mt-1 text-base leading-relaxed text-[#134e4a] dark:text-[#134e4a]">The explanation continues there.</p>
                   </>
                 )}
                 <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-emerald-950/10 pt-3">
-                  <VoiceControls rate={rate} volume={volume} onRate={setRate} onVolume={setVolume} />
+                  <VoiceControls rate={rate} volume={volume} onRate={setRate} onVolume={setVolume} onLight />
                   <div className="flex items-center gap-2">
                     <Button
                       type="button"
                       variant="outline"
                       size="sm"
                       onClick={togglePause}
-                      className="rounded-full border-emerald-900/15 bg-[#f3faf6] text-[#042f2e]"
+                      className="rounded-full border-[#042f2e]/15 bg-[#f3faf6] text-[#042f2e] dark:border-[#042f2e]/20 dark:bg-[#f3faf6] dark:text-[#042f2e]"
+                      style={{ color: "#042f2e", backgroundColor: "#f3faf6" }}
                     >
                       {paused ? <Play /> : <Pause />} {paused ? "Resume" : "Pause"}
                     </Button>
@@ -901,7 +916,8 @@ export function PageDemo() {
                       variant="outline"
                       size="sm"
                       onClick={finish}
-                      className="rounded-full border-emerald-900/15 bg-[#f3faf6] text-[#042f2e]"
+                      className="rounded-full border-[#042f2e]/15 bg-[#f3faf6] text-[#042f2e] dark:border-[#042f2e]/20 dark:bg-[#f3faf6] dark:text-[#042f2e]"
+                      style={{ color: "#042f2e", backgroundColor: "#f3faf6" }}
                     >
                       <Square /> Stop
                     </Button>
