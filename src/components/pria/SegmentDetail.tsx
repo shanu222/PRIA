@@ -1,8 +1,6 @@
 import Link from "next/link";
 import { ArrowUpRight, ChevronRight, Layers, MapPin } from "lucide-react";
 import { categoryStatus, segments, type InfraCategory, type Segment } from "@/data/pria";
-import { segmentProvinces } from "@/data/census";
-import { MAP_VIEWBOX, kashmirShape, provinceShapes } from "@/data/pakistan-geo";
 import { Icon } from "@/lib/icons";
 import { cn } from "@/lib/utils";
 import { CategoryTabs } from "./CategoryTabs";
@@ -10,47 +8,16 @@ import { DrimStrip } from "./DrimStrip";
 import { HazardProfile } from "./HazardProfile";
 import { Reveal } from "./Motion";
 import { segmentStyle } from "./SegmentCard";
+import { SegmentMiniMap } from "./SegmentMiniMap";
+import { categoryPhoto, segChip, segGlass } from "./segment-ui";
 import { StatusBadge } from "./StatusBadge";
 import { SubSectionPanel } from "./SubSectionPanel";
 import { TopoPattern } from "./TopoPattern";
 
 const HERO_IMAGE_FADE = "linear-gradient(to right, transparent 0%, rgba(0,0,0,0.55) 22%, #000 45%)";
-
-function SegmentMiniMap({ segment, className }: { segment: Segment; className?: string }) {
-  const inSegment = new Set<string>(segmentProvinces[segment.id]);
-  const glow = `drop-shadow(0 0 10px ${segment.color}) drop-shadow(0 0 22px color-mix(in srgb, ${segment.color} 60%, transparent))`;
-  return (
-    <svg
-      viewBox={`0 0 ${MAP_VIEWBOX.width} ${MAP_VIEWBOX.height}`}
-      aria-hidden="true"
-      className={cn("pointer-events-none w-auto", className)}
-      style={{ aspectRatio: `${MAP_VIEWBOX.width} / ${MAP_VIEWBOX.height}` }}
-    >
-      <g fill="rgba(4,12,16,0.6)" stroke="rgba(255,255,255,0.45)" strokeWidth={2.5} strokeLinejoin="round">
-        {provinceShapes.map((s) => (
-          <path key={s.id} d={s.d} />
-        ))}
-        <path d={kashmirShape.d} fillRule="evenodd" />
-      </g>
-      <g
-        fill={segment.color}
-        fillOpacity={0.55}
-        stroke={`color-mix(in srgb, ${segment.color} 45%, white)`}
-        strokeWidth={3}
-        strokeLinejoin="round"
-        style={{ filter: glow }}
-        className="motion-safe:animate-soft-pulse"
-      >
-        {provinceShapes
-          .filter((s) => inSegment.has(s.id))
-          .map((s) => (
-            <path key={s.id} d={s.d} />
-          ))}
-        {segment.id === "mountain" && <path d={kashmirShape.d} fillRule="evenodd" />}
-      </g>
-    </svg>
-  );
-}
+const OTHER_SEGMENT_FADE = "linear-gradient(to right, transparent 0%, #000 55%)";
+const CATEGORY_PHOTO_FADE =
+  "linear-gradient(to right, transparent 0%, #000 35%), linear-gradient(to top, transparent 0%, #000 45%)";
 
 function SegmentHero({ segment }: { segment: Segment }) {
   const light = `color-mix(in srgb, ${segment.color} 55%, white)`;
@@ -157,65 +124,94 @@ function SegmentRail({
   const others = segments.filter((s) => s.id !== segment.id);
   return (
     <aside aria-label="In this segment" className={cn("flex flex-col gap-4", className)}>
-      <div className="card-pro rounded-xl bg-card p-5">
-        <h2 className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">In this segment</h2>
-        <p className="mt-4 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Regions</p>
-        <ul className="mt-2 flex flex-col gap-1.5">
+      <div className={cn(segGlass, "relative overflow-hidden p-5")}>
+        <SegmentMiniMap segment={segment} className="absolute -right-4 top-6 h-32 opacity-90" />
+        <h2 className="relative flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em]">
+          <MapPin className="h-4 w-4 seg-text" aria-hidden />
+          In this segment
+        </h2>
+        <p className="relative mt-5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Regions</p>
+        <ul className="relative mt-2 flex flex-col gap-2">
           {segment.regions.map((r) => (
             <li key={r} className="flex items-center gap-2 text-sm font-medium">
-              <MapPin className="h-3.5 w-3.5 seg-text" aria-hidden />
+              <MapPin className="h-3.5 w-3.5 shrink-0 seg-text drop-shadow-[0_0_6px_var(--seg)]" aria-hidden />
               {r}
             </li>
           ))}
         </ul>
-        <p className="mt-5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+        <div className="relative my-4 h-px bg-gradient-to-r from-[color-mix(in_srgb,var(--seg)_45%,transparent)] to-transparent" />
+        <p className="relative text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
           {segment.categories.length} Categories
         </p>
-        <ul className="mt-2 flex flex-col gap-0.5">
-          {segment.categories.map((c) => (
-            <li key={c.id}>
-              <Link
-                href={`/segments/${segment.slug}/${c.id}`}
-                scroll={false}
-                aria-current={c.id === activeCategoryId ? "page" : undefined}
-                className={cn(
-                  "-mx-2 flex items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-muted",
-                  c.id === activeCategoryId ? "font-semibold seg-text" : "text-muted-foreground hover:text-foreground",
-                )}
-              >
-                <Icon name={c.icon} className="h-3.5 w-3.5 shrink-0" />
-                <span className="flex-1 truncate">{c.shortTitle}</span>
-                <span className="rounded bg-muted px-1.5 text-[11px] font-semibold tabular-nums text-muted-foreground">
-                  {c.subSections.length}
-                </span>
-              </Link>
-            </li>
-          ))}
+        <ul className="relative mt-2 flex flex-col gap-1">
+          {segment.categories.map((c) => {
+            const isActive = c.id === activeCategoryId;
+            return (
+              <li key={c.id}>
+                <Link
+                  href={`/segments/${segment.slug}/${c.id}`}
+                  scroll={false}
+                  aria-current={isActive ? "page" : undefined}
+                  className={cn(
+                    "group -mx-2 flex items-center gap-2.5 rounded-lg border border-transparent px-2 py-1.5 text-sm transition-all duration-200 hover:translate-x-0.5 hover:bg-[color-mix(in_srgb,var(--seg)_8%,transparent)]",
+                    isActive
+                      ? "border-[color-mix(in_srgb,var(--seg)_40%,transparent)] bg-[color-mix(in_srgb,var(--seg)_14%,transparent)] font-semibold seg-text shadow-[0_0_16px_-8px_var(--seg)]"
+                      : "text-muted-foreground hover:text-foreground",
+                  )}
+                >
+                  <Icon name={c.icon} className="h-4 w-4 shrink-0" />
+                  <span className="flex-1 truncate">{c.shortTitle}</span>
+                  <span
+                    className={cn(
+                      "min-w-6 rounded-md px-1.5 py-0.5 text-center text-[11px] font-bold tabular-nums",
+                      isActive ? "bg-[var(--seg-strong)] text-white" : "bg-muted text-muted-foreground",
+                    )}
+                  >
+                    {c.subSections.length}
+                  </span>
+                  <ChevronRight className="h-3.5 w-3.5 shrink-0 opacity-60 transition-transform group-hover:translate-x-0.5" aria-hidden />
+                </Link>
+              </li>
+            );
+          })}
         </ul>
       </div>
-      <div className="card-pro rounded-xl bg-card p-5">
-        <h2 className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">Other segments</h2>
-        <ul className="mt-3 flex flex-col gap-2">
+      <div className={cn(segGlass, "p-5")}>
+        <h2 className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em]">
+          <Layers className="h-4 w-4 seg-text" aria-hidden />
+          Other segments
+        </h2>
+        <ul className="mt-4 flex flex-col gap-2.5">
           {others.map((s) => (
             <li key={s.id}>
               <Link
                 href={`/segments/${s.slug}`}
                 style={segmentStyle(s)}
-                className="group flex items-center gap-3 rounded-lg border px-3 py-2.5 transition-all hover:border-[var(--seg)] hover:shadow-soft"
+                className="group relative isolate flex items-center gap-3 overflow-hidden rounded-xl border border-[color-mix(in_srgb,var(--seg)_55%,transparent)] bg-[#06141b] px-3 py-2.5 text-white shadow-[0_0_18px_-8px_var(--seg)] transition-all duration-300 hover:-translate-y-0.5 hover:border-[var(--seg)] hover:shadow-[0_0_26px_-6px_var(--seg)]"
               >
+                <img
+                  src={`/segments/${s.slug}.jpg`}
+                  alt=""
+                  loading="lazy"
+                  className="absolute inset-y-0 right-0 -z-10 h-full w-[75%] object-cover transition-transform duration-700 group-hover:scale-110"
+                  style={{ maskImage: OTHER_SEGMENT_FADE, WebkitMaskImage: OTHER_SEGMENT_FADE }}
+                />
                 <span
-                  className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-white"
-                  style={{ background: s.colorStrong }}
-                >
-                  <Icon name={s.icon} className="h-4 w-4" />
+                  aria-hidden="true"
+                  className="absolute inset-0 -z-10 bg-gradient-to-r from-[color-mix(in_srgb,var(--seg-strong)_45%,#06141b)] via-[color-mix(in_srgb,var(--seg-strong)_20%,rgba(6,20,27,0.6))] to-transparent"
+                />
+                <span className={cn("flex h-10 w-10 shrink-0 items-center justify-center rounded-lg", segChip)}>
+                  <Icon name={s.icon} className="h-5 w-5" />
                 </span>
                 <span className="min-w-0 flex-1">
-                  <span className="block text-[11px] font-semibold uppercase tracking-wider seg-text">
+                  <span className="block text-[11px] font-bold uppercase tracking-wider text-[color-mix(in_srgb,var(--seg)_60%,white)]">
                     Segment {s.number}
                   </span>
-                  <span className="block truncate text-sm font-medium">{s.shortTitle}</span>
+                  <span className="block truncate text-sm font-semibold drop-shadow">{s.shortTitle}</span>
                 </span>
-                <ArrowUpRight className="h-4 w-4 text-muted-foreground transition-colors group-hover:text-[var(--seg)]" aria-hidden />
+                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-white/25 bg-black/35 backdrop-blur transition-transform group-hover:translate-x-0.5">
+                  <ArrowUpRight className="h-3.5 w-3.5" aria-hidden />
+                </span>
               </Link>
             </li>
           ))}
@@ -237,25 +233,38 @@ export function SegmentDetail({ segment, category }: { segment: Segment; categor
       <div className="grid gap-6 2xl:grid-cols-[minmax(0,1fr)_280px]">
         <Reveal key={category.id} className="min-w-0">
           <div data-demo="content">
-          <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.16em] seg-text">
-                Infrastructure Category {category.number}
-              </p>
-              <h2 className="mt-1.5 text-2xl font-bold sm:text-[1.65rem]">{category.title}</h2>
-              <p className="mt-1.5 flex items-center gap-1.5 text-sm text-muted-foreground">
-                <Layers className="h-4 w-4" aria-hidden />
-                {category.subSections.length} sub-sections
-              </p>
-            </div>
-            <StatusBadge
-              status={status}
-              label={
-                status === "pending"
-                  ? "Recommendations pending"
-                  : `${category.subSections.reduce((n, s) => n + s.items.length, 0)} recommendations`
-              }
+          <div className="group/cat relative isolate mb-5 overflow-hidden rounded-2xl">
+            <img
+              src={categoryPhoto(segment, category)}
+              alt=""
+              className="absolute inset-y-0 right-0 -z-10 hidden h-full w-[58%] object-cover opacity-90 transition-transform duration-[1.6s] ease-out group-hover/cat:scale-105 sm:block"
+              style={{ maskImage: CATEGORY_PHOTO_FADE, WebkitMaskImage: CATEGORY_PHOTO_FADE, maskComposite: "intersect", WebkitMaskComposite: "source-in" }}
             />
+            <div className="flex min-h-[7.5rem] flex-wrap items-end justify-between gap-3 py-2 sm:min-h-[9rem]">
+              <div className="relative pl-4">
+                <span
+                  aria-hidden="true"
+                  className="absolute inset-y-1 left-0 w-1 rounded-full bg-gradient-to-b from-[var(--seg)] to-[var(--seg-strong)] shadow-[0_0_12px_var(--seg)]"
+                />
+                <p className="text-xs font-bold uppercase tracking-[0.22em] seg-text">
+                  Infrastructure Category {category.number}
+                </p>
+                <h2 className="mt-1.5 text-2xl font-extrabold tracking-tight drop-shadow-sm sm:text-[2rem]">{category.title}</h2>
+                <p className="mt-1.5 flex items-center gap-1.5 text-sm text-muted-foreground">
+                  <Layers className="h-4 w-4 seg-text" aria-hidden />
+                  {category.subSections.length} sub-sections
+                </p>
+              </div>
+              <StatusBadge
+                status={status}
+                className="border-[color-mix(in_srgb,var(--seg)_55%,transparent)] bg-[color-mix(in_srgb,var(--seg)_16%,hsl(var(--card)))] px-3 py-1 text-[color-mix(in_srgb,var(--seg)_65%,hsl(var(--foreground)))] shadow-[0_0_18px_-6px_var(--seg)] backdrop-blur"
+                label={
+                  status === "pending"
+                    ? "Recommendations pending"
+                    : `${category.subSections.reduce((n, s) => n + s.items.length, 0)} recommendations`
+                }
+              />
+            </div>
           </div>
           <SubSectionPanel key={`${segment.id}-${category.id}`} segment={segment} category={category} />
           </div>

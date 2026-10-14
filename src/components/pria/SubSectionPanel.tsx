@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { ChevronRight } from "lucide-react";
 import type { InfraCategory, Segment, SubSection } from "@/data/pria";
 import { getIcon, Icon } from "@/lib/icons";
 import { cn } from "@/lib/utils";
@@ -11,6 +12,7 @@ import { DrimStrip } from "./DrimStrip";
 import { NorthernRoutes } from "./NorthernRoutes";
 import { SegmentConstruction } from "./SegmentConstruction";
 import { StatusBadge } from "./StatusBadge";
+import { recommendationPhoto, segChip, segGlass, segTile } from "./segment-ui";
 
 function SubSectionBody({
   sub,
@@ -50,44 +52,82 @@ function SubSectionBody({
         </figure>
       )}
       {showDrim && <DrimStrip segment={segment} compact />}
-      {sub.items.length > 0 && <ItemList sub={sub} />}
+      {sub.items.length > 0 && (
+        <ItemList sub={sub} segment={segment} category={category} subIndex={category.subSections.indexOf(sub)} />
+      )}
       {showRoutes && <NorthernRoutes key={segment.id} segmentId={segment.id} />}
       {showBuild && <SegmentConstruction segment={segment} />}
     </div>
   );
 }
 
-function ItemList({ sub }: { sub: SubSection }) {
+function ItemList({
+  sub,
+  segment,
+  category,
+  subIndex,
+}: {
+  sub: SubSection;
+  segment: Segment;
+  category: InfraCategory;
+  subIndex: number;
+}) {
   return (
-    <ul className="grid gap-3">
+    <ul className="grid gap-3.5">
       {sub.items.map((item, i) => (
-        <li
+        <motion.li
           key={item.id}
-          className="group relative flex gap-4 rounded-xl border-2 border-[color-mix(in_srgb,var(--seg)_18%,hsl(var(--border)))] bg-card p-5 shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:border-[var(--seg)] hover:shadow-lift"
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.35, delay: i * 0.07, ease: [0.22, 1, 0.36, 1] }}
+          className={cn(
+            segTile,
+            "group relative grid overflow-hidden transition-all duration-300 hover:-translate-y-0.5 hover:border-[var(--seg)] hover:shadow-[0_0_28px_-10px_var(--seg)] sm:grid-cols-[minmax(0,1fr)_11rem] md:grid-cols-[minmax(0,1fr)_13rem]",
+          )}
         >
-          <span
-            aria-hidden="true"
-            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[color-mix(in_srgb,var(--seg)_12%,transparent)] font-heading text-sm font-bold seg-text transition-colors group-hover:bg-[var(--seg-strong)] group-hover:text-white"
-          >
-            {i + 1}
-          </span>
-          <div className="min-w-0">
-            <h4 className="font-semibold leading-snug">{item.title}</h4>
-            {item.description && <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{item.description}</p>}
-            {item.tags && item.tags.length > 0 && (
-              <div className="mt-3 flex flex-wrap gap-1.5">
-                {item.tags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="inline-flex items-center rounded-full border border-[color-mix(in_srgb,var(--seg)_35%,transparent)] bg-[color-mix(in_srgb,var(--seg)_6%,transparent)] px-2.5 py-0.5 text-xs font-semibold seg-text"
-                  >
-                    {tag}
-                  </span>
-                ))}
-              </div>
-            )}
+          <div className="relative order-2 flex gap-4 p-4 sm:order-1 sm:p-5">
+            <span
+              aria-hidden="true"
+              className={cn(
+                "flex h-9 w-9 shrink-0 items-center justify-center rounded-xl font-heading text-sm font-bold transition-transform duration-300 group-hover:scale-110",
+                segChip,
+              )}
+            >
+              {i + 1}
+            </span>
+            <div className="min-w-0">
+              <h4 className="font-semibold leading-snug">{item.title}</h4>
+              {item.description && <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{item.description}</p>}
+              {item.tags && item.tags.length > 0 && (
+                <div className="mt-3 flex flex-wrap gap-1.5">
+                  {item.tags.map((tag) => (
+                    <span
+                      key={tag}
+                      className="inline-flex items-center rounded-full border border-[color-mix(in_srgb,var(--seg)_45%,transparent)] bg-[color-mix(in_srgb,var(--seg)_12%,transparent)] px-2.5 py-0.5 text-xs font-semibold seg-text shadow-[0_0_10px_-6px_var(--seg)]"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
-        </li>
+          <div className="relative order-1 aspect-[16/7] overflow-hidden sm:order-2 sm:m-3 sm:ml-0 sm:aspect-auto sm:rounded-xl sm:border sm:border-[color-mix(in_srgb,var(--seg)_30%,transparent)]">
+            <img
+              src={recommendationPhoto(segment, category, subIndex, i)}
+              alt=""
+              loading="lazy"
+              className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
+            />
+            <span aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-transparent" />
+            <span
+              aria-hidden="true"
+              className="absolute right-2 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-lg border border-white/30 bg-black/45 text-white backdrop-blur transition-all duration-300 group-hover:translate-x-0.5 group-hover:bg-[var(--seg-strong)]"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </span>
+          </div>
+        </motion.li>
       ))}
     </ul>
   );
@@ -96,14 +136,14 @@ function ItemList({ sub }: { sub: SubSection }) {
 function SubSectionHeading({ sub, as: Heading = "h3" }: { sub: SubSection; as?: "h3" | "span" }) {
   return (
     <div className="flex min-w-0 items-center gap-3">
-      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[color-mix(in_srgb,var(--seg)_12%,transparent)] seg-text">
-        <Icon name={sub.icon} className="h-[18px] w-[18px]" />
+      <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[color-mix(in_srgb,var(--seg)_50%,transparent)] bg-[color-mix(in_srgb,var(--seg)_16%,transparent)] seg-text shadow-[0_0_18px_-4px_var(--seg),inset_0_1px_0_rgba(255,255,255,0.15)]">
+        <Icon name={sub.icon} className="h-5 w-5" />
       </span>
       <span className="min-w-0">
-        <span className="block text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+        <span className="block text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
           Sub-section {sub.code}
         </span>
-        <Heading className="block font-heading text-base font-semibold leading-snug">{sub.title}</Heading>
+        <Heading className="block font-heading text-lg font-bold leading-snug">{sub.title}</Heading>
       </span>
     </div>
   );
@@ -126,8 +166,8 @@ export function SubSectionPanel({ segment, category }: { segment: Segment; categ
     <>
       {/* Desktop: mini-nav + content */}
       <div className="hidden gap-6 lg:grid lg:grid-cols-[260px_minmax(0,1fr)]">
-        <nav aria-label={`${category.shortTitle} sub-sections`} className="self-start rounded-xl border-2 bg-card p-2 shadow-soft">
-          <ul className="flex flex-col gap-0.5">
+        <nav aria-label={`${category.shortTitle} sub-sections`} className={cn(segGlass, "self-start p-2.5")}>
+          <ul className="flex flex-col gap-1.5">
             {category.subSections.map((sub) => {
               const isActive = sub.id === active.id;
               return (
@@ -137,31 +177,42 @@ export function SubSectionPanel({ segment, category }: { segment: Segment; categ
                     onClick={() => setActiveId(sub.id)}
                     aria-current={isActive ? "true" : undefined}
                     className={cn(
-                      "relative flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                      "group relative isolate flex w-full items-center gap-2.5 overflow-hidden rounded-xl border px-2.5 py-2.5 text-left text-sm font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--seg)]",
                       isActive
-                        ? "bg-[color-mix(in_srgb,var(--seg)_10%,transparent)] text-foreground"
-                        : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                        ? "border-[var(--seg)] text-foreground shadow-[0_0_22px_-8px_var(--seg),inset_0_1px_0_rgba(255,255,255,0.1)]"
+                        : "border-[color-mix(in_srgb,var(--seg)_16%,hsl(var(--border)))] bg-[color-mix(in_srgb,var(--seg)_3%,hsl(var(--card)))] text-muted-foreground hover:translate-x-0.5 hover:border-[color-mix(in_srgb,var(--seg)_50%,transparent)] hover:text-foreground",
                     )}
                   >
                     {isActive && (
                       <motion.span
                         layoutId={`subnav-indicator-${category.id}`}
                         aria-hidden="true"
-                        className="absolute left-0 top-1/2 h-6 w-[3px] -translate-y-1/2 rounded-r-full bg-[var(--seg)]"
+                        className="absolute inset-0 -z-10 bg-gradient-to-r from-[color-mix(in_srgb,var(--seg)_28%,transparent)] to-[color-mix(in_srgb,var(--seg)_6%,transparent)]"
                       />
                     )}
                     <span
                       className={cn(
-                        "flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-xs font-bold uppercase",
-                        isActive ? "bg-[var(--seg-strong)] text-white" : "bg-muted text-muted-foreground",
+                        "flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-xs font-bold uppercase transition-transform duration-200 group-hover:scale-105",
+                        isActive ? segChip : "border bg-muted text-muted-foreground",
                       )}
                     >
                       {sub.code}
                     </span>
+                    <Icon
+                      name={sub.icon}
+                      className={cn("h-4 w-4 shrink-0 transition-colors", isActive ? "seg-text" : "opacity-70")}
+                    />
                     <span className="flex-1 leading-snug">{sub.title}</span>
                     {sub.items.length > 0 && (
-                      <span className="text-xs tabular-nums text-muted-foreground">{sub.items.length}</span>
+                      <span className="text-xs font-semibold tabular-nums text-muted-foreground">{sub.items.length}</span>
                     )}
+                    <ChevronRight
+                      aria-hidden="true"
+                      className={cn(
+                        "h-3.5 w-3.5 shrink-0 transition-transform duration-200 group-hover:translate-x-0.5",
+                        isActive ? "seg-text" : "opacity-50",
+                      )}
+                    />
                   </button>
                 </li>
               );
@@ -169,7 +220,7 @@ export function SubSectionPanel({ segment, category }: { segment: Segment; categ
           </ul>
         </nav>
 
-        <section aria-live="polite" className="min-w-0 rounded-xl border-2 border-[color-mix(in_srgb,var(--seg)_25%,hsl(var(--border)))] bg-card p-6 shadow-soft">
+        <section aria-live="polite" className={cn(segGlass, "min-w-0 p-6")}>
           <AnimatePresence mode="wait">
             <motion.div
               key={active.id}
@@ -178,9 +229,15 @@ export function SubSectionPanel({ segment, category }: { segment: Segment; categ
               exit={{ opacity: 0, x: -8 }}
               transition={{ duration: 0.22 }}
             >
-              <div className="mb-6 flex flex-wrap items-center justify-between gap-3 border-b pb-5">
+              <div className="mb-6 flex flex-wrap items-center justify-between gap-3 border-b border-[color-mix(in_srgb,var(--seg)_22%,hsl(var(--border)))] pb-5">
                 <SubSectionHeading sub={active} />
-                <StatusBadge status={active.status} />
+                <StatusBadge
+                  status={active.status}
+                  className={cn(
+                    active.status === "available" &&
+                      "border-[color-mix(in_srgb,var(--seg)_55%,transparent)] bg-[color-mix(in_srgb,var(--seg)_14%,transparent)] px-3 py-1 text-[color-mix(in_srgb,var(--seg)_65%,hsl(var(--foreground)))] shadow-[0_0_16px_-6px_var(--seg)]",
+                  )}
+                />
               </div>
               <SubSectionBody sub={active} segment={segment} category={category} />
             </motion.div>
@@ -196,7 +253,7 @@ export function SubSectionPanel({ segment, category }: { segment: Segment; categ
         onValueChange={(value) => {
           if (value) setActiveId(value);
         }}
-        className="rounded-xl border bg-card px-4 shadow-soft lg:hidden"
+        className={cn(segGlass, "px-4 lg:hidden")}
       >
         {category.subSections.map((sub) => (
           <AccordionItem key={sub.id} value={sub.id} className="last:border-b-0">
