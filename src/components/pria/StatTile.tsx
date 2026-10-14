@@ -27,7 +27,7 @@ export function StatTile({
         <p
           className={cn(
             "font-heading text-4xl font-bold tracking-tight sm:text-[2.6rem]",
-            emphasis ? "text-gradient-brand" : "text-foreground",
+            emphasis ? "text-gradient-brand" : "tone-gradient-text",
           )}
         >
           <CountUp value={stat.value} prefix={stat.prefix} suffix={stat.suffix} plain={stat.plain} decimals={stat.decimals} />

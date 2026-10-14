@@ -182,7 +182,7 @@ export function CityEvidence() {
         )}
       </div>
 
-      <div data-demo="map" className="overflow-hidden rounded-2xl border bg-card p-3 shadow-soft sm:p-4">
+      <div data-demo="map" className="card-pro overflow-hidden rounded-2xl bg-card p-3 sm:p-4">
         <PakistanMap
           ariaLabel="Map of Pakistan. Select a city to read its evidence."
           fills={(id) => ({ fill: provinceColor(id).base, opacity: 0.38, strokeWidth: 1.5 })}
@@ -340,7 +340,7 @@ export function CityEvidence() {
               </p>
               <div className="grid gap-4 lg:grid-cols-2">
                 {towns.map((town) => (
-                  <article key={town.id} className="rounded-2xl border bg-card p-5 shadow-soft">
+                  <article key={town.id} className="card-pro card-pro-lift rounded-2xl bg-card p-5">
                     <h3 className="font-heading text-lg font-bold">{town.name}</h3>
                     <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{town.why}</p>
                     <ul className="mt-3 flex flex-col gap-1.5 text-sm">

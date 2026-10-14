@@ -9,17 +9,17 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          "border border-[#065f46] bg-primary bg-gradient-to-r from-[#047857] via-[#0b5d3b] to-[#0e7490] bg-[length:200%_100%] bg-left text-white shadow-[0_6px_18px_-8px_rgba(4,120,87,0.7)] hover:-translate-y-px hover:bg-right hover:shadow-[0_12px_26px_-10px_rgba(14,116,144,0.75)] active:translate-y-0 [transition-property:background-position,transform,box-shadow] duration-500",
+          "btn-sheen border border-[#065f46] bg-primary bg-gradient-to-r from-[#047857] via-[#0f766e] to-[#1d4ed8] bg-[length:200%_100%] bg-left text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.25),0_6px_18px_-8px_rgba(4,120,87,0.7)] hover:-translate-y-px hover:bg-right hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.3),0_14px_28px_-10px_rgba(29,78,216,0.6)] active:translate-y-0 [transition-property:background-position,transform,box-shadow] duration-500",
         outline:
-          "border-2 border-[#047857]/35 bg-card bg-gradient-to-r from-[#047857]/[0.06] to-[#0e7490]/[0.06] text-[#065f46] shadow-sm hover:-translate-y-px hover:border-[#047857] hover:from-[#047857]/[0.12] hover:to-[#0e7490]/[0.12] hover:shadow-[0_10px_22px_-12px_rgba(4,120,87,0.6)] dark:border-emerald-400/35 dark:text-emerald-200 dark:hover:border-emerald-400",
+          "btn-sheen btn-gradient-outline text-[#065f46] shadow-sm [--btn-a:#059669] [--btn-b:#0891b2] hover:-translate-y-px dark:text-emerald-200",
         secondary:
-          "border-2 border-[#4338ca]/25 bg-[#4338ca]/[0.07] text-[#3730a3] hover:-translate-y-px hover:border-[#4338ca] hover:bg-[#4338ca]/[0.12] dark:text-indigo-200",
+          "btn-sheen btn-gradient-outline text-[#3730a3] [--btn-a:#4f46e5] [--btn-b:#a21caf] hover:-translate-y-px dark:text-indigo-200",
         ghost: "text-foreground hover:bg-muted active:bg-muted/80",
         link: "text-primary underline-offset-4 hover:underline",
         onDark:
-          "border-0 bg-gradient-to-b from-[#99f6e4] via-[#2dd4bf] to-[#0d9488] text-[#042f2e] shadow-[inset_0_1px_0_rgba(255,255,255,0.75),0_5px_0_#115e59,0_14px_24px_-8px_rgba(15,118,110,0.75)] hover:-translate-y-0.5 hover:from-[#ccfbf1] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.85),0_8px_0_#115e59,0_20px_28px_-8px_rgba(13,148,136,0.8)] active:translate-y-1 active:shadow-[inset_0_2px_4px_rgba(4,47,46,0.25),0_1px_0_#115e59]",
+          "btn-sheen border-0 bg-gradient-to-b from-[#99f6e4] via-[#2dd4bf] to-[#0d9488] text-[#042f2e] shadow-[inset_0_1px_0_rgba(255,255,255,0.75),0_5px_0_#115e59,0_14px_24px_-8px_rgba(15,118,110,0.75)] hover:-translate-y-0.5 hover:from-[#ccfbf1] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.85),0_8px_0_#115e59,0_20px_28px_-8px_rgba(13,148,136,0.8)] active:translate-y-1 active:shadow-[inset_0_2px_4px_rgba(4,47,46,0.25),0_1px_0_#115e59]",
         outlineOnDark:
-          "border-0 bg-gradient-to-b from-[#fcd34d] via-[#f59e0b] to-[#d97706] text-[#431407] shadow-[inset_0_1px_0_rgba(255,255,255,0.65),0_5px_0_#b45309,0_14px_24px_-8px_rgba(217,119,6,0.7)] hover:-translate-y-0.5 hover:from-[#fde68a] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.75),0_8px_0_#b45309,0_20px_28px_-8px_rgba(245,158,11,0.75)] active:translate-y-1 active:shadow-[inset_0_2px_4px_rgba(120,53,15,0.28),0_1px_0_#b45309]",
+          "btn-sheen border-0 bg-gradient-to-b from-[#fcd34d] via-[#f59e0b] to-[#d97706] text-[#431407] shadow-[inset_0_1px_0_rgba(255,255,255,0.65),0_5px_0_#b45309,0_14px_24px_-8px_rgba(217,119,6,0.7)] hover:-translate-y-0.5 hover:from-[#fde68a] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.75),0_8px_0_#b45309,0_20px_28px_-8px_rgba(245,158,11,0.75)] active:translate-y-1 active:shadow-[inset_0_2px_4px_rgba(120,53,15,0.28),0_1px_0_#b45309]",
       },
       size: {
         default: "h-10 px-4 py-2",

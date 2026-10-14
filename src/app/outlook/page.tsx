@@ -208,13 +208,17 @@ export default function OutlookPage() {
             </p>
             <dl className="mt-5 grid gap-3 sm:grid-cols-3">
               {[
-                ["Cumulative need", fmt(scenario.cumulativeNeed)],
-                ["Cumulative delivery", fmt(scenario.cumulativeDelivery)],
-                ["Backlog by 2047", fmt(scenario.cumulativeShortfall)],
-              ].map(([k, v], i) => (
-                <div key={k} className={`rounded-xl border-2 bg-card p-4 ${i === 2 ? "border-amber-500" : ""}`}>
-                  <dt className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{k}</dt>
-                  <dd className={`mt-1 font-heading text-2xl font-bold ${i === 2 ? "text-amber-700 dark:text-amber-400" : ""}`}>{v} units</dd>
+                ["Cumulative need", fmt(scenario.cumulativeNeed), "#047857", "#0d9488"],
+                ["Cumulative delivery", fmt(scenario.cumulativeDelivery), "#0e7490", "#2563eb"],
+                ["Backlog by 2047", fmt(scenario.cumulativeShortfall), "#b45309", "#dc2626"],
+              ].map(([k, v, tone, tone2]) => (
+                <div
+                  key={k}
+                  className="card-pro card-pro-lift rounded-xl bg-card p-4"
+                  style={{ "--tone": tone, "--tone-2": tone2 } as React.CSSProperties}
+                >
+                  <dt className="tone-text text-xs font-semibold uppercase tracking-wider">{k}</dt>
+                  <dd className="tone-gradient-text mt-1 font-heading text-2xl font-bold">{v} units</dd>
                 </div>
               ))}
             </dl>

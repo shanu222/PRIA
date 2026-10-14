@@ -120,6 +120,7 @@
   /* Two-colour gradient outline (thicker on top) over a tinted card face; it flows on hover. */
   .card-pro {
     position: relative;
+    isolation: isolate;
     border: 2px solid transparent;
     border-top-width: 4px;
     background:
@@ -132,9 +133,9 @@
         padding-box,
       linear-gradient(
           120deg,
-          color-mix(in srgb, var(--tone, #047857) 55%, hsl(var(--card))),
-          color-mix(in srgb, var(--tone-2, #0d9488) 45%, hsl(var(--card))),
-          color-mix(in srgb, var(--tone, #047857) 55%, hsl(var(--card)))
+          color-mix(in srgb, var(--tone, #047857) 72%, hsl(var(--card))),
+          color-mix(in srgb, var(--tone-2, #0d9488) 62%, hsl(var(--card))),
+          color-mix(in srgb, var(--tone, #047857) 72%, hsl(var(--card)))
         )
         border-box;
     background-size:
@@ -142,10 +143,145 @@
       200% 200%;
     box-shadow:
       0 1px 2px rgb(15 23 42 / 0.04),
-      0 6px 16px -6px color-mix(in srgb, var(--tone, #047857) 22%, transparent);
+      0 8px 20px -8px color-mix(in srgb, var(--tone, #047857) 30%, transparent);
     transition:
       transform 300ms cubic-bezier(0.16, 1, 0.3, 1),
       box-shadow 300ms;
+  }
+  /* Soft glow in the top corner, in the card's second tone; it widens on hover. */
+  .card-pro::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    background: radial-gradient(
+      120% 90% at 100% 0%,
+      color-mix(in srgb, var(--tone-2, #0d9488) 16%, transparent) 0%,
+      transparent 55%
+    );
+    opacity: 0.8;
+    transition: opacity 400ms, transform 600ms cubic-bezier(0.16, 1, 0.3, 1);
+    transform-origin: top right;
+  }
+  /* A light sweep that crosses the card once on hover. */
+  .card-pro::after {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    background: linear-gradient(115deg, transparent 35%, rgb(255 255 255 / 0.6) 50%, transparent 65%);
+    background-size: 250% 100%;
+    background-position: 130% 0;
+    transition: background-position 900ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .card-pro:hover::before {
+    opacity: 1;
+    transform: scale(1.25);
+  }
+  .card-pro:hover::after {
+    background-position: -30% 0;
+  }
+  .dark .card-pro::after {
+    background-image: linear-gradient(115deg, transparent 35%, rgb(255 255 255 / 0.07) 50%, transparent 65%);
+  }
+
+  /* Headline figures in the card's own two tones. */
+  .tone-gradient-text {
+    background: linear-gradient(120deg, var(--tone, #047857), var(--tone-2, #0d9488));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .dark .tone-gradient-text {
+    background: linear-gradient(
+      120deg,
+      color-mix(in srgb, var(--tone, #047857) 55%, white),
+      color-mix(in srgb, var(--tone-2, #0d9488) 55%, white)
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+  }
+
+  /* Buttons: a light sweep on hover, and a two-colour gradient outline for the light variants. */
+  .btn-sheen {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+  }
+  .btn-sheen::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background: linear-gradient(110deg, transparent 30%, rgb(255 255 255 / 0.45) 50%, transparent 70%);
+    background-size: 250% 100%;
+    background-position: 130% 0;
+    transition: background-position 700ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .btn-sheen:hover::after {
+    background-position: -30% 0;
+  }
+  .btn-gradient-outline {
+    border: 2px solid transparent;
+    background:
+      linear-gradient(
+          120deg,
+          color-mix(in srgb, var(--btn-a) 8%, hsl(var(--card))),
+          color-mix(in srgb, var(--btn-b) 8%, hsl(var(--card)))
+        )
+        padding-box,
+      linear-gradient(120deg, var(--btn-a), var(--btn-b), var(--btn-a)) border-box;
+    background-size:
+      100% 100%,
+      200% 100%;
+    transition:
+      background-position 600ms,
+      transform 150ms,
+      box-shadow 300ms;
+  }
+  .btn-gradient-outline:hover {
+    background-position:
+      0 0,
+      100% 0;
+    background:
+      linear-gradient(
+          120deg,
+          color-mix(in srgb, var(--btn-a) 15%, hsl(var(--card))),
+          color-mix(in srgb, var(--btn-b) 15%, hsl(var(--card)))
+        )
+        padding-box,
+      linear-gradient(120deg, var(--btn-a), var(--btn-b), var(--btn-a)) border-box;
+    background-size:
+      100% 100%,
+      200% 100%;
+    animation: btn-outline-flow 2.4s linear infinite;
+    box-shadow: 0 10px 22px -12px color-mix(in srgb, var(--btn-a) 70%, transparent);
+  }
+  @keyframes btn-outline-flow {
+    from {
+      background-position:
+        0 0,
+        0% 0;
+    }
+    to {
+      background-position:
+        0 0,
+        200% 0;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .card-pro::after,
+    .btn-sheen::after {
+      display: none;
+    }
+    .btn-gradient-outline:hover {
+      animation: none;
+    }
   }
   .card-pro:hover,
   .card-pro:focus-visible {

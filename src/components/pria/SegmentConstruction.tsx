@@ -50,7 +50,7 @@ export function SegmentConstruction({ segment }: { segment: Segment }) {
       </div>
 
       <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
-        <figure className="overflow-hidden rounded-2xl border bg-card">
+        <figure className="card-pro overflow-hidden rounded-2xl bg-card">
           <img src={plate.src} alt={plate.caption} className="aspect-video w-full object-cover" />
           <figcaption className="px-4 py-3 text-xs leading-relaxed text-muted-foreground">{plate.caption}</figcaption>
         </figure>
