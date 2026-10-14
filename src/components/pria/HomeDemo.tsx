@@ -862,36 +862,52 @@ export function PageDemo() {
         createPortal(
           <div className="fixed inset-0 z-50 flex items-end justify-center bg-[#042f2e]/72 p-3 backdrop-blur-[2px] sm:items-center sm:p-6">
             <div className="flex w-full max-w-5xl flex-col gap-3">
-              <div className="flex flex-wrap items-center justify-between gap-3 text-white">
-                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-teal-100">
-                  {tourMark?.mode === "all"
-                    ? `Full portal · ${pageLabel(pathname)} · ${(tourMark.index ?? 0) + 1} of ${tourMark.total}`
-                    : "This page"}
-                  {active ? ` · ${(step ?? 0) + 1} of ${steps.length}` : ""}
-                </p>
-                <VoiceControls rate={rate} volume={volume} onRate={setRate} onVolume={setVolume} onDark />
-                <Button type="button" variant="outline" onClick={togglePause} className="border-white/30 bg-white text-[#042f2e]">
-                  {paused ? <Play /> : <Pause />} {paused ? "Resume" : "Pause"}
-                </Button>
-                <Button type="button" variant="outline" onClick={finish} className="border-white/30 bg-white text-[#042f2e]">
-                  <Square /> Stop
-                </Button>
-              </div>
-              {active ? (
-                <>
-                  <ZoomShot sourceId={active.id} tick={step ?? 0} />
-                  <div className="rounded-2xl bg-white px-5 py-4 text-[#042f2e] shadow-lift">
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-emerald-800">Curator’s note</p>
-                    <p className="mt-1 font-heading text-lg font-semibold leading-snug">{active.title}</p>
-                    <p className="mt-1 text-base leading-relaxed text-[#134e4a]">{active.gist}</p>
-                  </div>
-                </>
-              ) : (
-                <div className="rounded-2xl bg-white px-5 py-8 text-center text-[#042f2e] shadow-lift">
-                  <p className="font-heading text-lg font-semibold">Opening the next page</p>
-                  <p className="mt-1 text-sm text-[#134e4a]">The explanation continues there.</p>
+              {active ? <ZoomShot sourceId={active.id} tick={step ?? 0} /> : null}
+              <div className="rounded-2xl bg-white px-5 py-4 text-[#042f2e] shadow-lift">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-emerald-800">Curator’s note</p>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-emerald-900/70">
+                    {tourMark?.mode === "all"
+                      ? `Full portal · ${pageLabel(pathname)} · ${(tourMark.index ?? 0) + 1} of ${tourMark.total}`
+                      : "This page"}
+                    {active ? ` · ${(step ?? 0) + 1} of ${steps.length}` : ""}
+                  </p>
                 </div>
-              )}
+                {active ? (
+                  <>
+                    <p className="mt-2 font-heading text-lg font-semibold leading-snug">{active.title}</p>
+                    <p className="mt-1 text-base leading-relaxed text-[#134e4a]">{active.gist}</p>
+                  </>
+                ) : (
+                  <>
+                    <p className="mt-2 font-heading text-lg font-semibold leading-snug">Opening the next page</p>
+                    <p className="mt-1 text-base leading-relaxed text-[#134e4a]">The explanation continues there.</p>
+                  </>
+                )}
+                <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-emerald-950/10 pt-3">
+                  <VoiceControls rate={rate} volume={volume} onRate={setRate} onVolume={setVolume} />
+                  <div className="flex items-center gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={togglePause}
+                      className="rounded-full border-emerald-900/15 bg-[#f3faf6] text-[#042f2e]"
+                    >
+                      {paused ? <Play /> : <Pause />} {paused ? "Resume" : "Pause"}
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={finish}
+                      className="rounded-full border-emerald-900/15 bg-[#f3faf6] text-[#042f2e]"
+                    >
+                      <Square /> Stop
+                    </Button>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>,
           document.body,
