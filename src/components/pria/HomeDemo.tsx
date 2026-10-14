@@ -7,7 +7,7 @@ import { motion } from "framer-motion";
 import { Pause, Play, Square } from "lucide-react";
 import { pages } from "@/data/pria";
 import { Button } from "@/components/ui/button";
-import { demoCarryOn, markDemoCarry, stepsForPath, type DemoStep } from "./demo-steps";
+import { markDemoCarry, stepsForPath, type DemoStep } from "./demo-steps";
 import { INTRO_POSTER, INTRO_SRC } from "./HomeIntro";
 
 function pickVoice(voices: SpeechSynthesisVoice[]) {
@@ -653,7 +653,6 @@ export function PageDemo() {
   const [rate, setRate] = React.useState(1);
   const [volume, setVolume] = React.useState(1);
   const runRef = React.useRef(0);
-  const carryRef = React.useRef(false);
   const touringRef = React.useRef(false);
   const modeRef = React.useRef<"page" | "all" | null>(null);
   const musicRef = React.useRef<Score | null>(null);
@@ -697,16 +696,7 @@ export function PageDemo() {
   }, []);
 
   React.useEffect(() => {
-    const tourContinues = () => touringRef.current && modeRef.current === "all";
-    if (tourContinues() || carryRef.current || demoCarryOn()) {
-      carryRef.current = false;
-      return () => {
-        if (tourContinues() || carryRef.current || demoCarryOn()) return;
-        runRef.current += 1;
-        stopMusic();
-        window.speechSynthesis?.cancel();
-      };
-    }
+    if (touringRef.current) return;
     setStep(null);
     setRunning(false);
     setIntro(false);
@@ -717,12 +707,6 @@ export function PageDemo() {
     runRef.current += 1;
     stopMusic();
     window.speechSynthesis?.cancel();
-    return () => {
-      if (tourContinues() || carryRef.current || demoCarryOn()) return;
-      runRef.current += 1;
-      stopMusic();
-      window.speechSynthesis?.cancel();
-    };
   }, [pathname, releaseHold, stopMusic]);
 
   const finish = React.useCallback(() => {
@@ -744,44 +728,48 @@ export function PageDemo() {
   }, [releaseHold, stopMusic]);
 
   const explainPage = async (path: string, run: number) => {
-    try {
-    const readyAt = Date.now() + 8000;
+    const onThisPage = () => {
+      const here = window.location.pathname;
+      return here === path || (path !== "/" && here.startsWith(`${path}/`));
+    };
+    const readyAt = Date.now() + 12000;
     let tour: DemoStep[] = [];
     while (run === runRef.current && Date.now() < readyAt) {
-      if (window.location.pathname === path) {
+      if (onThisPage()) {
         tour = stepsForPath(path);
         if (tour.length > 0 && document.querySelector("[data-demo]")) break;
       }
       await wait(80, holdRef);
     }
-    if (run !== runRef.current) return;
+    if (run !== runRef.current || tour.length === 0) return;
     for (let index = 0; index < tour.length; index++) {
       if (run !== runRef.current) return;
       const current = tour[index];
-      musicRef.current?.setScene(path, index);
-      await current.prepare?.();
-      let source = document.querySelector(`[data-demo="${current.id}"]`);
-      if (current.prepare) {
-        const foundBy = Date.now() + 2000;
+      try {
+        musicRef.current?.setScene(path, index);
+        await current.prepare?.();
+        let source = document.querySelector(`[data-demo="${current.id}"]`);
+        const foundBy = Date.now() + (current.prepare ? 8000 : 1500);
         while (run === runRef.current && Date.now() < foundBy && !source) {
           await wait(100, holdRef);
           source = document.querySelector(`[data-demo="${current.id}"]`);
         }
-        await wait(450, holdRef);
-        source = document.querySelector(`[data-demo="${current.id}"]`);
+        if (current.prepare) {
+          await wait(450, holdRef);
+          source = document.querySelector(`[data-demo="${current.id}"]`);
+        }
+        if (run !== runRef.current) return;
+        if (!source) continue;
+        source.scrollIntoView({ behavior: "auto", block: "center" });
+        await wait(700, holdRef);
+        if (run !== runRef.current) return;
+        setStep(index);
+        await wait(400, holdRef);
+        if (run !== runRef.current) return;
+        await speakChunks(current.script, run, runRef, voiceRef, holdRef);
+      } catch {
+        if (run !== runRef.current) return;
       }
-      if (run !== runRef.current) return;
-      if (!source) continue;
-      source.scrollIntoView({ behavior: "auto", block: "center" });
-      await wait(700, holdRef);
-      if (run !== runRef.current) return;
-      setStep(index);
-      await wait(400, holdRef);
-      if (run !== runRef.current) return;
-      await speakChunks(current.script, run, runRef, voiceRef, holdRef);
-    }
-    } finally {
-      markDemoCarry(false);
     }
   };
 
@@ -789,6 +777,7 @@ export function PageDemo() {
     const run = ++runRef.current;
     touringRef.current = true;
     modeRef.current = mode;
+    markDemoCarry(true);
     const paths = mode === "page" ? [window.location.pathname] : portalTour(window.location.pathname);
     setMenuOpen(false);
     setRunning(true);
@@ -809,24 +798,31 @@ export function PageDemo() {
     } catch {
       musicRef.current = null;
     }
-    for (let index = 0; index < paths.length; index++) {
-      if (run !== runRef.current) return;
-      const path = paths[index];
-      setTourMark({ mode, index, total: paths.length });
-      if (window.location.pathname !== path) {
-        carryRef.current = true;
-        setStep(null);
-        router.push(path);
-        const readyAt = Date.now() + 8000;
-        while (run === runRef.current && window.location.pathname !== path && Date.now() < readyAt) {
-          await wait(50, holdRef);
+    const walk = async () => {
+      for (let index = 0; index < paths.length; index++) {
+        if (run !== runRef.current) return;
+        const path = paths[index];
+        setTourMark({ mode, index, total: paths.length });
+        if (window.location.pathname !== path) {
+          markDemoCarry(true);
+          setStep(null);
+          router.push(path);
+          const readyAt = Date.now() + 12000;
+          while (run === runRef.current && window.location.pathname !== path && Date.now() < readyAt) {
+            await wait(50, holdRef);
+          }
+          await wait(600, holdRef);
         }
-        await wait(600, holdRef);
+        if (run !== runRef.current) return;
+        await explainPage(path, run);
       }
-      if (run !== runRef.current) return;
-      await explainPage(path, run);
+    };
+    if (mode === "page") {
+      await walk();
+      if (run === runRef.current) finish();
+      return;
     }
-    if (run === runRef.current) finish();
+    while (run === runRef.current) await walk();
   };
 
   const active = step == null ? null : steps[step];
