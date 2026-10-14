@@ -172,7 +172,8 @@ export function SummaryReadAloud({ paragraphs }: { paragraphs: string[] }) {
       } else {
         utterance.lang = "en-GB";
       }
-      utterance.rate = 0.95;
+      utterance.volume = 1;
+      utterance.rate = 1.15;
       utterance.pitch = 1;
       const mine = ++utterGen.current;
       const advance = () => {

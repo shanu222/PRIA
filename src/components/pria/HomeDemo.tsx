@@ -176,7 +176,7 @@ function createScore(): Score {
   warm.connect(ctx.destination);
   const opened = ctx.currentTime;
   master.gain.setValueAtTime(0.0001, opened);
-  master.gain.exponentialRampToValueAtTime(0.16, opened + 1.6);
+  master.gain.exponentialRampToValueAtTime(0.06, opened + 0.8);
 
   const noiseBuffer = ctx.createBuffer(1, ctx.sampleRate * 2, ctx.sampleRate);
   const noiseData = noiseBuffer.getChannelData(0);
@@ -396,9 +396,9 @@ function speakChunks(
       } else {
         utterance.lang = "en-GB";
       }
-      utterance.volume = appliedVolume;
-      utterance.rate = Math.min(1.15, appliedRate * 0.94);
-      utterance.pitch = 0.96;
+      utterance.volume = Math.min(1, appliedVolume);
+      utterance.rate = Math.min(1.6, appliedRate);
+      utterance.pitch = 1;
       utterance.onboundary = (event) => {
         if (mine !== token) return;
         if (typeof event.charIndex === "number") heard = event.charIndex;
@@ -411,7 +411,7 @@ function speakChunks(
       utterance.onend = () => {
         if (settled || mine !== token) return;
         token += 1;
-        window.setTimeout(next, 260);
+        window.setTimeout(next, 90);
       };
       utterance.onerror = advance;
       const expected = Math.max(1600, (line.split(/\s+/).length / (2.2 * appliedRate)) * 1000 + 900);
@@ -671,7 +671,7 @@ export function PageDemo() {
   const [intro, setIntro] = React.useState(false);
   const [paused, setPaused] = React.useState(false);
   const [menuOpen, setMenuOpen] = React.useState(false);
-  const [rate, setRate] = React.useState(1);
+  const [rate, setRate] = React.useState(1.15);
   const [volume, setVolume] = React.useState(1);
   const runRef = React.useRef(0);
   const touringRef = React.useRef(false);
