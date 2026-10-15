@@ -614,11 +614,9 @@ export const landscape = {
   censusStats: [
     {
       id: "census-population",
-      label: "Population (July 2026)",
-      value: national.populationTotal / 1_000_000,
+      label: "Population (2026)",
+      value: 255,
       suffix: " Mn",
-      decimals: 2,
-      note: "Provinces & ICT projected; AJK & GB, Census 2023",
       status: "available",
       source: "PBS",
     },

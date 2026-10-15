@@ -96,7 +96,7 @@ const STATIC: Record<string, DemoStep[]> = {
       title: "Population and housing",
       gist: "The baseline the rest of the portal stands on.",
       script:
-        `Population for the four provinces and Islamabad is the July 2026 projection, and housing durability is the refined count from the same workbook. Azad Jammu and Kashmir and Gilgit-Baltistan stay on the 2023 census. Together, the national population is about ${mn(national.populationTotal)} million. Housing tables for the provinces and Islamabad count about ${housingMn} million housing units, with an average household size of ${national.householdSize}. About ${national.paccaPct} percent of houses are pucca, the permanent stock, and about ${national.kachaPct} percent are kutcha, the temporary stock. Treat these as the verified baseline. The outlook toward 2047 is a separate projection, and it is labelled separately from this baseline.`,
+        `The projected population for 2026 is 255 million. Housing tables for the provinces and Islamabad count about ${housingMn} million housing units, with an average household size of ${national.householdSize}. About ${national.paccaPct} percent of houses are pucca, the permanent stock, and about ${national.kachaPct} percent are kutcha, the temporary stock. Treat these as the verified baseline. The outlook toward 2047 is a separate projection, and it is labelled separately from this baseline.`,
     },
     {
       id: "types",
