@@ -207,7 +207,7 @@ export default function OutlookPage() {
           id="provinces"
           eyebrow="By province"
           title="Where growth and building will concentrate"
-          description="Choose a measure, then hover or select a province. Punjab and Sindh hold about 78% of the population in both 2026 and 2047."
+          description="Choose a measure, then hover or select a province. Punjab and Sindh hold about 74% of the population in 2026 and about 78% in 2047."
         />
         <Reveal>
           <ProvinceOutlookMap />
@@ -215,7 +215,7 @@ export default function OutlookPage() {
         <Reveal className="mt-6">
           <DataTable
             title="Provincial outlook, 2026 and 2047"
-            caption="Population (GHSL), share of national population, building count and built-up coverage of land area."
+            caption="Pop. 2026 is the July 2026 projected total. Share in 2047, building count and built-up coverage remain the GHSL and Open Buildings series."
             source={`${src.ghsl}; ${src.buildingsProvince}`}
             columns={[
               { id: "name", label: "Province / region" },

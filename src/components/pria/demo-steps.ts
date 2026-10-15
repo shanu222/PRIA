@@ -154,7 +154,7 @@ const STATIC: Record<string, DemoStep[]> = {
       title: "Where it concentrates",
       gist: "Growth will not arrive evenly.",
       script:
-        "Punjab and Sindh together hold about 78 percent of the projected population in both 2026 and 2047, so most new housing, water and transport demand stays in those two provinces. Other regions still grow, and some, such as Islamabad and Khyber Pakhtunkhwa, add buildings quickly relative to their size. Select a province and a measure to see where people, buildings and built-up land concentrate. Investment and building codes should follow that concentration, with a design that fits the segment the province sits in.",
+        "Punjab and Sindh together hold about 74 percent of the projected population in 2026 and about 78 percent in 2047, so most new housing, water and transport demand stays in those two provinces. Other regions still grow, and some, such as Islamabad and Khyber Pakhtunkhwa, add buildings quickly relative to their size. Select a province and a measure to see where people, buildings and built-up land concentrate. Investment and building codes should follow that concentration, with a design that fits the segment the province sits in.",
     },
     {
       id: "housing",
