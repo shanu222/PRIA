@@ -1,9 +1,16 @@
 /**
- * Official figures from the 7th Population and Housing Census 2023 (Pakistan Bureau of Statistics):
- * Table 1 (area, population, density, urban share, growth), National Census Report tables 5.1, 5.3, 5.6
- * and 5.10 (structures, households, pacca / kacha houses, wall materials).
- * PBS housing tables cover the four provinces and ICT; AJK and Gilgit-Baltistan are included in the
- * national population total only.
+ * Population and housing for the portal.
+ *
+ * July 2026 refined workbook (Pakistan Tehsil Housing Data) supplies the projected population
+ * for the four provinces and Islamabad, and the refined housing-unit counts (pakka, semi-pakka
+ * and kacha, with under-construction units allocated). Density, household size and durability
+ * shares are recalculated from those counts. Punjab's residential structure count is the workbook
+ * figure.
+ *
+ * Fields the workbook does not replace stay on the 7th Population and Housing Census 2023 (PBS):
+ * area, urban population share, intercensal growth, wall materials, single-room share, the urban
+ * and rural housing split, and the other structure counts. Azad Jammu & Kashmir and Gilgit-Baltistan
+ * populations are still the census totals; the workbook has no population figures for them.
  */
 import type { PendingTable, SegmentId } from "./pria";
 
@@ -44,20 +51,20 @@ export const censusSource = {
 };
 
 export const national = {
-  populationProvincesIct: 241_499_431,
-  populationTotal: 247_541_947,
+  populationProvincesIct: 256_922_694,
+  populationTotal: 262_965_210,
   growthPct: 2.55,
-  households: 38_292_556,
+  households: 39_468_622,
   householdsUrbanPct: 39.23,
   householdsRuralPct: 60.77,
-  householdSize: 6.33,
-  paccaPct: 67.46,
-  semiPaccaPct: 12.58,
-  kachaPct: 19.96,
+  householdSize: 6.51,
+  paccaPct: 66.94,
+  semiPaccaPct: 13.69,
+  kachaPct: 19.36,
   bakedBrickWallsPct: 73.3,
   mudWallsPct: 20.3,
   singleRoomPct: 31.79,
-  residentialStructures: 30_434_514,
+  residentialStructures: 30_434_537,
   economicStructures: 5_151_063,
   multiStoreyStructures: 114_148,
 };
@@ -66,19 +73,19 @@ export const provinces: ProvinceCensus[] = [
   {
     id: "punjab",
     name: "Punjab",
-    population: 127_688_922,
+    population: 135_709_886,
     areaKm2: 205_345,
-    density: 621.83,
+    density: 660.89,
     urbanPct: 40.71,
     growthPct: 2.53,
-    households: 19_839_980,
-    householdSize: 6.44,
-    paccaPct: 80.8,
-    semiPaccaPct: 11.93,
-    kachaPct: 7.26,
+    households: 20_171_433,
+    householdSize: 6.73,
+    paccaPct: 80.3,
+    semiPaccaPct: 12.56,
+    kachaPct: 7.14,
     mudWallsPct: 11.84,
     singleRoomPct: 24.24,
-    residentialStructures: 17_379_863,
+    residentialStructures: 17_379_886,
     economicStructures: 3_270_252,
     mixedStructures: 810_060,
     temporaryShelters: 104_267,
@@ -87,16 +94,16 @@ export const provinces: ProvinceCensus[] = [
   {
     id: "sindh",
     name: "Sindh",
-    population: 55_696_147,
+    population: 59_348_000,
     areaKm2: 140_914,
-    density: 395.25,
+    density: 421.16,
     urbanPct: 53.97,
     growthPct: 2.57,
-    households: 9_862_870,
-    householdSize: 5.65,
-    paccaPct: 57.69,
-    semiPaccaPct: 9.19,
-    kachaPct: 33.11,
+    households: 10_383_626,
+    householdSize: 5.72,
+    paccaPct: 57.31,
+    semiPaccaPct: 11.24,
+    kachaPct: 31.45,
     mudWallsPct: 23.79,
     singleRoomPct: 50.31,
     residentialStructures: 6_163_126,
@@ -108,16 +115,16 @@ export const provinces: ProvinceCensus[] = [
   {
     id: "khyber-pakhtunkhwa",
     name: "Khyber Pakhtunkhwa",
-    population: 40_856_097,
+    population: 43_262_669,
     areaKm2: 101_741,
-    density: 401.57,
+    density: 425.22,
     urbanPct: 15.01,
     growthPct: 2.38,
-    households: 5_861_457,
-    householdSize: 6.9,
-    paccaPct: 55.57,
-    semiPaccaPct: 19.58,
-    kachaPct: 24.85,
+    households: 6_001_003,
+    householdSize: 7.21,
+    paccaPct: 55.45,
+    semiPaccaPct: 20.28,
+    kachaPct: 24.27,
     mudWallsPct: 28.29,
     singleRoomPct: 27.52,
     residentialStructures: 4_689_072,
@@ -129,16 +136,16 @@ export const provinces: ProvinceCensus[] = [
   {
     id: "balochistan",
     name: "Balochistan",
-    population: 14_894_402,
+    population: 16_074_139,
     areaKm2: 347_190,
-    density: 42.9,
+    density: 46.3,
     urbanPct: 30.96,
     growthPct: 3.2,
-    households: 2_317_256,
-    householdSize: 6.43,
-    paccaPct: 19.64,
-    semiPaccaPct: 16.78,
-    kachaPct: 63.58,
+    households: 2_495_975,
+    householdSize: 6.44,
+    paccaPct: 21.81,
+    semiPaccaPct: 19.16,
+    kachaPct: 59.03,
     mudWallsPct: 61.02,
     singleRoomPct: 32.72,
     residentialStructures: 1_864_928,
@@ -150,16 +157,16 @@ export const provinces: ProvinceCensus[] = [
   {
     id: "islamabad",
     name: "Islamabad Capital Territory",
-    population: 2_363_863,
+    population: 2_528_000,
     areaKm2: 906,
-    density: 2609.12,
+    density: 2790.29,
     urbanPct: 46.91,
     growthPct: 2.8,
-    households: 410_993,
-    householdSize: 5.52,
-    paccaPct: 97.35,
-    semiPaccaPct: 1.21,
-    kachaPct: 1.44,
+    households: 416_585,
+    householdSize: 6.07,
+    paccaPct: 96.71,
+    semiPaccaPct: 1.87,
+    kachaPct: 1.42,
     mudWallsPct: 1.53,
     singleRoomPct: 8.1,
     residentialStructures: 337_525,
@@ -192,9 +199,9 @@ export const fmtMn = (n: number) => `${(n / 1_000_000).toFixed(2)} Mn`;
 /** Built-stock table rendered from the census (four provinces and ICT). */
 export const housingTable: PendingTable = {
   id: "census-housing",
-  title: "Housing & Built Stock by Province (Census 2023)",
+  title: "Housing & Built Stock by Province",
   caption:
-    "Population, housing units, house durability and building structures per province, from the PBS 7th Population and Housing Census 2023.",
+    "July 2026 projected population, refined housing units and house durability. Urban share and building structures remain the PBS Census 2023, except Punjab residential structures.",
   rowHeader: "Province / Region",
   columns: [
     { id: "population", label: "Population" },

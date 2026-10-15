@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { getPage, landscape } from "@/data/pria";
 import { getPriaContent } from "@/data/content";
-import { censusSource, housingTable } from "@/data/census";
+import { housingTable, national } from "@/data/census";
 import { PageHeader, SectionHeader } from "@/components/layout/PageHeader";
 import { GLOW_ORDER, GlowStatTile, GlowTypeCard } from "@/components/pria/GlowCard";
 import { Reveal, Stagger, StaggerItem } from "@/components/pria/Motion";
@@ -31,9 +31,9 @@ export default async function LandscapePage() {
       <section data-demo="census" aria-labelledby="census" className="scroll-mt-24">
         <SectionHeader
           id="census"
-          eyebrow="Census 2023"
+          eyebrow="July 2026 & Census 2023"
           title="Population and housing at a glance"
-          description={`${censusSource.label}.`}
+          description="Projected population and refined housing durability from the July 2026 workbook. Urban share, growth and wall materials remain the PBS Census 2023."
         />
         <Stagger className="grid grid-cols-2 gap-4 lg:grid-cols-4">
           {landscape.censusStats.map((s, i) => (
@@ -78,7 +78,7 @@ export default async function LandscapePage() {
           id="residential-split"
           eyebrow="Residential"
           title="Urban and rural split"
-          description="Share of the 38.29 million housing units in urban and rural areas, Census 2023."
+          description={`Share of the ${(national.households / 1_000_000).toFixed(2)} million housing units in urban and rural areas. Urban and rural shares remain Census 2023.`}
         />
         <Reveal>
           <div className="rounded-2xl border border-emerald-400/35 bg-[linear-gradient(160deg,#04231d,#071417)] p-5 shadow-[0_0_32px_-14px_#34d399] sm:p-7">

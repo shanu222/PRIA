@@ -89,14 +89,14 @@ const STATIC: Record<string, DemoStep[]> = {
       title: "The national picture",
       gist: "Who lives where, and what kind of stock they live in.",
       script:
-        "Safe infrastructure starts from a reliable picture of who lives where, and what is already built. This landscape is that baseline for Pakistan. It brings together the 2023 census, the mix of residential, commercial, strategic and communication stock, and the urban and rural split. Agencies can use it to see which provinces carry dense population, weaker housing, or a larger rural share, before a project location is chosen.",
+        "Safe infrastructure starts from a reliable picture of who lives where, and what is already built. This landscape is that baseline for Pakistan. It brings together the July 2026 population and refined housing counts, the 2023 census stock, and the urban and rural split. Agencies can use it to see which provinces carry dense population, weaker housing, or a larger rural share, before a project location is chosen.",
     },
     {
       id: "census",
-      title: "Census 2023",
-      gist: "The official count the rest of the portal stands on.",
+      title: "Population and housing",
+      gist: "The baseline the rest of the portal stands on.",
       script:
-        `These counts are from the 2023 census of the Pakistan Bureau of Statistics. The national population, including Azad Jammu and Kashmir and Gilgit-Baltistan, is about ${mn(national.populationTotal)} million. Housing tables for the provinces and Islamabad count about ${housingMn} million housing units, with an average household size of ${national.householdSize}. About ${national.paccaPct} percent of houses are pucca, the permanent stock, and about ${national.kachaPct} percent are kutcha, the temporary stock. Treat these as the verified baseline. Later projections start from data series, and they are labelled separately from this census.`,
+        `Population for the four provinces and Islamabad is the July 2026 projection, and housing durability is the refined count from the same workbook. Azad Jammu and Kashmir and Gilgit-Baltistan stay on the 2023 census. Together, the national population is about ${mn(national.populationTotal)} million. Housing tables for the provinces and Islamabad count about ${housingMn} million housing units, with an average household size of ${national.householdSize}. About ${national.paccaPct} percent of houses are pucca, the permanent stock, and about ${national.kachaPct} percent are kutcha, the temporary stock. Treat these as the verified baseline. The outlook toward 2047 is a separate projection, and it is labelled separately from this baseline.`,
     },
     {
       id: "types",
@@ -117,14 +117,14 @@ const STATIC: Record<string, DemoStep[]> = {
       title: "Urban and rural",
       gist: "Most of the housing story is still outside the big cities.",
       script:
-        `Of about ${housingMn} million housing units in the census, about ${national.householdsRuralPct} percent are rural and about ${national.householdsUrbanPct} percent are urban. Most of the stock, and much of the weaker construction, sits outside the largest cities. A building standard written only for urban apartments will miss the rural majority. Housing policy, rural development and disaster programmes need both sides of this split when they estimate materials, skills and inspection capacity.`,
+        `Of about ${housingMn} million housing units, about ${national.householdsRuralPct} percent are rural and about ${national.householdsUrbanPct} percent are urban, using the Census 2023 urban and rural shares. Most of the stock, and much of the weaker construction, sits outside the largest cities. A building standard written only for urban apartments will miss the rural majority. Housing policy, rural development and disaster programmes need both sides of this split when they estimate materials, skills and inspection capacity.`,
     },
     {
       id: "housing",
       title: "Province by province",
       gist: "The same census, read as a table you can compare.",
       script:
-        "This table breaks the same census into provinces, so a national percentage can be traced to the place that carries it. Compare pucca and kutcha shares, household size and urban population when you set a provincial housing target or a reconstruction budget. A province with a higher kutcha share has more homes likely to fail under flood, heat or shaking, and that is where durable materials and trained masons change the loss.",
+        "This table breaks the baseline into provinces, so a national percentage can be traced to the place that carries it. Compare pucca and kutcha shares, household size and urban population when you set a provincial housing target or a reconstruction budget. A province with a higher kutcha share has more homes likely to fail under flood, heat or shaking, and that is where durable materials and trained masons change the loss.",
     },
   ],
   "/outlook": [
@@ -239,7 +239,7 @@ const STATIC: Record<string, DemoStep[]> = {
       title: "Where housing is weakest",
       gist: "Pacca and kacha stock tell you where the next loss will concentrate.",
       script:
-        "Loss depends on the hazard and on the building that meets it. The census shows large differences in pucca and kutcha housing, density and urban share. Balochistan, for example, has about 63.6 percent kutcha houses, and about 61 percent of homes have mud or unbaked-brick walls. Those homes are more likely to fail in flood or heavy rain. Use the provincial comparison to see where vulnerability concentrates, and to aim safer materials and inspection at the weaker stock.",
+        "Loss depends on the hazard and on the building that meets it. The baseline shows large differences in pucca and kutcha housing, density and urban share. Balochistan, for example, has about 59.0 percent kutcha houses, and about 61 percent of homes have mud or unbaked-brick walls. Those homes are more likely to fail in flood or heavy rain. Use the provincial comparison to see where vulnerability concentrates, and to aim safer materials and inspection at the weaker stock.",
     },
     {
       id: "gaps",
@@ -433,7 +433,7 @@ const STATIC: Record<string, DemoStep[]> = {
       title: "One reference",
       gist: "Everyday building decisions, against one hazard-informed standard.",
       script:
-        `The 2023 census counted about ${housingMn} million housing units, and about ${national.kachaPct} percent of them are kutcha. That temporary stock, together with scattered growth and the losses already recorded, is why a single habit of building is not enough. The atlas answers with four segments and six categories, so a house, a market or a road is judged by the hazard of its own ground. Agencies can use that structure to replace a generic design with one that fits the site.`,
+        `The refined housing count is about ${housingMn} million units, and about ${national.kachaPct} percent of them are kutcha. That temporary stock, together with scattered growth and the losses already recorded, is why a single habit of building is not enough. The atlas answers with four segments and six categories, so a house, a market or a road is judged by the hazard of its own ground. Agencies can use that structure to replace a generic design with one that fits the site.`,
     },
   ],
   "/summary/end-state": [

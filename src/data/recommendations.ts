@@ -554,7 +554,7 @@ const desert = build("desert-arid", {
       ],
       [
         "Upgrade the kacha housing stock",
-        "63.6% of houses in Balochistan are kacha and 61% have mud or unbaked-brick walls (Census 2023); prioritise these households for durable, affordable materials.",
+        "59.0% of houses in Balochistan are kacha (July 2026 refined count) and 61% have mud or unbaked-brick walls (Census 2023); prioritise these households for durable, affordable materials.",
         ["Census 2023", "Housing quality"],
       ],
     ],

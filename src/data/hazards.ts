@@ -102,7 +102,7 @@ export const segmentProfiles: Record<SegmentId, SegmentProfile> = {
       { id: "smog", label: "Smog & air pollution", icon: "Wind" },
     ],
     facts: [
-      { value: "52.9%", label: "of Pakistan's population lives in Punjab (127.7 Mn)", source: "Census 2023" },
+      { value: "52.8%", label: "of the population in the four provinces and ICT lives in Punjab (135.7 Mn)", source: "July 2026 projection" },
       { value: "33 Mn", label: "people affected by the 2022 floods across the Indus basin", source: "NDMA" },
       { value: "439", label: "bridges and 13,115 km of roads damaged in 2022", source: "NDMA" },
       { value: "223", label: "deaths in Punjab in the 2022 floods, incl. hill torrents around Taunsa", source: "NDMA" },
@@ -118,7 +118,7 @@ export const segmentProfiles: Record<SegmentId, SegmentProfile> = {
     facts: [
       { value: "53.7 °C", label: "at Turbat on 28 May 2017, Pakistan's highest recorded temperature", source: "World Meteorological Organization" },
       { value: "53.5 °C", label: "at Mohenjo-daro on 26 May 2010", source: "Pakistan Meteorological Department" },
-      { value: "63.6%", label: "of houses in Balochistan are kacha; 61% have mud or unbaked-brick walls", source: "Census 2023" },
+      { value: "59.0%", label: "of houses in Balochistan are kacha; 61% have mud or unbaked-brick walls", source: "July 2026 refined housing count; wall materials, Census 2023" },
       { value: "426,897", label: "houses damaged or destroyed in Balochistan in the 2022 floods", source: "NDMA" },
     ],
   },

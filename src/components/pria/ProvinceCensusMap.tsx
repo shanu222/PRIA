@@ -66,13 +66,13 @@ export function ProvinceCensusMap() {
           ))}
         </div>
         <PakistanMap
-          ariaLabel={`Map of Pakistan shaded by ${metric.label.toLowerCase()}, Census 2023`}
+          ariaLabel={`Map of Pakistan shaded by ${metric.label.toLowerCase()}`}
           activeId={focusId}
           onActiveChange={setHovered}
           onSelect={setSelected}
           labelFor={(p) => {
             const v = metric.value(p);
-            return `${p.name}: ${v === undefined ? "no census housing data" : `${v.toLocaleString("en-US")}${metric.unit}`}`;
+            return `${p.name}: ${v === undefined ? "no housing data" : `${v.toLocaleString("en-US")}${metric.unit}`}`;
           }}
           fills={(id) => {
             const v = metric.value(getProvince(id)!);
@@ -143,7 +143,9 @@ export function ProvinceCensusMap() {
               );
             })}
           </ol>
-          <p className="mt-3 text-[11px] text-muted-foreground">Source: {censusSource.label}.</p>
+          <p className="mt-3 text-[11px] text-muted-foreground">
+            Source: July 2026 projected population and refined housing counts. Urban share remains {censusSource.label}.
+          </p>
         </div>
       </div>
     </div>

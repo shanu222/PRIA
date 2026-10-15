@@ -614,11 +614,11 @@ export const landscape = {
   censusStats: [
     {
       id: "census-population",
-      label: "Population (Census 2023)",
+      label: "Population (July 2026)",
       value: national.populationTotal / 1_000_000,
       suffix: " Mn",
       decimals: 2,
-      note: "Incl. AJK & Gilgit-Baltistan",
+      note: "Provinces & ICT projected; AJK & GB, Census 2023",
       status: "available",
       source: "PBS",
     },
@@ -795,7 +795,7 @@ export const challenges = {
     id: "projected-breakdown",
     title: "Projected Province & Region Outlook",
     caption:
-      "Current status (PBS Census 2023), projected 2047 population, buildings and built-up coverage (PRIA GHSL and Open Buildings series) and key challenge per province and region.",
+      "Current status uses the July 2026 projected population and refined housing counts (Azad Jammu & Kashmir and Gilgit-Baltistan remain Census 2023). Projected 2047 population, buildings and built-up coverage are the PRIA GHSL and Open Buildings series.",
     rowHeader: "Province / Region",
     columns: projectedColumns,
     rows: regions.map((region) => ({
@@ -1052,7 +1052,7 @@ export const summary: Record<"ndma-role" | "responsibilities" | "conclusion" | "
     title: "Conclusion",
     status: "available",
     paragraphs: [
-      "Pakistan's population reached 241.5 million in the four provinces and ICT at the 2023 Census, growing at 2.55% a year, and the country counted 38.3 million housing units, one in five of them kacha. Growth has been fragmented, a few cities are over-saturated, land is shrinking and there is no formal spatial planning. At the same time, the 2005 earthquake, the 2010 and 2022 floods, the 2015 heatwave and Cyclone Biparjoy in 2023 have shown how exposed that growth is.",
+      "Pakistan's population in the four provinces and ICT is 256.9 million on the July 2026 projection, growing at 2.55% a year, and the refined count is 39.5 million housing units, about one in five of them kacha. Growth has been fragmented, a few cities are over-saturated, land is shrinking and there is no formal spatial planning. At the same time, the 2005 earthquake, the 2010 and 2022 floods, the 2015 heatwave and Cyclone Biparjoy in 2023 have shown how exposed that growth is.",
       "PRIA responds by dividing the country into four regional resilience segments (Mountain, Riverine & Plains, Desert & Arid, and Coastal) and setting recommendations for six infrastructure categories in each, from material options and DRIM design options to construction methods, no-go areas, maintenance and periodic audit.",
       "Resilience will come less from new dams and embankments alone than from millions of everyday decisions about where and how houses, markets, roads and networks are built. PRIA gives those decisions a common, hazard-informed reference for the next twenty years.",
     ],
